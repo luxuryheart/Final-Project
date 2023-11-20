@@ -1,0 +1,30 @@
+// backend for typescript
+    -   npm install -D typescript
+    -   npm install -D ts-node
+    -   npm install -D nodemon
+    -	npm i express body-parser cookie-parser compression cors
+    -	npm i -D @types/express @types/body-parser @types/cookie-parser @types/compression @types/cors
+    -	npm i dotenv mongoose
+    -	npm i -D @types/mongoose
+    -   npm i bcryptjs jsonwebtoken
+    -   npm i -D @types/bcryptjs @types/jsonwebtoken
+
+    >> nano tsconfig.json
+        -   {
+                "compilerOptions": {
+                    "module": "NodeNext",
+                    "moduleResolution": "NodeNext",
+                    "baseUrl": "src",
+                    "outDir": "./dist",
+                    // "outDir": "dist",
+                    "sourceMap": true,
+                    "noImplicitAny": true,
+                },
+                "include": ["src/**/*"],
+            }
+    >> nano nodemon.json
+        -   {
+                "watch" : ["src"],
+                "ext": ".ts,.js",
+                "exec": "ts-node ./src/index.ts"
+            }
