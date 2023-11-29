@@ -28,3 +28,7 @@
                 "ext": ".ts,.js",
                 "exec": "ts-node ./src/index.ts"
             }
+
+
+setup project with javascript
+    - npm install express body-parser cors morgan dotenv mongoose bcrypt jsonwebtoken nodemon
