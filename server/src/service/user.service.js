@@ -1,4 +1,4 @@
-const { userModel } = require("../models/user.model")
+const { userModel, roleModel } = require("../models/user.model")
 const jwt = require("jsonwebtoken");
 const ErrorHandler = require("../utils/ErrorHandler");
 
@@ -38,4 +38,34 @@ const getUserAll = (user, res) => {
     }
 }
 
-module.exports = { register, login, getUserAll }
+const updateProfile = async(data, user, res) => {
+    try {
+
+        const roles = await roleModel.findOne({ name: data.role });
+        if (!roles) {
+            return next(new ErrorHandler("Role not found", 400));
+        }
+
+        const userProfile = await userModel.findByIdAndUpdate({ _id: user._id }, {
+            "profile.firstname": data.firstname,
+            "profile.lastname": data.lastname,
+            "profile.gender": data.gender,
+            role: roles._id
+        }, { new: true });
+
+        if (!userProfile) { 
+            return next(new ErrorHandler("Update failed"))
+        }
+
+        res.status(201).json({
+            success: true,
+            message: "Profile updated",
+            userProfile,
+        })
+
+    } catch (error) {
+        return next(new ErrorHandler(error, 500))
+    }
+}
+
+module.exports = { register, login, getUserAll, updateProfile }

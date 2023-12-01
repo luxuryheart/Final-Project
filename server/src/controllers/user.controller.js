@@ -109,4 +109,27 @@ const getAllUser = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-module.exports = { Register, Login, getAllUser };
+const updateProfileUser = CatchAsyncError(async(req, res, next) => {
+    try {
+        const data = { firstname, lastname, gender, role } = req.body;
+        
+        if (data.firstname === undefined || data.firstname === null || data.firstname === ""
+            || data.lastname === undefined || data.lastname === null || data.lastname === ""
+            || data.gender === undefined || data.gender === null || data.gender === ""
+            || data.role === undefined || data.role === null || data.role === "") {
+            return next(new ErrorHandler("Data is required", 400))
+        }
+        
+        const updateProfile = await userModel.findById({ _id: req.user.id });
+        if (!updateProfile) {
+            return next(new ErrorHandler("User not found", 400));
+        }
+        
+        userService.updateProfile(data, updateProfile, res)
+
+    } catch (error) {
+        return next(new ErrorHandler(error, 500))
+    }
+});
+
+module.exports = { Register, Login, getAllUser, updateProfileUser };
