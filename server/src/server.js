@@ -17,9 +17,10 @@ const port = process.env.PORT || 3000;
 // import route
 const userRouter = require('./routes/user.route');
 const dormitoryRouter = require('./routes/dormitory/dormitory.route')
+const backofficeRouter = require('./routes/backoffice/backoffice.route')
 
 // user routes
-app.use('/api/v1', userRouter, dormitoryRouter);
+app.use('/api/v1', userRouter, dormitoryRouter, backofficeRouter);
 
 // db connection and server listening
 dbConnect()

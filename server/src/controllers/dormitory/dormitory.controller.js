@@ -1,5 +1,5 @@
 const CatchAsyncError = require('../../middleware/catchAsyncErrors');
-const { dormitoryModel } = require('../../models/dormitory/dormitory.model');
+const { dormitoryModel, floorsModel, waterModel, electricalModel } = require('../../models/dormitory/dormitory.model');
 const ErrorHandler = require('../../utils/ErrorHandler');
 const dormitoryService = require('../../service/dormitory/dormitory.service')
 
@@ -20,7 +20,12 @@ const DormitoryCreate = CatchAsyncError(async (req, res, next) => {
             return next(new ErrorHandler("name or address or contact is required", 400));
         }
 
+        
         const dormitory = await dormitoryService.DormitoryCreate(data, req.user, res);
+        
+        const value = [ "คิดตามหน่วยจริง", "เหมาจ่ายรายเดือน" ]
+        await dormitoryService.createWaterPrice(value, dormitory);
+        await dormitoryService.createElectricalPrice(value, dormitory);
 
         const floors = await dormitoryService.Addfloor(dormitory._id, data.amount, res);
 
@@ -31,6 +36,7 @@ const DormitoryCreate = CatchAsyncError(async (req, res, next) => {
     }
 });
 
+// edit rooms
 const EditRoomsAndFloors = CatchAsyncError(async (req, res, next) => {
     try {
 
@@ -62,4 +68,71 @@ const EditRoomsAndFloors = CatchAsyncError(async (req, res, next) => {
     }
 })
 
-module.exports = { DormitoryCreate, EditRoomsAndFloors }
+// price for rooms
+const UpdatePriceForRoom = CatchAsyncError(async(req, res, next) => {
+    try {
+
+        const { roomIds, floorId, dormitoryId, price } = req.body
+        if (roomIds === undefined || roomIds.length === 0 || floorId === null
+            || floorId === undefined || floorId === null || floorId === ""
+            || dormitoryId === undefined || dormitoryId === null || dormitoryId === "") {
+                return next(new ErrorHandler("data is required", 400))
+        }
+        
+        const floor = await floorsModel.findById({ _id: floorId });
+        const dormitory = await dormitoryModel.findById({ _id: dormitoryId });
+
+        dormitoryService.UpdatePriceForRoom(floor, roomIds, price, res)
+        
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+// water and electrical price 
+const UpdateWaterAndElectricPrice = CatchAsyncError(async(req, res, next) => {
+    try {
+
+        const { flag, dormitoryId, floorId, roomIds, waterId, electricalId } = req.body;
+
+        if (flag === "" || flag === undefined || flag === null 
+        || dormitoryId === undefined || dormitoryId === null || dormitoryId === "") {
+            return next(new ErrorHandler("flag is required", 400));
+        }
+
+        const water = await waterModel.findOne({ dormitoryId: dormitoryId });
+        const electrical = await electricalModel.findOne({ dormitoryId: dormitoryId });
+        const floorById = await floorsModel.findById({ _id: floorId });
+        const dormitoryById = await dormitoryModel.findById({ _id: dormitoryId });
+        
+        if (!water) {
+            return next(new ErrorHandler("water price not found in dormitory"))
+        }
+
+        if (!electrical) {
+            return next(new ErrorHandler("electrical price not found in dormitory"))
+        }
+
+        if (!floorById) {
+            return next(new ErrorHandler("floor id not found in dormitory"))
+        }
+
+        if (!dormitoryById) {
+            return next(new ErrorHandler("dormitory id not found"))
+        }
+
+        // update water
+        if (flag === "0") {
+            await dormitoryService.UpdateWaterPrice(floorById, roomIds, waterId, res);
+        }
+
+        if (flag === "1") {
+            await dormitoryService.UpdateElectricalPrice(floorById, roomIds, electricalId, res);
+        }
+
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice }

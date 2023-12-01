@@ -2,6 +2,8 @@ const {
   dormitoryModel,
   floorsModel,
   roomsModel,
+  waterModel,
+  electricalModel,
 } = require("../../models/dormitory/dormitory.model");
 const ErrorHandler = require("../../utils/ErrorHandler");
 
@@ -166,6 +168,7 @@ const InCreaseFloors = async (dormitoryId, res) => {
       return next(new ErrorHandler("Dormitory not found", 400));
     }
 
+    
     if (dormitory.floors.length > 0) {
       const floorId = dormitory.floors[dormitory.floors.length - 1];
       const floorName = await floorsModel.findById({ _id: floorId });
@@ -383,4 +386,87 @@ const DeleteFloor = async (dormitoryId, floorId, res) => {
   }
 };
 
-module.exports = { DormitoryCreate, Addfloor, Addrooms, InCreaseFloors, IncreaseRoom, DeleteRoom, DeleteFloor };
+// update price for rooms
+
+const UpdatePriceForRoom = async(floor, roomIds, price, res) => {
+  try {
+    for (const roomId of roomIds) {
+      await roomsModel.findByIdAndUpdate({ _id: roomId }, {
+        roomCharge: price.roomCharge
+      }, { new: true } )
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Room charge updated successfully",
+    })
+
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+}
+
+// flag 0 - update water price
+const UpdateWaterPrice = async(floorById, roomIds, waterId, res) => {
+  try {
+    for (const roomId of roomIds) {
+      await roomsModel.findByIdAndUpdate({ _id: roomId }, {
+        waterID: waterId
+      }, { new: true })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Water price updated successfully"
+    })
+    
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+}
+
+// flag 1 - update electrical price
+const UpdateElectricalPrice = async(floorById, roomIds, electricalId, res) => {
+  try {
+    for (const roomId of roomIds) {
+      await roomsModel.findByIdAndUpdate({ _id: roomId }, {
+        electricID: electricalId
+      }, { new: true })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Electrical price updated successfully"
+    })
+    
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+}
+
+const createWaterPrice = async(value, dormitory) => {
+  const dormitoryId = await dormitoryModel.findById({ _id: dormitory._id})
+  for (const name of value) {
+    await waterModel.create({
+      name: name,
+      dormitoryId: dormitoryId,
+    })
+  }
+
+  return null
+}
+
+const createElectricalPrice = async(value, dormitory) => {
+  const dormitoryId = await dormitoryModel.findById({ _id: dormitory._id})
+  for (const name of value) {
+    await electricalModel.create({
+      name: name,
+      dormitoryId: dormitoryId,
+    })
+  }
+
+  return null
+}
+
+module.exports = { DormitoryCreate, createWaterPrice, createElectricalPrice, Addfloor, Addrooms, InCreaseFloors, 
+  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice };
