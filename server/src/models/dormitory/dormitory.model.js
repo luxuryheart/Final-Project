@@ -40,7 +40,12 @@ const roomsSchema = new mongoose.Schema({
         ref: "Status",
         default: null,
     },
-    meter: {
+    waterMeter: {
+        type: Number,
+        required: [true, "meter is required"],
+        default: 0,
+    },
+    electricalMeter: {
         type: Number,
         required: [true, "meter is required"],
         default: 0,

@@ -310,7 +310,10 @@ const IncreaseRoom = async (floorId, res) => {
         })
     }
   } catch (error) {
-    return next(new ErrorHandler(error, 500));
+    return res.status(500).json({
+      success: false,
+      message: "Error updating"
+    });
   }
 }
 
@@ -468,5 +471,41 @@ const createElectricalPrice = async(value, dormitory) => {
   return null
 }
 
+// get all rooms 
+const GetAllRooms = async (dormitory, res) => {
+  try {
+    // ให้ใช้ findOne และ populate เพื่อดึงข้อมูล dormitory
+    const dormitoryDetail = await dormitoryModel.findOne({ _id: dormitory._id })
+      .populate({
+        path: "floors",
+        populate: {
+          path: "rooms"
+        }
+      });
+
+    if (!dormitoryDetail) {
+      return res.status(404).json({
+        success: false,
+        message: "Dormitory not found",
+      });
+    }
+
+    // ส่ง response ทั้งหมดไปยัง client
+    res.status(200).json({
+      success: true,
+      message: "Get all rooms successfully",
+      dormitoryDetail,
+    });
+
+  } catch (error) {
+    // ในกรณี error คุณไม่ได้ระบุ `next` ใน parameter ฟังก์ชัน
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+
 module.exports = { DormitoryCreate, createWaterPrice, createElectricalPrice, Addfloor, Addrooms, InCreaseFloors, 
-  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice };
+  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice, GetAllRooms };

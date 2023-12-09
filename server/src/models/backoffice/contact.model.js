@@ -2,8 +2,12 @@ const mongoose = require('mongoose');
 
 const contactSchema = new mongoose.Schema({
     name: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        type: String,
+        required: [true, "Name is required"]
+    },
+    address: {
+        type: String,
+        required: [true, "Address is required"]
     },
     personalId: {
         type: String,
@@ -37,17 +41,34 @@ const contactSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    meterStart: {
+    waterMeter: {
         type: Number,
-        required: [true, "Start Date is required"],
+        required: [true, "water meter is required"],
     },
-    meterEmd: {
+    electricalMeter: {
         type: Number,
-        required: [true, "End Date is required"],
+        required: [true, "electrical meter is required"],
     },
     note: {
         type: String,
         max: 255,
+        default: null,
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
+    dormitoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Dormitory",
+    },
+    floorId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Floor",
+    },
+    roomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Room"
     }
 }, { timestamps: true });
 

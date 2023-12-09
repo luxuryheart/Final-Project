@@ -1,7 +1,8 @@
 const CatchAsyncError = require('../../middleware/catchAsyncErrors');
 const { dormitoryModel, floorsModel, waterModel, electricalModel } = require('../../models/dormitory/dormitory.model');
 const ErrorHandler = require('../../utils/ErrorHandler');
-const dormitoryService = require('../../service/dormitory/dormitory.service')
+const dormitoryService = require('../../service/dormitory/dormitory.service');
+const { userModel } = require('../../models/user.model');
 
 // dormitory create
 const DormitoryCreate = CatchAsyncError(async (req, res, next) => {
@@ -135,4 +136,21 @@ const UpdateWaterAndElectricPrice = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice }
+const GetAllRooms = CatchAsyncError(async(req, res, next) => {
+    try {
+        const dormitoryId = req.params;
+
+        const dormitory = await dormitoryModel.findOne({ _id: dormitoryId.id });
+
+        if (!dormitory || dormitory.userID.toString() !== req.user.id) {
+            return next(new ErrorHandler("User and Dormitory are not matching"));
+        }
+
+        dormitoryService.GetAllRooms(dormitory, res);
+
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+});
+
+module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms }
