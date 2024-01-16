@@ -56,11 +56,13 @@ const userSchema = new mongoose.Schema({
         ref: 'Role',
         default: null,
     },
-    status: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'UserStatus',
-        default: null,
-    },
+    status: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'UserStatus',
+            default: null,
+        }
+    ],
     dormitory: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Dormitory',

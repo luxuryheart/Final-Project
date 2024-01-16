@@ -56,21 +56,22 @@ const Addfloor = async (id, amount, res) => {
 };
 
 // add default rooms in floor
-const Addrooms = async (id, res) => {
+const Addrooms = async (id, dormitoryId, res) => {
   try {
     // สร้างห้อง
     let roomIds = [];
     let room;
+    const roomAmount = 2
     for (let i = 0; i < id.length; i++) {
       let floor = await floorsModel.findById({ _id: id[i] });
       if (parseInt(floor.name) < 10) {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < roomAmount; j++) {
           room = floor.name + "0" + (j + 1);
           const createdRoom = await roomsModel.create({ name: room });
           roomIds.push(createdRoom._id);
         }
       } else if (parseInt(floor.name) >= 10) {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < roomAmount; j++) {
           room = floor.name + "0" + (j + 1);
           const createdRoom = await roomsModel.create({ name: room });
           roomIds.push(createdRoom._id);
@@ -84,7 +85,7 @@ const Addrooms = async (id, res) => {
       roomIds = [];
     }
 
-    const dormitory = await getDormitory();
+    const dormitory = await getDormitory(dormitoryId);
 
     res.status(200).json({
       success: true,
@@ -96,12 +97,13 @@ const Addrooms = async (id, res) => {
   }
 };
 
+// TODO: ทำให้ response ออกไปแค่หอพักที่สร้าง
 // get all dormitory and floor and room
-const getDormitory = async () => {
+const getDormitory = async (dormitoryId) => {
   try {
     // ดึงข้อมูลทั้งหมดของ dormitory พร้อม populate floors และ userID
-    const dormitories = await dormitoryModel
-      .find()
+    const dormitory = await dormitoryModel
+      .findOne({ _id: dormitoryId })
       .populate({
         path: "floors",
         populate: {
@@ -112,50 +114,40 @@ const getDormitory = async () => {
       .populate("userID", "-password");
 
     // เตรียมข้อมูลที่จะส่งกลับ
-    const data = dormitories.map((dormitory) => {
-      const floors = dormitory.floors.map((floor) => {
-        // ดึงข้อมูลของห้อง (rooms) ของแต่ละชั้น (floor)
-        const rooms = floor.rooms.map((room) => {
-          return {
-            // ข้อมูลของห้อง
-            _id: room._id,
-            name: room.name,
-            roomCharge: room.roomCharge,
-            enabled: room.enabled,
-            waterID: room.waterID,
-            electricID: room.electricID,
-            status: room.status,
-            // อื่น ๆ ที่ต้องการนำเข้าไป
-          };
-        });
-
-        return {
-          // ข้อมูลของชั้น
-          _id: floor._id,
-          name: floor.name,
-          // เพิ่มข้อมูลของห้อง (rooms)
-          rooms: rooms,
+    const data = {
+      // ข้อมูลของ dormitory
+      _id: dormitory._id,
+      name: dormitory.name,
+      // ข้อมูลที่เพิ่มเติมของ floors และ userID
+      floors: dormitory.floors.map((floor) => ({
+        // ข้อมูลของชั้น
+        _id: floor._id,
+        name: floor.name,
+        // เพิ่มข้อมูลของห้อง (rooms)
+        rooms: floor.rooms.map((room) => ({
+          // ข้อมูลของห้อง
+          _id: room._id,
+          name: room.name,
+          roomCharge: room.roomCharge,
+          enabled: room.enabled,
+          waterID: room.waterID,
+          electricID: room.electricID,
+          status: room.status,
           // อื่น ๆ ที่ต้องการนำเข้าไป
-        };
-      });
-
-      return {
-        // ข้อมูลของ dormitory
-        _id: dormitory._id,
-        name: dormitory.name,
-        // ข้อมูลที่เพิ่มเติมของ floors และ userID
-        floors: floors,
-        userID: dormitory.userID,
+        })),
         // อื่น ๆ ที่ต้องการนำเข้าไป
-      };
-    });
+      })),
+      userID: dormitory.userID,
+      // อื่น ๆ ที่ต้องการนำเข้าไป
+    };
 
     return data;
   } catch (error) {
     // หากเกิดข้อผิดพลาดในการดึงข้อมูล
-    return next(new ErrorHandler(error, 500));
+    throw new Error(error); // or use next(error) if you're in an Express route handler
   }
 };
+
 
 // get all the rooms and floor
 
@@ -335,14 +327,16 @@ const updateFloor = async (floorId, roomIdArray) => {
 const DeleteRoom = async (floorId, roomId, res) => {
   try {
     // ลบ room จาก floor
-    const floor = await floorsModel.findByIdAndUpdate(
-      floorId,
+    const floor = await floorsModel.findOneAndUpdate(
+      { _id:floorId },
       { $pull: { rooms: roomId } },
       { new: true }
     );
 
+    console.log(floor);
+
     // ลบ room โดยตรง
-    const room = await roomsModel.findByIdAndDelete(roomId);
+    const room = await roomsModel.findOneAndDelete({ _id:roomId });
 
     // เช็คว่ามี floor และ room หรือไม่
     if (!floor || !room) {
@@ -363,7 +357,7 @@ const DeleteRoom = async (floorId, roomId, res) => {
 const DeleteFloor = async (dormitoryId, floorId, res) => {
   try {
     // หา floor และ rooms
-    const floor = await floorsModel.findById(floorId);
+    const floor = await floorsModel.findOne({ _id: floorId });
 
     // ลบทุกรายการ rooms
     for (const roomId of floor.rooms) {

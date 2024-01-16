@@ -30,7 +30,7 @@ const DormitoryCreate = CatchAsyncError(async (req, res, next) => {
 
         const floors = await dormitoryService.Addfloor(dormitory._id, data.amount, res);
 
-        await dormitoryService.Addrooms(floors, res);
+        const room = await dormitoryService.Addrooms(floors, dormitory._id, res);
 
     } catch (error) {
         return next(new ErrorHandler(error, 500));
@@ -45,7 +45,7 @@ const EditRoomsAndFloors = CatchAsyncError(async (req, res, next) => {
 
         if (flag === "" || flag === undefined || flag === null 
             || dormitoryId === undefined || dormitoryId === null || dormitoryId === "") {
-            return next(new ErrorHandler("flag is required", 400));
+            return next(new ErrorHandler("flag or dormitory is required", 400));
         }
 
         // Add floor
@@ -60,6 +60,7 @@ const EditRoomsAndFloors = CatchAsyncError(async (req, res, next) => {
         if (flag === "2") {
             dormitoryService.DeleteRoom(floorId, roomId, res)
         }
+        // ลบชั้น
         if (flag === "3") {
             dormitoryService.DeleteFloor(dormitoryId, floorId, res)
         }

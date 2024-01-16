@@ -11,7 +11,7 @@ const Register = CatchAsyncError(async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
 
-        if (userlogin === undefined || userlogin === null || userlogin === "" || 
+        if (username === undefined || username === null || username === "" || 
             password === undefined || password === null || password === "") {
             return next(new ErrorHandler("Username or password is required"));
         }
@@ -83,6 +83,7 @@ const Login = CatchAsyncError(async(req, res, next) => {
                 email: user.email,
                 tel: user.tel,
                 role: role.name,
+                dormitory: user.dormitory,
             }
         }
 

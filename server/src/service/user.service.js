@@ -9,8 +9,6 @@ const register = async(data, res) => {
         .populate('role')
         .populate('status');
 
-    console.log(userResponse);
-
     return res.status(201).json({
         success: true,
         userResponse,
@@ -57,10 +55,13 @@ const updateProfile = async(data, user, res) => {
             return next(new ErrorHandler("Update failed"))
         }
 
+        const userDetail = await userModel.findOne({ _id: user._id })
+            .populate('role')
+
         res.status(201).json({
             success: true,
             message: "Profile updated",
-            userProfile,
+            userDetail,
         })
 
     } catch (error) {

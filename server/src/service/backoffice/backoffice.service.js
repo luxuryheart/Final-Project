@@ -75,13 +75,13 @@ const CreateContactForm = async (data, date, res) => {
     });
 
     // TODO: ใช้เมื่อคิดว่าจะสร้าง invoice ยังไง
-    // res.status(201).json({
-    //   success: true,
-    //   message: "Contact created successfully",
-    //   contact,
-    // });
+    return res.status(201).json({
+      success: true,
+      message: "Contact created successfully",
+      contact,
+    });
 
-    return contact;
+    // return contact;
   } catch (error) {
     res.status(404).json({
       success: false,
@@ -93,21 +93,51 @@ const CreateContactForm = async (data, date, res) => {
 
 // TODO: Invoice
 // create invoice
-const CreateInvoice = async (contact, res) => {
-  const renterId = await renterDetailModel.findOne({ userId: contact.userId });
+const CreateInvoice = async (data, res) => {
+	try {
+	  const water = await waterModel.findOne({ _id: data.room.waterID });
+	  const electrical = await electricalModel.findOne({
+		_id: data.room.electricID,
+	  });
+  
+	  const waterPrice =
+		water.name === "คิดตามหน่วยจริง"
+		  ? data.waterUnit.totalUnit * water.price
+		  : water.price;
+  
+	  const electricalPrice =
+		electrical.name === "คิดตามหน่วยจริง"
+		  ? data.electricalUnit.totalUnit * electrical.price
+		  : electrical.price;
 
-  await invoiceModel.create({
-    roomId: contact.roomId,
-    renterDetailId: renterId,
-    dormitoryId: contact.dormitoryId,
-  });
-
-  res.status(201).json({
-    success: true,
-    message: "Contact created successfully",
-    contact,
-  });
-};
+		console.log(electricalPrice);
+  
+	  const totalPrice = waterPrice + electricalPrice;
+  
+	  await invoiceModel.create({
+		roomId: data.room._id,
+		renterDetailId: data.renterDetail._id,
+		"description.roomDesc.roomPrice": data.room.roomCharge,
+		"description.waterDesc.waterPrice": waterPrice,
+		"description.electricalDesc.electricalPrice": electricalPrice,
+		totalPrice: totalPrice,
+		grandTotal: totalPrice,
+		dormitoryId: data.dormitoryId,
+	  });
+  
+	  return res.status(201).json({
+		success: true,
+		message: "Contact created successfully",
+	  });
+	} catch (error) {
+	  console.error(error);
+	  return res.status(500).json({
+		success: false,
+		message: "Internal Server Error",
+	  });
+	}
+  };
+  
 
 // user details
 const UpdateRenterDetails = async (data, res) => {
@@ -161,6 +191,7 @@ const WaterCalculate = async (data, res) => {
     const water = await waterModel.findOne({ _id: room.waterId });
     const roomIsExists = await waterUnitModel.findOne({ roomId: room.roomId });
 
+    // TODO: ทำเช็คว่ามี invoice ยังถ้ามีแล้วให้อัปเดต ถ้ายังไม่มีให้ผ่านไปก่อน
     if (water.name === "เหมาจ่ายรายเดือน") {
       await roomsModel.findOneAndUpdate(
         { _id: room.roomId },
