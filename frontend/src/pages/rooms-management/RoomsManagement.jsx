@@ -25,7 +25,7 @@ const RoomsManagement = () => {
         setRooms(res.data.dormitoryDetail)
       }
     } catch (error) {
-      console.log(err);
+      console.log(error);
     }
   }
 

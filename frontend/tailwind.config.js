@@ -12,7 +12,11 @@ export default {
         colorDark: "#212A3E",
         colorBlueGray: "#9BA4B5",
         bgForm: "#FDFDFD",
-        textTitle: "#797F8B"
+        textTitle: "#797F8B",
+        bgRed: "#DD1313",
+        room: "#E5F2FA",
+        bgModal: "#FBFBFB",
+        bgBlueInput: "#C9D3E8"
       }
     },
   },

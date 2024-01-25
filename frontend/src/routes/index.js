@@ -54,3 +54,9 @@ export const RoomsPrice = lazy(
         setTimeout(() => resolve(import("../pages/rooms-price/RoomsPrice")), 1000);
       })
 )
+export const RoomsMeterPrice = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/room-meter-price/RoomMeterPrice")), 1000);
+    })
+)
