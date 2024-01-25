@@ -25,6 +25,8 @@ const DormitoryCreate = CatchAsyncError(async (req, res, next) => {
         const dormitory = await dormitoryService.DormitoryCreate(data, req.user, res);
         
         const value = [ "คิดตามหน่วยจริง", "เหมาจ่ายรายเดือน" ]
+        //TODO: หาวิธีเพิ่มหน่วย unit เข้าไปตอนสร้างหอให้ได้
+        const unit = [ "หน่วย", "เหมา"]
         await dormitoryService.createWaterPrice(value, dormitory);
         await dormitoryService.createElectricalPrice(value, dormitory);
 
@@ -154,4 +156,16 @@ const GetAllRooms = CatchAsyncError(async(req, res, next) => {
     }
 });
 
-module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms }
+// TODO: พึ่งสร้างใหม่
+const GetMeterByDormitoryId = CatchAsyncError(async(req, res, next) => {
+    try {
+        const dormitoryId = req.params; 
+        
+        await dormitoryService.GroupMeters(dormitoryId, res);
+
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId }

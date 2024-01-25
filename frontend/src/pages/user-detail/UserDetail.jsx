@@ -6,56 +6,57 @@ import { useNavigate } from "react-router-dom";
 
 const UserDetail = () => {
   document.title = "JongHor | User-detail";
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [detail, setDetail] = useState({
     firstname: "",
     lastname: "",
-  })
-  const [gender, setGender] = useState("")
-  const [role, setRole] = useState("")
+  });
+  const [gender, setGender] = useState("");
+  const [role, setRole] = useState("");
 
   const handleChange = (e) => {
-	const { name, value } = e.target;
-	setDetail((prevDetail) => ({
-		...prevDetail,
-		[name]: value,
-	}));
-  }
+    const { name, value } = e.target;
+    setDetail((prevDetail) => ({
+      ...prevDetail,
+      [name]: value,
+    }));
+  };
 
   const handleRole = (e) => {
-	const { value } = e.target;
-	let updatedValue = value;
-	if (value === "เจ้าของหอ") {
-		updatedValue = "admin"
-	} else if (value === "พนักงาน") {
-		updatedValue = "employee"
-	} else {
-		updatedValue = "user"
-	}
-	setRole(updatedValue)
-  }
+    const { value } = e.target;
+    let updatedValue = value;
+    if (value === "เจ้าของหอ") {
+      updatedValue = "admin";
+    } else if (value === "พนักงาน") {
+      updatedValue = "employee";
+    } else {
+      updatedValue = "user";
+    }
+    setRole(updatedValue);
+  };
 
   const handleSubmit = (e) => {
-	e.preventDefault();
-	try {
-		axios.put('/api/v1/user-update', {
-			firstname: detail.firstname,
-			lastname: detail.lastname,
-			gender: gender,
-			role: role,
-		})
-		.then((res) => {
-			const role = res.data.userDetail.role.name
-			if (role === "admin") {
-				navigate("/dormitory")
-			} else if (role === "employee" || role === "user") {
-				navigate("/")
-			}
-		})
-	} catch (error) {
-		console.log(error);
-	}
-  }
+    e.preventDefault();
+    try {
+      axios
+        .put("/api/v1/user-update", {
+          firstname: detail.firstname,
+          lastname: detail.lastname,
+          gender: gender,
+          role: role,
+        })
+        .then((res) => {
+          const role = res.data.userDetail.role.name;
+          if (role === "admin") {
+            navigate("/dormitory");
+          } else if (role === "employee" || role === "user") {
+            navigate("/");
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="container mx-auto h-screen w-screen">
@@ -101,7 +102,14 @@ const UserDetail = () => {
               <div className="px-5 mt-2 flex justify-between items-center">
                 {Gender.map((item, i) => (
                   <div className="flex items-center gap-x-2" key={i}>
-                    <input type="radio" name={`radio-1`} className="radio" required value={item} onChange={(e) => setGender(e.target.value)}/>
+                    <input
+                      type="radio"
+                      name={`radio-1`}
+                      className="radio"
+                      required
+                      value={item}
+                      onChange={(e) => setGender(e.target.value)}
+                    />
                     <p className="text-colorDark text-sm">{item}</p>
                   </div>
                 ))}
@@ -112,7 +120,14 @@ const UserDetail = () => {
               <div className="px-5 mt-2 flex justify-between items-center">
                 {Role.map((item, i) => (
                   <div className="flex items-center gap-x-2" key={i}>
-                    <input type="radio" name={`radio-2`} className="radio" required value={item} onChange={handleRole}/>
+                    <input
+                      type="radio"
+                      name={`radio-2`}
+                      className="radio"
+                      required
+                      value={item}
+                      onChange={handleRole}
+                    />
                     <p className="text-colorDark text-sm">{item}</p>
                   </div>
                 ))}

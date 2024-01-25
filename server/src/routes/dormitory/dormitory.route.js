@@ -8,5 +8,6 @@ dormitoryRouter.post('/dormitory-rooms-floors-update', auth.isAuthenticated, aut
 dormitoryRouter.post('/dormitory-rooms-price', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.UpdatePriceForRoom)
 dormitoryRouter.post('/dormitory-rooms-water-electric', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.UpdateWaterAndElectricPrice)
 dormitoryRouter.get('/get-all-rooms/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.GetAllRooms)
+dormitoryRouter.get('/get-meter-by-dormitory/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.GetMeterByDormitoryId)
 
 module.exports = dormitoryRouter;

@@ -67,6 +67,10 @@ const waterSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    unit: {
+        type: String,
+        default: null
+    },
     dormitoryId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Dormitory"
@@ -80,6 +84,10 @@ const electricalSchema = new mongoose.Schema({
     price: {
         type: Number,
         default: 0,
+    },
+    unit: {
+        type: String,
+        default: null
     },
     dormitoryId: {
         type: mongoose.Schema.Types.ObjectId,

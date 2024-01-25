@@ -441,6 +441,7 @@ const UpdateElectricalPrice = async(floorById, roomIds, electricalId, res) => {
   }
 }
 
+// TODO: เพ่ิมหน่วย unit เข้าไปเพื่อทำให้การเรียกใช้งานง่ายขึ้น
 const createWaterPrice = async(value, dormitory) => {
   const dormitoryId = await dormitoryModel.findById({ _id: dormitory._id})
   for (const name of value) {
@@ -470,12 +471,16 @@ const GetAllRooms = async (dormitory, res) => {
   try {
     // ให้ใช้ findOne และ populate เพื่อดึงข้อมูล dormitory
     const dormitoryDetail = await dormitoryModel.findOne({ _id: dormitory._id })
-      .populate({
-        path: "floors",
-        populate: {
-          path: "rooms"
-        }
-      });
+    .populate({
+      path: "floors",
+      populate: {
+        path: "rooms",
+        populate: [
+          { path: "waterID" },
+          { path: "electricID" }
+        ]
+      }
+    });
 
     if (!dormitoryDetail) {
       return res.status(404).json({
@@ -500,6 +505,48 @@ const GetAllRooms = async (dormitory, res) => {
   }
 };
 
+const GroupMeters = async (dormitoryId, res) => {
+  try {
+    const [waterMeter, electricalMeter] = await Promise.all([
+      getWaterMeter(dormitoryId),
+      getElectricalMeter(dormitoryId)
+    ]);
+
+    const meters = {
+      waterMeter,
+      electricalMeter
+    }
+
+    if (waterMeter.length > 0 && electricalMeter.length > 0) {
+      return res.status(200).json({
+        success: true,
+        message: "Get all meters successfully",
+        meters,
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "Meters not found",
+      });
+    }
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+}
+
+const getWaterMeter = async (dormitoryId) => {
+  const waterMeter = await waterModel.find({ dormitoryId: dormitoryId.id }).exec();
+  return waterMeter;
+}
+
+const getElectricalMeter = (dormitoryId) => {
+  const electricalMeter = electricalModel.find({ dormitoryId: dormitoryId.id }).exec()
+  return electricalMeter
+}
 
 module.exports = { DormitoryCreate, createWaterPrice, createElectricalPrice, Addfloor, Addrooms, InCreaseFloors, 
-  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice, GetAllRooms };
+  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice, GetAllRooms, GroupMeters };
