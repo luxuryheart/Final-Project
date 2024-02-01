@@ -134,10 +134,10 @@ const UserDetail = () => {
               </div>
             </div>
             <button
-              className="btn w-full bg-colorBlueDark text-backgroundColor font-extralight text-lg font-serif"
+              className="btn w-full bg-colorBlueDark text-bgColor font-extralight text-lg font-serif"
               type="submit"
             >
-              บันทึก
+              เสร็จสิ้น
             </button>
           </form>
         </div>

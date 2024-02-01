@@ -16,6 +16,7 @@ import { DormitoryHome } from "./routes/index";
 import { RoomsManagement } from "./routes/index";
 import { RoomsPrice } from "./routes/index";
 import { RoomsMeterPrice } from "./routes/index";
+import { DormitoryBankMeter } from "./routes/index";
 
 function App() {
   console.log("App.jsx: ", token);
@@ -38,6 +39,7 @@ function App() {
               <Route path="/dormitory" element={<Layout />}>
                 <Route index element={<DormitoryCreate />}/>
                 <Route path="home" element={<DormitoryHome />}/>
+                <Route path="bank-meter" element={<DormitoryBankMeter />}/>
                 <Route path="rooms-management" element={<RoomsManagement />}/>
                 <Route path="rooms-price" element={<RoomsPrice />}/>
                 <Route path="rooms-meter-price" element={<RoomsMeterPrice />}/>

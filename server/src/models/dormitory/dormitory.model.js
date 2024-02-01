@@ -140,8 +140,32 @@ const dormitorySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: [true, "User is required on dormitory"]
-    }
+    },
+    banks: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "Bank",
+        default: null,
+    },
 }, { timestamps:true });
+// TODO: model สร้างใหม่
+const bankSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, "Bank name is required"],
+    },
+    account: {
+        type: String,
+        required: [true, "Account is required"],
+    },
+    bank: {
+        type: String,
+        required: [true, "Bank name is required"],
+    },
+    dormitoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Dormitory"
+    },
+}, { timestamps: true });
 
 const dormitoryModel = mongoose.model("Dormitory", dormitorySchema);
 const floorsModel = mongoose.model("Floor", floorsSchema);
@@ -149,5 +173,6 @@ const roomsModel = mongoose.model("Room", roomsSchema);
 const statusModel = mongoose.model("Status", statusSchema);
 const waterModel = mongoose.model("Water", waterSchema);
 const electricalModel = mongoose.model("Electrical", electricalSchema)
+const bankModel = mongoose.model("Bank", bankSchema)
 
-module.exports = { dormitoryModel, floorsModel, roomsModel, statusModel, waterModel, electricalModel }
+module.exports = { dormitoryModel, floorsModel, roomsModel, statusModel, waterModel, electricalModel, bankModel }

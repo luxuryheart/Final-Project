@@ -9,5 +9,8 @@ dormitoryRouter.post('/dormitory-rooms-price', auth.isAuthenticated, auth.author
 dormitoryRouter.post('/dormitory-rooms-water-electric', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.UpdateWaterAndElectricPrice)
 dormitoryRouter.get('/get-all-rooms/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.GetAllRooms)
 dormitoryRouter.get('/get-meter-by-dormitory/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.GetMeterByDormitoryId)
+dormitoryRouter.get('/get-bank/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.GetBankByDormitoryId)
+dormitoryRouter.put('/update-meter', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.UpdateMeter)
+dormitoryRouter.post('/bank', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.BankAccount)
 
 module.exports = dormitoryRouter;

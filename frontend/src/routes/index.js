@@ -60,3 +60,10 @@ export const RoomsMeterPrice = lazy(
       setTimeout(() => resolve(import("../pages/room-meter-price/RoomMeterPrice")), 1000);
     })
 )
+
+export const DormitoryBankMeter = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/dormitory-manage-bank-meter/DormitoryBankMeter")), 1000);
+    })
+)

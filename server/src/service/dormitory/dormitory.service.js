@@ -4,6 +4,7 @@ const {
   roomsModel,
   waterModel,
   electricalModel,
+  bankModel,
 } = require("../../models/dormitory/dormitory.model");
 const ErrorHandler = require("../../utils/ErrorHandler");
 
@@ -548,5 +549,76 @@ const getElectricalMeter = (dormitoryId) => {
   return electricalMeter
 }
 
+// TODO: อัพเดตค่าน้ำค่าไฟ
+const UpdateElectrical = async (id, price, res) => {
+  try {
+    await electricalModel.findOneAndUpdate({ _id: id }, { price: price }, { new: true })
+    return res.status(200).json({
+      success: true,
+      message: "Update meter successfully"
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+}
+
+const UpdateWater = async (id, price, res) => {
+  try {
+    await waterModel.findOneAndUpdate({ _id: id }, { price: price }, { new: true })
+    return res.status(200).json({
+      success: true,
+      message: "Update meter successfully"
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+}
+
+// TODO: สร้างบัญชีธนาคาร
+const CreateBankAccount = async (dormitoryId, name, accountNumber, bankName, res) => {
+  try {
+    const newBank = await bankModel.create({
+      dormitoryId: dormitoryId,
+      name: name,
+      account: accountNumber,
+      bank: bankName
+    });
+
+    await dormitoryModel.findOneAndUpdate({ _id: dormitoryId }, { $push: { banks: newBank._id } }, { new: true });
+
+    return res.status(200).json({
+      success: true,
+      message: "Create bank account successfully"
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+const DeleteBankAccount = async (dormitoryId, bankId, res) => {
+  try {
+    const bank = await bankModel.findOneAndDelete({ _id: bankId });
+    await dormitoryModel.findOneAndUpdate({ _id: dormitoryId }, { $pull: { banks: bank._id } }, { new: true });
+    return res.status(200).json({
+      success: true,
+      message: "Delete bank account successfully"
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+}
+
 module.exports = { DormitoryCreate, createWaterPrice, createElectricalPrice, Addfloor, Addrooms, InCreaseFloors, 
-  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice, GetAllRooms, GroupMeters };
+  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice, GetAllRooms, GroupMeters, UpdateElectrical, UpdateWater, CreateBankAccount, DeleteBankAccount };

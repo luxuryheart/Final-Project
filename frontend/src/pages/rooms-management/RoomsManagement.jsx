@@ -35,7 +35,7 @@ const RoomsManagement = () => {
       dormitoryId: idMock,
       flag: "0",
     })
-    setTimeout(() => window.location.reload(), 1000)
+    setTimeout(() => getRooms(), 1000)
   }
   const increaseRoom = async(e, floorId) => {
     e.preventDefault() 
@@ -44,7 +44,7 @@ const RoomsManagement = () => {
       floorId: floorId,
       flag: "1",
     })
-    setTimeout(() => window.location.reload(), 500)
+    setTimeout(() => getRooms(), 500)
   }
 
   const deleteRoom = async(e, floorId, roomId) => {
@@ -55,7 +55,7 @@ const RoomsManagement = () => {
       roomId: roomId,
       flag: "2",
     })
-    setTimeout(() => window.location.reload(), 500)
+    setTimeout(() => getRooms(), 500)
   }
 
   const deleteFloor = async(e, floorId) => {
@@ -65,7 +65,7 @@ const RoomsManagement = () => {
       floorId: floorId,
       flag: "3",
     })
-    setTimeout(() => window.location.reload(), 1000)
+    setTimeout(() => getRooms(), 1000)
   } 
 
   useEffect(() => {
@@ -162,7 +162,7 @@ const RoomsManagement = () => {
                 <button
                   className="py-2 rounded-md  hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95 w-1/2 bg-colorBlueDark text-bgColor font-extralight text-base font-serif text-center"
                 >
-                  บันทึก
+                  เสร็จสิ้น
                 </button>
               </Link>
             </div>

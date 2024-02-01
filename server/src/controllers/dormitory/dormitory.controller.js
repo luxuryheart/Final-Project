@@ -1,5 +1,5 @@
 const CatchAsyncError = require('../../middleware/catchAsyncErrors');
-const { dormitoryModel, floorsModel, waterModel, electricalModel } = require('../../models/dormitory/dormitory.model');
+const { dormitoryModel, floorsModel, waterModel, electricalModel, bankModel } = require('../../models/dormitory/dormitory.model');
 const ErrorHandler = require('../../utils/ErrorHandler');
 const dormitoryService = require('../../service/dormitory/dormitory.service');
 const { userModel } = require('../../models/user.model');
@@ -168,4 +168,60 @@ const GetMeterByDormitoryId = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId }
+// TODO: บัญชีธนาคารสร้างใหม่
+const GetBankByDormitoryId = CatchAsyncError(async(req, res, next) => {
+    try {
+        const dormitoryId = req.params; 
+        const bank = await bankModel.find({ dormitoryId: dormitoryId.id });
+
+        if (!bank) {
+            res.status(400).json({
+                success: false,
+                message: "Bank not found in this dormitory",
+                bank
+            })
+        }
+        
+        res.status(200).json({
+            success: true,
+            message: "Water price updated successfully",
+            bank
+        })
+        
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+const BankAccount = CatchAsyncError(async(req, res, next) => {
+    try {
+        const { dormitoryId, name, account, bank, flag, bankId } = req.body;
+        if (flag === "0") {
+            await dormitoryService.CreateBankAccount(dormitoryId, name, account, bank, res);
+        } else if (flag === "1") {
+            await dormitoryService.DeleteBankAccount(dormitoryId, bankId, res);
+        }
+        
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+// TODO: อัพเดตค่าน้ำค่าไฟ
+const UpdateMeter = CatchAsyncError(async(req, res, next) => {
+    try {
+        const { flag, id, price } = req.body;
+    
+        // อัพเดตค่าไฟตามไอดี
+        if (flag === "1") {
+            await dormitoryService.UpdateElectrical(id, price, res);
+        } else if (flag === "2") { // อัพเดตค่าน้ำตามไอดี
+            await dormitoryService.UpdateWater(id, price, res);
+        }
+        
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId, GetBankByDormitoryId, UpdateMeter, BankAccount }
