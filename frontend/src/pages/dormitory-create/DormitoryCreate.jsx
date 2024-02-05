@@ -10,7 +10,8 @@ const DormitoryCreate = () => {
   const dispatch = useDispatch()
   const text = "เพิ่มข้อมูลหอพัก"
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   //address
   const [provinces, setProvinces] = useState([]);
@@ -110,10 +111,15 @@ const DormitoryCreate = () => {
           email: email,
         },
         amount: floor,
+      }, {
+        headers: {
+          authtoken: `${token}`
+        },
       })
       if (res.data.success) {
         dispatch(dormitoryCreate(res.data.dormitory))
-        setTimeout(() => navigate("rooms-management"), 2000)
+        const dormitoryId = res.data.dormitory._id
+        setTimeout(() => navigate(`rooms-management/${dormitoryId}`), 2000)
       }
     } catch (error) {
       

@@ -1,13 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { banks } from "../../utils/data/bank/bank";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const DormitoryBankMeter = () => {
 
   const [bankAccount, setBankAccount] = useState([]);
   const [meters, setMeters] = useState([]);
-  const idMock = "656a19e62bcd35aee1e16ded";
   const [bank, setBank] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [accountName, setAccountName] = useState("");
@@ -15,6 +14,7 @@ const DormitoryBankMeter = () => {
   const [waterPerMonth, setWaterPerMonth] = useState(0);
   const [electricalPerUnit, setElectricalPerUnit] = useState(0);
   const [electricalPerMonth, setElectricalPerMonth] = useState(0);
+  const { id } = useParams();
 
   // pagination for bankAccount
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,7 +33,7 @@ const DormitoryBankMeter = () => {
   const numbers = [...Array(totalPages + 1).keys()].slice(1);
 
   const getBankAccount = async () => {
-    const res = await axios.get(`/api/v1/get-bank/${idMock}`)
+    const res = await axios.get(`/api/v1/get-bank/${id}`)
     if (res.data.success) {
       setBankAccount(res.data.bank)
     }
@@ -41,7 +41,7 @@ const DormitoryBankMeter = () => {
 
   const getMeter = async() => {
     try {
-      const res = await axios.get(`/api/v1/get-meter-by-dormitory/${idMock}`)
+      const res = await axios.get(`/api/v1/get-meter-by-dormitory/${id}`)
       if (res.data.success) { 
         setMeters(res.data.meters)
         setWaterPerUnit(res.data.meters.waterMeter[0].price)
@@ -122,7 +122,7 @@ const DormitoryBankMeter = () => {
   const handleCreateBank = async(e) => {
     try {
       const res = await axios.post("/api/v1/bank", {
-        dormitoryId: idMock,
+        dormitoryId: id,
         bank: bank,
         account: accountNumber,
         name: accountName,
@@ -158,7 +158,7 @@ const DormitoryBankMeter = () => {
   const handleDeleteBank = async(e, id) => {
     try {
       const res = await axios.post(`/api/v1/bank`, {
-        dormitoryId: idMock,
+        dormitoryId: id,
         bankId: id,
         flag: "1"
       })
@@ -403,7 +403,7 @@ const DormitoryBankMeter = () => {
           </div>
           <div id="button">
             <Link
-              to={"/dormitory/home"}
+              to={`/dormitory/home/${id}`}
               className="w-[70vh] flex justify-center mb-5"
             >
               <button className="py-2 rounded-md  hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95 w-1/2 bg-colorBlueDark text-bgColor font-extralight text-base font-serif text-center">

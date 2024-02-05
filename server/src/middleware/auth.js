@@ -5,13 +5,11 @@ require("dotenv").config();
 
 const isAuthenticated = CatchAsyncError(async (req, res, next) => {
     const token = req.headers["authtoken"];
-
     if (!token) {
         return next(new ErrorHandler("Token not found", 400));
     }
 
     const decoded = jwt.verify(token, process.env.KEY);
-
     if (!decoded) {
         return next(new ErrorHandler("token is not valid", 400));
     }

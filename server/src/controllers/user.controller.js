@@ -78,7 +78,7 @@ const Login = CatchAsyncError(async(req, res, next) => {
 
         let payload = {
             user: {
-                id: user.id,
+                _id: user.id,
                 profile: user.profile,
                 email: user.email,
                 tel: user.tel,
@@ -120,17 +120,25 @@ const updateProfileUser = CatchAsyncError(async(req, res, next) => {
             || data.role === undefined || data.role === null || data.role === "") {
             return next(new ErrorHandler("Data is required", 400))
         }
-        
-        const updateProfile = await userModel.findById({ _id: req.user.id });
+        const updateProfile = await userModel.findOne({ _id: req.user._id });
         if (!updateProfile) {
             return next(new ErrorHandler("User not found", 400));
         }
         
-        userService.updateProfile(data, updateProfile, res)
+        userService.updateProfile(data, updateProfile, process.env.KEY, res)
 
     } catch (error) {
         return next(new ErrorHandler(error, 500))
     }
 });
 
-module.exports = { Register, Login, getAllUser, updateProfileUser };
+const getUserDetail = CatchAsyncError(async(req, res, next) => {
+    try {
+        console.log(req.user);
+        await userService.getUserDetail(req.user, res)
+    } catch (error) {
+        return next(new ErrorHandler(error, 500))
+    }
+})
+
+module.exports = { Register, Login, getAllUser, updateProfileUser, getUserDetail };

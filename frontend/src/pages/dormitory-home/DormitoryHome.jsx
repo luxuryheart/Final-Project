@@ -2,11 +2,13 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getTitle } from "../../store/titleSlice";
 import { manageDetail } from "../../utils/data/dormitory-home/data";
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 const DormitoryHome = () => {
   const dispatch = useDispatch();
   const text = "สร้างหอพัก";
+
+  const { id } = useParams();
 
   useEffect(() => {
     dispatch(getTitle(text));
@@ -24,7 +26,7 @@ const DormitoryHome = () => {
               <div>{detail.name}</div>
             </div>
           </div>
-          <Link to={detail.link}>
+          <Link to={detail.link+id}>
             <button className="px-3 py-1 rounded-lg bg-colorBlueDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
               ตั้งค่า
             </button>

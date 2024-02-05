@@ -67,3 +67,47 @@ export const DormitoryBankMeter = lazy(
       setTimeout(() => resolve(import("../pages/dormitory-manage-bank-meter/DormitoryBankMeter")), 1000);
     })
 )
+
+// admin
+export const AdminLayout = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../layouts/AdminLayout")), 1000);
+    })
+)
+
+export const Dashboard = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/dashboard/Dashboard")), 1000);
+    })
+)
+
+export const RoomManagementBo = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/room-management/RoomManagement")), 1000);
+    })
+)
+
+// Meter
+export const MeterLayout = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/meter/MeterLayout")), 1000);
+    })
+)
+
+export const WaterMeter = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/meter/WaterMeter")), 1000);
+    })
+)
+
+export const ElectricalMeter = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/meter/ElectricalMeter")), 1000);
+    })
+)

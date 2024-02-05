@@ -5,7 +5,8 @@ const auth = require('../middleware/auth')
 
 userRouter.post('/register', userController.Register);
 userRouter.post('/login', userController.Login);
-userRouter.get('/user', auth.isAuthenticated, auth.authorizeRoles('admin'), userController.getAllUser);
+userRouter.get('/users', auth.isAuthenticated, auth.authorizeRoles('admin'), userController.getAllUser);
 userRouter.put('/user-update', auth.isAuthenticated, userController.updateProfileUser);
+userRouter.get('/user-detail', auth.isAuthenticated, userController.getUserDetail);
 
 module.exports = userRouter;

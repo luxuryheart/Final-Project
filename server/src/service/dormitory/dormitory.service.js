@@ -1,3 +1,4 @@
+const { populate } = require("dotenv");
 const {
   dormitoryModel,
   floorsModel,
@@ -5,6 +6,7 @@ const {
   waterModel,
   electricalModel,
   bankModel,
+  statusModel,
 } = require("../../models/dormitory/dormitory.model");
 const ErrorHandler = require("../../utils/ErrorHandler");
 
@@ -13,14 +15,13 @@ const DormitoryCreate = async (data, user, res) => {
     if (!user) {
       return next(new ErrorHandler("User not found", 400));
     }
-
     const dormitory = await dormitoryModel.create({
       name: data.name,
       address: data.address,
       contact: data.contact,
-      userID: user.id,
+      userID: user._id,
     });
-
+    
     return dormitory;
   } catch (error) {
     return next(new ErrorHandler(error, 500));
@@ -63,18 +64,19 @@ const Addrooms = async (id, dormitoryId, res) => {
     let roomIds = [];
     let room;
     const roomAmount = 2
+    const status = await statusModel.findOne({ name: "ว่าง" });
     for (let i = 0; i < id.length; i++) {
       let floor = await floorsModel.findById({ _id: id[i] });
       if (parseInt(floor.name) < 10) {
         for (let j = 0; j < roomAmount; j++) {
           room = floor.name + "0" + (j + 1);
-          const createdRoom = await roomsModel.create({ name: room });
+          const createdRoom = await roomsModel.create({ name: room, status: status._id });
           roomIds.push(createdRoom._id);
         }
       } else if (parseInt(floor.name) >= 10) {
         for (let j = 0; j < roomAmount; j++) {
           room = floor.name + "0" + (j + 1);
-          const createdRoom = await roomsModel.create({ name: room });
+          const createdRoom = await roomsModel.create({ name: room, status: status._id });
           roomIds.push(createdRoom._id);
         }
       }
@@ -155,13 +157,12 @@ const getDormitory = async (dormitoryId) => {
 // flag 0 - increase floor 1
 const InCreaseFloors = async (dormitoryId, res) => {
   try {
-    const dormitory = await dormitoryModel.findById({ _id: dormitoryId });
-
+    console.log(dormitoryId);
+    const dormitory = await dormitoryModel.findOne({ _id: dormitoryId });
     if (!dormitory) {
       return next(new ErrorHandler("Dormitory not found", 400));
     }
 
-    
     if (dormitory.floors.length > 0) {
       const floorId = dormitory.floors[dormitory.floors.length - 1];
       const floorName = await floorsModel.findById({ _id: floorId });
@@ -207,16 +208,17 @@ const addRoom = async (floorIncrease) => {
   let roomIds = [];
   let room;
   let floor = await floorsModel.findById({ _id: floorIncrease._id });
+  const status = await statusModel.findOne({ name: "ว่าง" });
   if (parseInt(floor.name) < 10) {
     for (let j = 0; j < 1; j++) {
       room = floor.name + "0" + (j + 1);
-      const createdRoom = await roomsModel.create({ name: room });
+      const createdRoom = await roomsModel.create({ name: room, status: status._id });
       roomIds.push(createdRoom._id);
     }
   } else if (parseInt(floor.name) >= 10) {
     for (let j = 0; j < 1; j++) {
       room = floor.name + "0" + (j + 1);
-      const createdRoom = await roomsModel.create({ name: room });
+      const createdRoom = await roomsModel.create({ name: room, status: status._id });
       roomIds.push(createdRoom._id);
     }
   }
@@ -478,9 +480,10 @@ const GetAllRooms = async (dormitory, res) => {
         path: "rooms",
         populate: [
           { path: "waterID" },
-          { path: "electricID" }
+          { path: "electricID" },
+          { path: "status" },
         ]
-      }
+      },
     });
 
     if (!dormitoryDetail) {
@@ -620,5 +623,30 @@ const DeleteBankAccount = async (dormitoryId, bankId, res) => {
   }
 }
 
+const GetDormitoryByUser = async (id, res) => {
+  try {
+    const dormitory = await dormitoryModel
+      .find({ userID: id })
+      .populate({
+        path: "floors",
+        populate: {
+          path: "rooms",
+          populate: [{ path: "waterID" }, { path: "electricID" }],
+        },
+      })
+      .populate({ path: "banks" });
+    return res.status(200).json({
+      success: true,
+      message: "Get dormitory successfully",
+      dormitory,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = { DormitoryCreate, createWaterPrice, createElectricalPrice, Addfloor, Addrooms, InCreaseFloors, 
-  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice, GetAllRooms, GroupMeters, UpdateElectrical, UpdateWater, CreateBankAccount, DeleteBankAccount };
+  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice, GetAllRooms, GroupMeters, UpdateElectrical, UpdateWater, CreateBankAccount, DeleteBankAccount, GetDormitoryByUser };

@@ -3,16 +3,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { getTitle } from '../../store/titleSlice'
 import axios from 'axios'
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 const RoomsManagement = () => {
   const { dormitory } = useSelector((state) => state.dormitory)
   const dispatch = useDispatch()
   const text = "กำหนดผังห้อง"
   const navigate = useNavigate()
-
-  const dormitoryId = dormitory._id
-  const idMock = "656a19e62bcd35aee1e16ded"
+  const { id } = useParams();
 
   // เดี๋ยวมีการเอาไอดีจาก params มาตอนนี้ใช้ useDispatch ชั่วคราว
 
@@ -20,7 +18,7 @@ const RoomsManagement = () => {
 
   const getRooms = async() => {
     try {
-      const res = await axios.get(`/api/v1/get-all-rooms/${idMock}`)
+      const res = await axios.get(`/api/v1/get-all-rooms/${id}`)
       if (res.data.success) {
         setRooms(res.data.dormitoryDetail)
       }
@@ -32,7 +30,7 @@ const RoomsManagement = () => {
   const increaseFloor = async(e) => {
     e.preventDefault() 
     const res = await axios.post("/api/v1/dormitory-rooms-floors-update", {
-      dormitoryId: idMock,
+      dormitoryId: id,
       flag: "0",
     })
     setTimeout(() => getRooms(), 1000)
@@ -40,7 +38,7 @@ const RoomsManagement = () => {
   const increaseRoom = async(e, floorId) => {
     e.preventDefault() 
     const res = await axios.post("/api/v1/dormitory-rooms-floors-update", {
-      dormitoryId: idMock,
+      dormitoryId: id,
       floorId: floorId,
       flag: "1",
     })
@@ -50,7 +48,7 @@ const RoomsManagement = () => {
   const deleteRoom = async(e, floorId, roomId) => {
     e.preventDefault() 
     const res = await axios.post("/api/v1/dormitory-rooms-floors-update", {
-      dormitoryId: idMock,
+      dormitoryId: id,
       floorId: floorId,
       roomId: roomId,
       flag: "2",
@@ -61,7 +59,7 @@ const RoomsManagement = () => {
   const deleteFloor = async(e, floorId) => {
     e.preventDefault()
     const res = await axios.post("/api/v1/dormitory-rooms-floors-update", {
-      dormitoryId: idMock,
+      dormitoryId: id,
       floorId: floorId,
       flag: "3",
     })
@@ -78,7 +76,7 @@ const RoomsManagement = () => {
       <div className="flex justify-center py-10">
         <div className="bg-bgForm py-10 px-4 mt-5 w-8/12 lg:w-6/12 xl:w-5/12 drop-shadow-lg rounded-md">
           <div className="flex flex-col">
-            <div className="overflow-y-scroll overscroll-auto h-[52vh] max-h-[60vh] mb-5">
+            <div className="overflow-y-scroll overscroll-auto max-h-[60vh] mb-5">
               <div className="flex flex-col gap-y-5 items-center justify-between w-full text-colorDark text-xl">
                 {rooms &&
                   rooms.floors && 
@@ -120,7 +118,7 @@ const RoomsManagement = () => {
                                     {/* TODO: หลังบ้านทำสถานะก่อนเดี๋ยวมาเพิ่ม */}
                                     <td>
                                       <div className="bg-[#EBF9F1] text-[#1F9254] px-2 py-1 text-xs rounded-xl">
-                                        ว่าง
+                                        {room.status.name}
                                       </div>
                                     </td>
                                     <td>
@@ -158,7 +156,7 @@ const RoomsManagement = () => {
               </button>
             </div>
             <div id='button'>
-              <Link to={'/dormitory/home'} className='w-full flex justify-center'>
+              <Link to={`/dormitory/home/${id}`} className='w-full flex justify-center'>
                 <button
                   className="py-2 rounded-md  hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95 w-1/2 bg-colorBlueDark text-bgColor font-extralight text-base font-serif text-center"
                 >

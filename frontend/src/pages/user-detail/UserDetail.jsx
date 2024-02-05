@@ -14,6 +14,8 @@ const UserDetail = () => {
   const [gender, setGender] = useState("");
   const [role, setRole] = useState("");
 
+  const token = localStorage.getItem("token");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setDetail((prevDetail) => ({
@@ -35,7 +37,7 @@ const UserDetail = () => {
     setRole(updatedValue);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     try {
       axios
@@ -44,9 +46,15 @@ const UserDetail = () => {
           lastname: detail.lastname,
           gender: gender,
           role: role,
+        }, {
+          headers: {
+            authtoken: `${token}`,
+          },
         })
-        .then((res) => {
-          const role = res.data.userDetail.role.name;
+        .then(async(res) => {
+          const role = res.data.formattedUserDetail.user.role;
+          localStorage.removeItem("token");
+          localStorage.setItem("token", res.data.token);
           if (role === "admin") {
             navigate("/dormitory");
           } else if (role === "employee" || role === "user") {

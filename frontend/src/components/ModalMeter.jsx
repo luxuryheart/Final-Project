@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState} from "react";
 import { FaXmark } from "react-icons/fa6";
+import { useParams } from 'react-router-dom';
 
 const ModalMeter = ({ selectRooms, setSelectRooms, setOpenModal, getRooms}) => {
   const tabData = [
@@ -9,7 +10,7 @@ const ModalMeter = ({ selectRooms, setSelectRooms, setOpenModal, getRooms}) => {
   ];
 
   const [meters, setMeters] = useState({});
-  const idMock = "656a19e62bcd35aee1e16ded";
+  const { id } = useParams();
   const [isTab, setIsTab] = useState("0");
 
   const [water, setWater] = useState("");
@@ -17,7 +18,7 @@ const ModalMeter = ({ selectRooms, setSelectRooms, setOpenModal, getRooms}) => {
 
   const getMeter = async() => {
     try {
-      const res = await axios.get(`/api/v1/get-meter-by-dormitory/${idMock}`)
+      const res = await axios.get(`/api/v1/get-meter-by-dormitory/${id}`)
       if (res.data.success) { 
         setMeters(res.data.meters)
       }
@@ -32,7 +33,7 @@ const ModalMeter = ({ selectRooms, setSelectRooms, setOpenModal, getRooms}) => {
       const res = await axios.post("/api/v1/dormitory-rooms-water-electric", {
         roomIds: selectRooms.rooms,
         floorId: selectRooms.floorId,
-        dormitoryId: idMock,
+        dormitoryId: id,
         flag: isTab,
         waterId: water,
         electricalId: electrical

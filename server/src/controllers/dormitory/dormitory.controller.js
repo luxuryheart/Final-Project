@@ -20,8 +20,6 @@ const DormitoryCreate = CatchAsyncError(async (req, res, next) => {
             || data.amount === undefined || data.amount === null || data.amount === ""){
             return next(new ErrorHandler("name or address or contact is required", 400));
         }
-
-        
         const dormitory = await dormitoryService.DormitoryCreate(data, req.user, res);
         
         const value = [ "คิดตามหน่วยจริง", "เหมาจ่ายรายเดือน" ]
@@ -145,7 +143,7 @@ const GetAllRooms = CatchAsyncError(async(req, res, next) => {
 
         const dormitory = await dormitoryModel.findOne({ _id: dormitoryId.id });
 
-        if (!dormitory || dormitory.userID.toString() !== req.user.id) {
+        if (!dormitory || dormitory.userID.toString() !== req.user._id) {
             return next(new ErrorHandler("User and Dormitory are not matching"));
         }
 
@@ -224,4 +222,15 @@ const UpdateMeter = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId, GetBankByDormitoryId, UpdateMeter, BankAccount }
+const GetDormitoryByUser = CatchAsyncError(async(req, res, next) => {
+    try {
+        const id = req.params;
+
+        await dormitoryService.GetDormitoryByUser(id.id, res);
+
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId, GetBankByDormitoryId, UpdateMeter, BankAccount, GetDormitoryByUser }

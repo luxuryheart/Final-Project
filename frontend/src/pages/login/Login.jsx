@@ -29,16 +29,32 @@ const Login = () => {
 				if(res.data.success === true) {
 					localStorage.setItem("token", res.data.token)
 					const user = jwtDecode(res.data.token);
-					const profile = user.user.profile	
+					const profile = user.user.profile
+					const dormitory = getDormitoryByUser(user.user._id)	
 					if (profile.firstname === "" && profile.lastname === "" && profile.gender === "") {
 						navigate("/user-detail")
-					} else if (user.user.dormitory === null) {
+					} else if (dormitory.length === 0) {
 						navigate("/dormitory");
 					} else {
 						navigate('/')
 					}
 				}
 			})
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	const getDormitoryByUser = async(id) => {
+		try {
+			const res = await axios.get(`/api/v1/get-dormitory-by-user/${id}`, {
+				headers: {
+					authtoken: `${localStorage.getItem("token")}`,
+				},
+			})
+			if (res.data.success) {
+				return res.data.dormitory
+			}
 		} catch (error) {
 			console.log(error);
 		}

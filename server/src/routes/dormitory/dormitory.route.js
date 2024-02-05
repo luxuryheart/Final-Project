@@ -12,5 +12,6 @@ dormitoryRouter.get('/get-meter-by-dormitory/:id', auth.isAuthenticated, auth.au
 dormitoryRouter.get('/get-bank/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.GetBankByDormitoryId)
 dormitoryRouter.put('/update-meter', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.UpdateMeter)
 dormitoryRouter.post('/bank', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.BankAccount)
+dormitoryRouter.get('/get-dormitory-by-user/:id', auth.isAuthenticated, dormitoryController.GetDormitoryByUser)
 
 module.exports = dormitoryRouter;

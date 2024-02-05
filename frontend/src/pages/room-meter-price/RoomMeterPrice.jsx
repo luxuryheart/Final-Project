@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { getTitle } from "../../store/titleSlice";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { IoIosWater } from "react-icons/io";
 import { MdOutlineElectricBolt } from "react-icons/md";
 import ModalMeter from '../../components/ModalMeter';
@@ -11,11 +11,11 @@ const RoomMeterPrice = () => {
     const dispatch = useDispatch();
     const text = "กำหนดค่าห้อง";
     const [rooms, setRooms] = useState({});
-    const idMock = "656a19e62bcd35aee1e16ded";
     const [selectRooms, setSelectRooms] = useState({
       floorId: "",
       rooms: [],
     });
+    const { id } = useParams();
   
     const [openMadal, setOpenModal] = useState(false);
     const handleSelect = (e, floorId, roomId) => {
@@ -62,7 +62,7 @@ const RoomMeterPrice = () => {
     };
   const getRooms = async () => {
     try {
-      const res = await axios.get(`/api/v1/get-all-rooms/${idMock}`);
+      const res = await axios.get(`/api/v1/get-all-rooms/${id}`);
       if (res.data.success) {
         setRooms(res.data.dormitoryDetail);
       }
@@ -83,7 +83,7 @@ const RoomMeterPrice = () => {
         <div className="flex justify-center pb-5">
           <div className="bg-bgForm py-10 px-4 mt-5 w-8/12 lg:w-6/12 xl:w-7/12 drop-shadow-lg rounded-md">
             <div className="flex flex-col">
-              <div className="overflow-y-scroll overscroll-auto h-[68vh] max-h-[80vh] mb-5">
+              <div className="overflow-y-scroll overscroll-auto max-h-[80vh] mb-5">
                 {rooms &&
                   rooms.floors &&
                   rooms.floors.map((floor, i) => (
@@ -168,7 +168,7 @@ const RoomMeterPrice = () => {
               </div>
               <div id="button">
                 <Link
-                  to={"/dormitory/home"}
+                  to={`/dormitory/home/${id}`}
                   className="w-full flex justify-center"
                 >
                   <button className="py-2 rounded-md  hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95 w-1/2 bg-colorBlueDark text-bgColor font-extralight text-base font-serif text-center">
