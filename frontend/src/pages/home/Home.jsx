@@ -25,6 +25,34 @@ const Home = () => {
     ),
   }));
 
+  const roomFree = dormitory.map((d) => ({
+    dormitoryName: d.name,
+    freeRoomsCount: d.floors.reduce(
+      (total, floor) => 
+        total + floor.rooms.filter(room => room.status.name === "ว่าง").length,
+      0
+    ),
+  }));
+
+  // TODO: ยังไม่ได้ใช้มีสถานะเป็น ไม่ว่าง
+  const roomOccupied = dormitory.map((d) => ({
+    dormitoryName: d.name,
+    occupiedRoomsCount: d.floors.reduce(
+      (total, floor) => 
+        total + floor.rooms.filter(room => room.status.name === "ไม่ว่าง").length,
+      0
+    ),
+  }))
+
+  const roomBooked = dormitory.map((d) => ({
+    dormitoryName: d.name,
+    bookedRoomsCount: d.floors.reduce(
+      (total, floor) => 
+        total + floor.rooms.filter(room => room.status.name === "จอง").length,
+      0
+    ),
+  }))
+
   const checkAuthToken = async () => {
     if (!token) {
       navigate("/login");
@@ -99,7 +127,7 @@ const Home = () => {
                     <div className="grid grid-cols-2 px-10 text-sm mb-3 text-colorDark/80">
                       <div>
                         <FaCircle className="inline h-3 w-3 text-green-500" />{" "}
-                        ห้องว่าง 20 ห้อง
+                        ห้องว่าง {roomFree[0].freeRoomsCount} ห้อง
                       </div>
                       {roomsCountPerDormitory.map((item, i) => {
                         if (item.dormitoryName === dormitory.name) {
@@ -117,7 +145,7 @@ const Home = () => {
                       </div>
                       <div className="text-start pl-16">
                         <FaCircle className="inline h-3 w-3 text-purple-500" />{" "}
-                        จอง 0 (ยังไม่ได้ทำ) ห้อง
+                        จอง {roomBooked[0].bookedRoomsCount} ห้อง
                       </div>
                     </div>
                     <div className="text-end px-10">

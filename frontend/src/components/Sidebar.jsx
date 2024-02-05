@@ -41,8 +41,6 @@ const Sidebar = () => {
     }
   };
 
-  console.log(path);
-
   const handleOpenSubmenu = (e, itemName, path) => {
     e.preventDefault();
     setSubMenuState((prevState) =>

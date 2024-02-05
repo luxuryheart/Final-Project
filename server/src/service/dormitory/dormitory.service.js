@@ -251,6 +251,7 @@ const updatedDormitory = async (dormitoryId, floorIds) => {
 const IncreaseRoom = async (floorId, res) => {
   try {
     const floor = await floorsModel.findById({ _id: floorId });
+    const status = await statusModel.findOne({ name: "ว่าง" });
 
     if (floor.rooms.length > 0) {
       const floorLastId = floor.rooms[floor.rooms.length - 1]
@@ -258,6 +259,7 @@ const IncreaseRoom = async (floorId, res) => {
       if (parseInt(roomName.name % 10) <= 10) {
         const room = await roomsModel.create({
           name: (parseInt(roomName.name) + 1),
+          status: status._id,
         })
         
         // สร้าง array ของ roomId จาก room
@@ -274,6 +276,7 @@ const IncreaseRoom = async (floorId, res) => {
       } else {
         const room = await roomsModel.create({
           name: parseInt(roomName.name) + "0" + (parseInt(roomName.name) + 1),
+          status: status._id,
         })
         
         // สร้าง array ของ roomId จาก room
@@ -293,7 +296,8 @@ const IncreaseRoom = async (floorId, res) => {
         let roomId = []
         const floorName = floor.name
         const room = await roomsModel.create({
-          name: floorName + "0" + 1
+          name: floorName + "0" + 1,
+          status: status._id,
         })
         roomId.push(room._id)
         const floors = await updateFloor(floorId, roomId)
@@ -631,7 +635,7 @@ const GetDormitoryByUser = async (id, res) => {
         path: "floors",
         populate: {
           path: "rooms",
-          populate: [{ path: "waterID" }, { path: "electricID" }],
+          populate: [{ path: "waterID" }, { path: "electricID" }, { path: "status" }],
         },
       })
       .populate({ path: "banks" });

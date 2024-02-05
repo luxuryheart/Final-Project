@@ -16,7 +16,8 @@ export default {
         bgRed: "#DD1313",
         room: "#E5F2FA",
         bgModal: "#FBFBFB",
-        bgBlueInput: "#C9D3E8"
+        bgBlueInput: "#C9D3E8",
+        bgLine: "#8DA0C8",
       }
     },
   },
