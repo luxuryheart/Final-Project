@@ -155,9 +155,9 @@ const getDormitory = async (dormitoryId) => {
 // get all the rooms and floor
 
 // flag 0 - increase floor 1
+// TODO: error เพิ่มชั้นแล้วมันเพิ่มหลายชั้น
 const InCreaseFloors = async (dormitoryId, res) => {
   try {
-    console.log(dormitoryId);
     const dormitory = await dormitoryModel.findOne({ _id: dormitoryId });
     if (!dormitory) {
       return next(new ErrorHandler("Dormitory not found", 400));
@@ -165,23 +165,21 @@ const InCreaseFloors = async (dormitoryId, res) => {
 
     if (dormitory.floors.length > 0) {
       const floorId = dormitory.floors[dormitory.floors.length - 1];
-      const floorName = await floorsModel.findById({ _id: floorId });
-
+      const floorName = await floorsModel.findOne({ _id: floorId });
+      
       if (!floorName) {
         return next(new ErrorHandler(error, 400));
       }
-
-      const floors = await floorsModel.find();
-
+      
       // สร้าง array ของ floorId จาก floors
-      const floorIdArray = floors.map((floor) => floor._id);
+      const floorIdArray = dormitory.floors.map((floor) => floor._id);
 
       const floorIncrease = await floorsModel.create({
         name: parseInt(floorName.name) + 1,
       });
       floorIdArray.push(floorIncrease._id);
 
-      // เพิ่มห้องเข้าชั้นที ละ 1 ห้อง
+      // // เพิ่มห้องเข้าชั้นที ละ 1 ห้อง
       const rooms = await addRoom(floorIncrease);
 
       //อัพเดตจำนวนชั้นของหอ

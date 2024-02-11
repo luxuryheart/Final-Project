@@ -33,7 +33,7 @@ const contactSchema = new mongoose.Schema({
         type: Number,
         required: [true, "Deposit is required"],
     },
-    minusDeposit: {
+    refundAmount: {
         type: Number,
         default: 0,
     },
@@ -72,6 +72,50 @@ const contactSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-const contactModel = mongoose.model("Contact", contactSchema)
+const contactPaymentSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
+    lists: [
+        {
+            name: {
+                type: String,
+                required: [true, "Name is required"]
+            },
+            price: {
+                type: Number,
+                required: [true, "Price is required"]
+            },  
+        },
+    ],
+    total: {
+        type: Number,
+        required: [true, "Total price is required"]
+    },
+    paymentType: {
+        type: String,
+        required: [true, "Payment type is required"]
+    },
+    paymentDate: {
+        type: Date,
+        required: [true, "Payment date is required"]
+    },
+    account: {
+        type: String,
+        required: [true, "Account is required"]
+    },
+    paid: {
+        type: Boolean,
+        default: false,
+    },
+    dormitoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Dormitory",
+    }
+}, { timestamps: true });
 
-module.exports = { contactModel }
+const contactModel = mongoose.model("Contact", contactSchema)
+const contactPaymentModel = mongoose.model("ContactPayment", contactPaymentSchema)
+
+module.exports = { contactModel, contactPaymentModel }

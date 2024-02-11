@@ -25,6 +25,10 @@ const ModalRoomPrice = ({ selectRooms, setSelectRooms, setOpenModal, getRooms}) 
                     roomCharge: rommPrice,
                     servicePrice: furniturePrice
                 }
+            }, {
+                headers: {
+                    authtoken: localStorage.getItem("token")
+                }
             })
             if (res.data.success) {
                 setOpenModal(false)

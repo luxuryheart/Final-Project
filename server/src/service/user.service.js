@@ -25,11 +25,11 @@ const login = (payload, key, res) => {
     })
 }
 
-const getUserAll = (user, res) => {
+const getUserAll = (users, res) => {
     try {
         res.status(200).json({
             success: true,
-            user,
+            users,
         })
     } catch (error) {
         return next(new ErrorHandler(error,500))    

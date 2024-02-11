@@ -18,6 +18,7 @@ export default {
         bgModal: "#FBFBFB",
         bgBlueInput: "#C9D3E8",
         bgLine: "#8DA0C8",
+        bgCyan: "#5B77AF"
       }
     },
   },

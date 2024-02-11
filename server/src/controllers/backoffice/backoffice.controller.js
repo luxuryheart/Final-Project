@@ -16,11 +16,9 @@ const CreateContact = CatchAsyncError(async (req, res, next) => {
 
     const formattedPersonalId = await formatPersonalId(data.personalId);
 
-    // Explicitly parse startDate with the specified format
     const parsedStartDate = moment(startDate, "YYYY-MM-DD");
 
     if (data.flag !== undefined && data.flag === "0") {
-      // Call the CalculateContact function with the parsed startDate
       var date = await backofficeService.CalculateContact(
         parsedStartDate,
         data.durationInMonth,
@@ -106,4 +104,51 @@ const CreateInvoice = CatchAsyncError(async(req, res, next) => {
 	}
 })
 
-module.exports = { CreateContact, UpdateRenterDetails, MeterCalculate, CreateInvoice }
+const GetRenterDetail = CatchAsyncError(async(req, res, next) => {
+    try {
+        const { id } = req.params;
+
+       await backofficeService.GetRenterDetail(id, res);
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+// TODO: สร้าง contact details กับ bill details
+const ContactPayment = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { contactBill, contactData, dormitoryId } = req.body
+
+	const userId = req.user._id
+	
+	// สร้าง contact bill 
+	const contactPayment = await backofficeService.ContactPayment(contactBill, userId, dormitoryId, res);
+	
+	// สร้างสัญญาเช่า (contact)
+	const formattedPersonalId = await formatPersonalId(contactData.personalId);
+	const parsedStartDate = moment(contactData.startDate, "YYYY-MM-DD");
+
+    if (contactData.flag !== undefined && contactData.flag === "0") {
+      var date = await backofficeService.CalculateContact(
+        parsedStartDate,
+        contactData.durationInMonth,
+        res
+      );
+    }
+
+    contactData.personalId = formattedPersonalId;
+	if (contactPayment.paid === true) {
+		const contact = await backofficeService.CreateContactForm(contactData, date, res);
+    if (contact) {
+      await backofficeService.CreateRenterDeatails(userId, contactData, res)
+    }
+	} else {
+		await backofficeService.DeleteContactPayment(contactPayment._id, res)
+	}
+
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+});
+
+module.exports = { CreateContact, UpdateRenterDetails, MeterCalculate, CreateInvoice, GetRenterDetail, ContactPayment }

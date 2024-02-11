@@ -66,9 +66,9 @@ const Sidebar = () => {
   }, []);
 
   return (
-    <div className="h-screen bg-colorBlueDark text-bgColor">
+    <div className="h-screen bg-colorBlueDark text-bgColor lg:w-full">
       <div className="flex flex-col items-center justify-between h-screen">
-        <div className="w-full">
+        <div className="xl:w-full lg:w-full">
           <div className="flex flex-col items-center justify-center mt-5 mb-5 relative">
             <div className="text-2xl">{dormitory.name}</div>
             <div className="text-sm absolute top-6">BACKOFFICE</div>

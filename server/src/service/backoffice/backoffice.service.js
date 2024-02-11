@@ -1,5 +1,5 @@
 const moment = require("moment");
-const { contactModel } = require("../../models/backoffice/contact.model");
+const { contactModel, contactPaymentModel } = require("../../models/backoffice/contact.model");
 const { renterDetailModel } = require("../../models/backoffice/renter.model");
 const { invoiceModel } = require("../../models/backoffice/invoice.model");
 const {
@@ -10,6 +10,7 @@ const {
   roomsModel,
   waterModel,
   electricalModel,
+  statusModel,
 } = require("../../models/dormitory/dormitory.model");
 
 const CalculateContact = async (startDate, durationInMonths, res) => {
@@ -44,9 +45,11 @@ const CalculateContact = async (startDate, durationInMonths, res) => {
 
 const CreateContactForm = async (data, date, res) => {
   let totalPrice = data.deposit;
-  if (data.minusDeposit === undefined) {
-    return (totalPrice = data.deposit - data.minusDeposit);
+  if (data.refundAmount === undefined) {
+    return (totalPrice = data.deposit - data.refundAmount);
   }
+
+  const status = await statusModel.findOne({ name: "มีผู้เช่า" });
 
   if (await contactModel.findOne({ userId: data.userId })) {
     return res.status(400).json({
@@ -57,15 +60,15 @@ const CreateContactForm = async (data, date, res) => {
 
   try {
     const contact = await contactModel.create({
-      name: data.userDetail.firstname + " " + data.userDetail.lastname,
-      address: data.userDetail.address,
+      name: data.name,
+      address: data.address,
       personalId: data.personalId,
-      tel: data.userDetail.tel,
+      tel: data.tel,
       rangeContact: date.durationInMonths,
       contactStartDate: date.startDate,
       contactEndDate: date.endDate,
       deposit: data.deposit,
-      minusDeposit: data.minusDeposit,
+      minusDeposit: data.refundAmount,
       waterMeter: data.waterMeter,
       electricalMeter: data.electricalMeter,
       userId: data.userId,
@@ -74,12 +77,23 @@ const CreateContactForm = async (data, date, res) => {
       roomId: data.roomId,
     });
 
+    await roomsModel.findOneAndUpdate(
+      { _id: data.roomId },
+      {
+        status: status._id,
+      }
+    )
+
     // TODO: ใช้เมื่อคิดว่าจะสร้าง invoice ยังไง
-    return res.status(201).json({
-      success: true,
-      message: "Contact created successfully",
-      contact,
-    });
+    {/* 
+      คอมเม้นไว้ก่อนนึกออกเดี๋ยวมาทำ
+      return res.status(201).json({
+        success: true,
+        message: "Contact created successfully",
+        contact,
+      });
+    */}
+    return contact
 
     // return contact;
   } catch (error) {
@@ -275,6 +289,57 @@ const ElectricalCalculate = async (data, res) => {
   });
 };
 
+const GetRenterDetail = async (data, res) => {
+  const renter = await renterDetailModel.findOne({ roomId: data });
+  if (!renter) {
+    return res.status(404).json({
+      success: false,
+      message: "Renter not found",
+      renter: null
+    });
+  }
+  return res.status(200).json({
+    success: true,
+    message: "Renter detail",
+    renter,
+  });
+}
+
+const ContactPayment = async (contactBill, userId, dormitoryId, res) => {
+  const contact = await contactPaymentModel.create({
+    userId: userId,
+    lists: contactBill.list,
+    total: contactBill.total,
+    paymentType: contactBill.paymentType,
+    paymentDate: contactBill.paymentDate,
+    account: contactBill.account,
+    paid: contactBill.paid,
+    dormitoryId: dormitoryId
+  })
+  const contactPayment = await contactPaymentModel.findOne({ _id: contact._id });
+  return contactPayment
+}
+
+const DeleteContactPayment = async (id, res) => {
+  await contactPaymentModel.deleteOne({ _id: id });
+  return res.status(200).json({
+    success: true,
+    message: "Contact deleted successfully because paid is false",
+  });
+}
+
+const CreateRenterDeatails = async (userId, contactData, res) => {
+  const renter = await renterDetailModel.create({
+    userId: userId,
+    roomId: contactData.roomId,
+  })
+  return res.status(200).json({
+    success: true,
+    message: "Renter created successfully",
+    renter
+  })
+}
+
 module.exports = {
   CalculateContact,
   CreateContactForm,
@@ -282,4 +347,8 @@ module.exports = {
   CreateInvoice,
   WaterCalculate,
   ElectricalCalculate,
+  GetRenterDetail,
+  ContactPayment,
+  DeleteContactPayment,
+  CreateRenterDeatails
 };

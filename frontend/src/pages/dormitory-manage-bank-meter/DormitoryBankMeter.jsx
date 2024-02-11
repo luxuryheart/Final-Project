@@ -15,6 +15,7 @@ const DormitoryBankMeter = () => {
   const [electricalPerUnit, setElectricalPerUnit] = useState(0);
   const [electricalPerMonth, setElectricalPerMonth] = useState(0);
   const { id } = useParams();
+  const token = localStorage.getItem("token");
 
   // pagination for bankAccount
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,7 +34,11 @@ const DormitoryBankMeter = () => {
   const numbers = [...Array(totalPages + 1).keys()].slice(1);
 
   const getBankAccount = async () => {
-    const res = await axios.get(`/api/v1/get-bank/${id}`)
+    const res = await axios.get(`/api/v1/get-bank/${id}`, {
+      headers: {
+        authtoken: `${token}`,
+      },
+    })
     if (res.data.success) {
       setBankAccount(res.data.bank)
     }
@@ -41,7 +46,11 @@ const DormitoryBankMeter = () => {
 
   const getMeter = async() => {
     try {
-      const res = await axios.get(`/api/v1/get-meter-by-dormitory/${id}`)
+      const res = await axios.get(`/api/v1/get-meter-by-dormitory/${id}`, {
+        headers: {
+          authtoken: `${token}`,
+        },
+      })
       if (res.data.success) { 
         setMeters(res.data.meters)
         setWaterPerUnit(res.data.meters.waterMeter[0].price)
@@ -93,6 +102,10 @@ const DormitoryBankMeter = () => {
         flag: "1",
         id: id,
         price: price
+      }, {
+        headers: {
+          authtoken: `${token}`,
+        },
       })
       if (res.data.success) {
         setTimeout(() => getMeter(), 1000)
@@ -110,6 +123,10 @@ const DormitoryBankMeter = () => {
         flag: "2",
         id: id,
         price: price
+      }, {
+        headers: {
+          authtoken: `${token}`,
+        },
       })
       if (res.data.success) {
         setTimeout(() => getMeter(), 1000)
@@ -127,6 +144,10 @@ const DormitoryBankMeter = () => {
         account: accountNumber,
         name: accountName,
         flag: "0",
+      }, {
+        headers: {
+          authtoken: `${token}`,
+        },
       })
       if (res.data.success) {
         setAccountName("")
@@ -161,6 +182,10 @@ const DormitoryBankMeter = () => {
         dormitoryId: id,
         bankId: id,
         flag: "1"
+      }, {
+        headers: {
+          authtoken: `${token}`,
+        },
       })
       if (res.data.success) {
         setTimeout(() => getBankAccount(), 1000)

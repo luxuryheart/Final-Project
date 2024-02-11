@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaCircle } from "react-icons/fa";
 import UserHome from "../../components/UserHome";
 import axios from "axios";
@@ -162,9 +162,11 @@ const Home = () => {
                 ))}
               </div>
               <div className="w-full px-8">
-                <button className="w-full px-3 py-1 rounded-md bg-colorBlueDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
-                  เพิ่มหอพัก
-                </button>
+                <Link to={"/dormitory"}>
+                  <button className="w-full px-3 py-1 rounded-md bg-colorBlueDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
+                    เพิ่มหอพัก
+                  </button>
+                </Link>
               </div>
             </div>
             <div className="mt-8 bg-bgForm text-colorBlueDark rounded-lg shadow-md py-3 h-[28vh]">
@@ -183,7 +185,7 @@ const Home = () => {
                         {dormitory.name}
                         <span className="font-thin text-sm">(ห้อง 102)</span>
                         <FaCircle className="inline text-red-600" />
-                        <div className="text-bgColor absolute top-[5.5px] xl:right-[364px] lg:right-[236px] text-sm">
+                        <div className="text-bgColor absolute top-[5.5px] xl:right-[356px] lg:right-[228px] text-sm">
                           2
                         </div>
                       </div>

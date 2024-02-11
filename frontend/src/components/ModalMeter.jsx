@@ -15,10 +15,15 @@ const ModalMeter = ({ selectRooms, setSelectRooms, setOpenModal, getRooms}) => {
 
   const [water, setWater] = useState("");
   const [electrical, setElectrical] = useState("");
+  const token = localStorage.getItem("token");
 
   const getMeter = async() => {
     try {
-      const res = await axios.get(`/api/v1/get-meter-by-dormitory/${id}`)
+      const res = await axios.get(`/api/v1/get-meter-by-dormitory/${id}`, {
+        headers: {
+          authtoken: `${token}`,
+        },
+      })
       if (res.data.success) { 
         setMeters(res.data.meters)
       }
@@ -37,6 +42,10 @@ const ModalMeter = ({ selectRooms, setSelectRooms, setOpenModal, getRooms}) => {
         flag: isTab,
         waterId: water,
         electricalId: electrical
+      }, {
+        headers: {
+          authtoken: localStorage.getItem("token")
+        }
       })
       if (res.data.success) {
         setOpenModal(false)

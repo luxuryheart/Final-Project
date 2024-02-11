@@ -182,7 +182,7 @@ const GetBankByDormitoryId = CatchAsyncError(async(req, res, next) => {
         
         res.status(200).json({
             success: true,
-            message: "Water price updated successfully",
+            message: "Get bank information successfully",
             bank
         })
         

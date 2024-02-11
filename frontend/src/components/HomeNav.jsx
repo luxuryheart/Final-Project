@@ -33,7 +33,10 @@ const HomeNav = ({userDetail, setOpenModal, openModal}) => {
                 <div className="font-base">{userDetail?.role?.name}</div>
               </div>
             </div>
-            <FaCircleUser className="h-8 w-8 text-colorDark cursor-pointer shadow-lg" onClick={() => setOpenModal(!openModal)}/>
+            {/* <FaCircleUser className="h-8 w-8 text-colorDark cursor-pointer shadow-lg" onClick={() => setOpenModal(!openModal)}/> */}
+            <div className='flex items-center justify-end'>
+              <img src='https://avataaars.io/?avatarStyle=Circle&topType=ShortHairTheCaesar&accessoriesType=Prescription01&hairColor=Platinum&facialHairType=BeardLight&facialHairColor=Auburn&clotheType=ShirtCrewNeck&clotheColor=PastelBlue&eyeType=Dizzy&eyebrowType=UpDownNatural&mouthType=Grimace&skinColor=Pale' className="h-12 w-12 text-colorDark cursor-pointer shadow-lg mb-2" onClick={() => setOpenModal(!openModal)}/>
+            </div>
           </div>
         </div>
       </div>

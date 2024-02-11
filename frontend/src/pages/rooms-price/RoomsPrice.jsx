@@ -15,6 +15,7 @@ const RoomsPrice = () => {
   });
 
   const { id } = useParams();
+  const token = localStorage.getItem("token");
 
   const [openMadal, setOpenModal] = useState(false);
   const handleSelect = (e, floorId, roomId) => {
@@ -61,7 +62,11 @@ const RoomsPrice = () => {
   };
   const getRooms = async () => {
     try {
-      const res = await axios.get(`/api/v1/get-all-rooms/${id}`);
+      const res = await axios.get(`/api/v1/get-all-rooms/${id}`, {
+        headers: {
+          authtoken: `${token}`,
+        },
+      });
       if (res.data.success) {
         setRooms(res.data.dormitoryDetail);
       }

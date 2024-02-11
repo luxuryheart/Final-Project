@@ -8,4 +8,10 @@ backofficeRouter.post('/backoffice/user-detail', auth.isAuthenticated, auth.auth
 backofficeRouter.post('/backoffice/meter', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.MeterCalculate)
 backofficeRouter.post('/backoffice/invoices', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.CreateInvoice)
 
+// TODO: สร้าง API GET RenterDetail
+backofficeRouter.get('/backoffice/renter-detail/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetRenterDetail)
+
+// TODO: สร้าง contact พร้อม bill details
+backofficeRouter.post('/backoffice/contact-payment', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.ContactPayment)
+
 module.exports = backofficeRouter;

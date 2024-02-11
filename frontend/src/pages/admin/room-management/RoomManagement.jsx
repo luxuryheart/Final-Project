@@ -4,9 +4,12 @@ import { IoMdSearch } from "react-icons/io";
 import { useParams } from 'react-router-dom';
 import { GetDormitoryByID  } from '../../../services/backoffice/dormitorybo';
 import axios from 'axios';
+import { IoAddCircleOutline } from "react-icons/io5";
+import { MdCancel } from "react-icons/md";
 
-const RoomManagement = () => {
+const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName }) => {
   const [dormitory, setDormitory] = useState({})
+  const [floorOpen, setFloorOpen] = useState(false)
   
   const { id } = useParams()
 
@@ -33,12 +36,50 @@ const RoomManagement = () => {
     }
   }
 
+  const increaseFloor = async(e) => {
+    e.preventDefault() 
+    const res = await axios.post("/api/v1/dormitory-rooms-floors-update", {
+      dormitoryId: id,
+      flag: "0",
+    })
+    setTimeout(() => getDormitoryById(), 1000)
+  }
+
+  const deleteFloor = async(e, floorId) => {
+    e.preventDefault()
+    const res = await axios.post("/api/v1/dormitory-rooms-floors-update", {
+      dormitoryId: id,
+      floorId: floorId,
+      flag: "3",
+    })
+    setTimeout(() => getDormitoryById(), 1000)
+  } 
+
+  const deleteRoom = async(e, floorId, roomId) => {
+    e.preventDefault() 
+    const res = await axios.post("/api/v1/dormitory-rooms-floors-update", {
+      dormitoryId: id,
+      floorId: floorId,
+      roomId: roomId,
+      flag: "2",
+    })
+    setTimeout(() => getDormitoryById(), 500)
+  }
+
+  const openRoom = (e, floorId, roomId, roomName) => {
+    e.preventDefault()
+    setRoomId(roomId)
+    setFloorId(floorId)
+    setRoomName(roomName)
+    setRoomModal(true)
+  }
+
   useEffect(() => {
     getDormitoryById()
   }, [])
 
   return (
-    <>
+    <div className='relative'>
       <div className="mx-auto max-h-screen h-screen max-w-screen w-full">
         <div className="px-5 py-4 text-colorDark">
           <div id="header" className="flex justify-between items-center">
@@ -48,7 +89,7 @@ const RoomManagement = () => {
               ตั้งค่าการแสดงผล
             </button>
           </div>
-          <div id="body" className="overflow-y-auto max-h-screen mt-3">
+          <div id="body" className="overflow-y-auto max-h-[85vh] mt-3 mb-3">
             {dormitory &&
               dormitory.floors &&
               dormitory.floors.length > 0 &&
@@ -72,8 +113,16 @@ const RoomManagement = () => {
                       </div>
                     </div>
                     <div>
-                      <button className="bg-colorBlueDark text-bgColor py-1 px-2 rounded-md text-sm hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95"
-                      onClick={(e) => increaseRoom(e, floor._id)}>
+                      <button
+                        className="bg-red-600 mx-2 text-bgColor py-1 px-2 rounded-md text-sm hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95"
+                        onClick={(e) => deleteFloor(e, floor._id)}
+                      >
+                        ลบชั้น
+                      </button>
+                      <button
+                        className="bg-colorBlueDark text-bgColor py-1 px-2 rounded-md text-sm hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95"
+                        onClick={(e) => increaseRoom(e, floor._id)}
+                      >
                         เพิ่มห้อง
                       </button>
                     </div>
@@ -89,8 +138,19 @@ const RoomManagement = () => {
                             key={index}
                           >
                             <p>{room.name}</p>
-                            <div className={`flex items-center justify-center ${room.status.name === "ว่าง" ? " bg-sky-100 " : " bg-green-200 "} w-full lg:h-[110px] xl:h-[140px] rounded-lg cursor-pointer duration-300 hover:bg-sky-200 hover:scale-105`}>
-                              {room.status.name === "ว่าง" ? <div>ห้องว่าง</div> : <div>มีผู้เช่า</div>}
+                            <div
+                              className={`relative flex items-center justify-center ${
+                                room.status.name === "ว่าง"
+                                  ? " bg-sky-100 "
+                                  : " bg-green-200 "
+                              } w-full lg:h-[110px] xl:h-[140px] rounded-lg cursor-pointer duration-300 hover:bg-sky-200`}
+                            onClick={(e) => openRoom(e, floor._id, room._id, room.name)}>
+                              {room.status.name === "ว่าง" ? (
+                                <div>ห้องว่าง</div>
+                              ) : (
+                                <div>มีผู้เช่า</div>
+                              )}
+                              <div className='absolute -top-2 -right-2 z-10' onClick={(e) => deleteRoom(e, floor._id, room._id)}><MdCancel className='text-red-600 h-7 w-7 hover:scale-110 duration-300'/></div>
                             </div>
                           </div>
                         ))}
@@ -99,9 +159,24 @@ const RoomManagement = () => {
                 </div>
               ))}
           </div>
+          <div id="footer" className="w-full mb-5">
+            <div className="flex flex-col items-center justify-center text-colorDark">
+              <IoAddCircleOutline
+                className="h-10 w-10 text-green-800 cursor-pointer hover:text-green-500 duration-300"
+                onMouseEnter={(e) => setFloorOpen(true)}
+                onMouseLeave={(e) => setFloorOpen(false)}
+                onClick={increaseFloor}
+              />
+              {floorOpen && (
+                <div className="bg-bgForm shadow-lg px-3 py-1 rounded-md text-sm">
+                  เพิ่มชั้น
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

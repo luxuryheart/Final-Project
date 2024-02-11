@@ -11,6 +11,7 @@ const RoomsManagement = () => {
   const text = "กำหนดผังห้อง"
   const navigate = useNavigate()
   const { id } = useParams();
+  const token = localStorage.getItem("token");
 
   // เดี๋ยวมีการเอาไอดีจาก params มาตอนนี้ใช้ useDispatch ชั่วคราว
 
@@ -18,7 +19,11 @@ const RoomsManagement = () => {
 
   const getRooms = async() => {
     try {
-      const res = await axios.get(`/api/v1/get-all-rooms/${id}`)
+      const res = await axios.get(`/api/v1/get-all-rooms/${id}`, {
+        headers: {
+          authtoken: `${token}`,
+        },
+      })
       if (res.data.success) {
         setRooms(res.data.dormitoryDetail)
       }
@@ -32,8 +37,14 @@ const RoomsManagement = () => {
     const res = await axios.post("/api/v1/dormitory-rooms-floors-update", {
       dormitoryId: id,
       flag: "0",
+    }, {
+      headers: {
+        authtoken: `${token}`
+      },
     })
-    setTimeout(() => getRooms(), 1000)
+    if (res.data.success) {
+      setTimeout(() => getRooms(), 1000)
+    }
   }
   const increaseRoom = async(e, floorId) => {
     e.preventDefault() 
@@ -41,6 +52,10 @@ const RoomsManagement = () => {
       dormitoryId: id,
       floorId: floorId,
       flag: "1",
+    }, {
+      headers: {
+        authtoken: `${token}`
+      },
     })
     setTimeout(() => getRooms(), 500)
   }
@@ -52,6 +67,10 @@ const RoomsManagement = () => {
       floorId: floorId,
       roomId: roomId,
       flag: "2",
+    }, {
+      headers: {
+        authtoken: `${token}`
+      },
     })
     setTimeout(() => getRooms(), 500)
   }
@@ -62,6 +81,10 @@ const RoomsManagement = () => {
       dormitoryId: id,
       floorId: floorId,
       flag: "3",
+    }, {
+      headers: {
+        authtoken: `${token}`
+      },
     })
     setTimeout(() => getRooms(), 1000)
   } 
