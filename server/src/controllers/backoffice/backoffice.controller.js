@@ -46,10 +46,13 @@ const formatPersonalId = (personalId) => {
 const UpdateRenterDetails = CatchAsyncError(async (req, res, next) => {
 	try {
 		const data = { email, facebook, lineId, educationOrOffice, department, position, studentOrEmployeeId, 
-			urgentTel, relationships, tel, vehicle, note, userId
+			urgentTel, relationships, tel, vehicle, note, roomId
 		} = req.body;
 
-		await backofficeService.UpdateRenterDetails(data, res)
+    const userId = req.user._id
+    console.log(userId);
+
+		await backofficeService.UpdateRenterDetails(data, userId, res)
 
 	} catch (error) {
 		return next(new ErrorHandler(error, 500));
@@ -138,7 +141,7 @@ const ContactPayment = CatchAsyncError(async (req, res, next) => {
 
     contactData.personalId = formattedPersonalId;
 	if (contactPayment.paid === true) {
-		const contact = await backofficeService.CreateContactForm(contactData, date, res);
+		const contact = await backofficeService.CreateContactForm(contactData, userId, date, res);
     if (contact) {
       await backofficeService.CreateRenterDeatails(userId, contactData, res)
     }
@@ -151,4 +154,31 @@ const ContactPayment = CatchAsyncError(async (req, res, next) => {
   }
 });
 
-module.exports = { CreateContact, UpdateRenterDetails, MeterCalculate, CreateInvoice, GetRenterDetail, ContactPayment }
+const GetVehicle = CatchAsyncError(async (req, res, next) => {
+  try {
+    await backofficeService.GetVehicle(res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+// ดึงข้อมูลห้องด้วยการ filter ชั้น
+const GetFLoorFilter = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetFloorFilter(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetFloorById = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetFloorById(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+module.exports = { CreateContact, UpdateRenterDetails, MeterCalculate, CreateInvoice, GetRenterDetail, ContactPayment, GetVehicle, GetFLoorFilter, GetFloorById }

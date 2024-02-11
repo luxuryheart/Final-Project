@@ -3,7 +3,7 @@ import ContactCreate from "./ContactCreate";
 import ContactPayment from "./ContactPayment";
 import axios from "axios";
 
-const Contact = ({ floorId, roomId, getRenterDetail }) => {
+const Contact = ({ floorId, roomId, getRenterDetail, setRoomModal }) => {
   const [next, setNext] = useState(0);
   const [contactData, setContactData] = useState({
     name: "",
@@ -22,8 +22,6 @@ const Contact = ({ floorId, roomId, getRenterDetail }) => {
     floorId: floorId,
     roomId: roomId,
   });
-
-  console.log(contactData);
 
   const [list, setList] = useState([
     {

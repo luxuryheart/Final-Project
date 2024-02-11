@@ -56,12 +56,11 @@ const renterDetailSchema = new mongoose.Schema({
     },
     vehicle: [
         {
-            vehicleId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Vehicle",
+            type: {
+                type: String,
                 default: "",
             },
-            carNumber: {
+            carId: {
                 type: String,
                 // required: [true, "carNumber is required"],
                 default: "",

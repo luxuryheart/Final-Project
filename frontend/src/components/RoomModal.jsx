@@ -109,7 +109,7 @@ const RoomModal = ({
             </div>
             <div className="">
               {tabMenu === 0 ? (
-                <RenterDetail />
+                <RenterDetail roomId={roomId} getRenterDetail={getRenterDetail}/>
               ) : tabMenu === 1 ? (
                 <BookingRoom />
               ) : tabMenu === 2 ? (

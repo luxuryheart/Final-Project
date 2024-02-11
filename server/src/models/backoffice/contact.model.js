@@ -81,11 +81,9 @@ const contactPaymentSchema = new mongoose.Schema({
         {
             name: {
                 type: String,
-                required: [true, "Name is required"]
             },
             price: {
                 type: Number,
-                required: [true, "Price is required"]
             },  
         },
     ],

@@ -138,19 +138,21 @@ const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName }) =>
                             key={index}
                           >
                             <p>{room.name}</p>
-                            <div
-                              className={`relative flex items-center justify-center ${
-                                room.status.name === "ว่าง"
-                                  ? " bg-sky-100 "
-                                  : " bg-green-200 "
-                              } w-full lg:h-[110px] xl:h-[140px] rounded-lg cursor-pointer duration-300 hover:bg-sky-200`}
-                            onClick={(e) => openRoom(e, floor._id, room._id, room.name)}>
-                              {room.status.name === "ว่าง" ? (
-                                <div>ห้องว่าง</div>
-                              ) : (
-                                <div>มีผู้เช่า</div>
-                              )}
-                              <div className='absolute -top-2 -right-2 z-10' onClick={(e) => deleteRoom(e, floor._id, room._id)}><MdCancel className='text-red-600 h-7 w-7 hover:scale-110 duration-300'/></div>
+                            <div className='relative w-full lg:h-[110px] xl:h-[140px] p-1'>
+                              <div
+                                className={` flex items-center justify-center ${
+                                  room.status.name === "ว่าง"
+                                    ? " bg-sky-100 "
+                                    : " bg-green-200 "
+                                }  rounded-lg cursor-pointer duration-300 hover:bg-sky-200 h-full`}
+                              onClick={(e) => openRoom(e, floor._id, room._id, room.name)}>
+                                {room.status.name === "ว่าง" ? (
+                                  <div>ห้องว่าง</div>
+                                ) : (
+                                  <div>มีผู้เช่า</div>
+                                )}
+                              </div>
+                                <div className='absolute -top-2 -right-2 z-10 cursor-pointer' onClick={(e) => deleteRoom(e, floor._id, room._id)}><MdCancel className='text-red-600 h-7 w-7 hover:scale-110 duration-300'/></div>
                             </div>
                           </div>
                         ))}

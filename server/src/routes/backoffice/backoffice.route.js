@@ -10,8 +10,13 @@ backofficeRouter.post('/backoffice/invoices', auth.isAuthenticated, auth.authori
 
 // TODO: สร้าง API GET RenterDetail
 backofficeRouter.get('/backoffice/renter-detail/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetRenterDetail)
+backofficeRouter.get('/backoffice/vehicle', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetVehicle)
 
 // TODO: สร้าง contact พร้อม bill details
 backofficeRouter.post('/backoffice/contact-payment', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.ContactPayment)
+
+// get room filter with floor
+backofficeRouter.get('/backoffice/floor-filter/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetFLoorFilter)
+backofficeRouter.get('/backoffice/floors/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetFloorById)
 
 module.exports = backofficeRouter;

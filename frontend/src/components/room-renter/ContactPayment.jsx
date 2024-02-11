@@ -145,9 +145,6 @@ const ContactPayment = ({ setNext, contactData, users, list, setList, getRenterD
     useEffect(() => {
         getBankAccount()
     }, [])
-
-    console.log(account);
-
   return (
     <div>
         <div className='px-5 text-colorDark'>

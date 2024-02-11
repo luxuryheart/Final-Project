@@ -1,6 +1,6 @@
 const moment = require("moment");
 const { contactModel, contactPaymentModel } = require("../../models/backoffice/contact.model");
-const { renterDetailModel } = require("../../models/backoffice/renter.model");
+const { renterDetailModel, vehicleModel } = require("../../models/backoffice/renter.model");
 const { invoiceModel } = require("../../models/backoffice/invoice.model");
 const {
   waterUnitModel,
@@ -11,6 +11,8 @@ const {
   waterModel,
   electricalModel,
   statusModel,
+  dormitoryModel,
+  floorsModel,
 } = require("../../models/dormitory/dormitory.model");
 
 const CalculateContact = async (startDate, durationInMonths, res) => {
@@ -43,7 +45,7 @@ const CalculateContact = async (startDate, durationInMonths, res) => {
   return date;
 };
 
-const CreateContactForm = async (data, date, res) => {
+const CreateContactForm = async (data, userId, date, res) => {
   let totalPrice = data.deposit;
   if (data.refundAmount === undefined) {
     return (totalPrice = data.deposit - data.refundAmount);
@@ -51,7 +53,7 @@ const CreateContactForm = async (data, date, res) => {
 
   const status = await statusModel.findOne({ name: "มีผู้เช่า" });
 
-  if (await contactModel.findOne({ userId: data.userId })) {
+  if (await contactModel.findOne({ roomId: data.roomId })) {
     return res.status(400).json({
       success: false,
       message: "User already exists",
@@ -71,7 +73,7 @@ const CreateContactForm = async (data, date, res) => {
       minusDeposit: data.refundAmount,
       waterMeter: data.waterMeter,
       electricalMeter: data.electricalMeter,
-      userId: data.userId,
+      userId: userId,
       dormitoryId: data.dormitoryId,
       floorId: data.floorId,
       roomId: data.roomId,
@@ -81,6 +83,8 @@ const CreateContactForm = async (data, date, res) => {
       { _id: data.roomId },
       {
         status: status._id,
+        waterMeter: data.waterMeter,
+        electricalMeter: data.electricalMeter,
       }
     )
 
@@ -154,8 +158,8 @@ const CreateInvoice = async (data, res) => {
   
 
 // user details
-const UpdateRenterDetails = async (data, res) => {
-  if (!(await contactModel.findOne({ userId: data.userId }))) {
+const UpdateRenterDetails = async (data, userId, res) => {
+  if (!(await contactModel.findOne({ roomId: data.roomId }))) {
     return res.status(404).json({
       success: false,
       message: "Contact not found",
@@ -175,10 +179,10 @@ const UpdateRenterDetails = async (data, res) => {
     tel: data.tel,
     vehicle: data.vehicle,
     note: data.note,
-    userId: data.userId,
+    userId: userId,
   };
 
-  if (await renterDetailModel.findOne({ userId: data.userId })) {
+  if (await renterDetailModel.findOne({ userId: userId })) {
     const userDetails = await renterDetailModel.findOneAndUpdate(renterDatail);
 
     return res.status(200).json({
@@ -189,7 +193,6 @@ const UpdateRenterDetails = async (data, res) => {
   }
 
   const userDetails = await renterDetailModel.create(renterDatail);
-  t;
   return res.status(200).json({
     success: true,
     message: "Contact updated successfully",
@@ -289,8 +292,8 @@ const ElectricalCalculate = async (data, res) => {
   });
 };
 
-const GetRenterDetail = async (data, res) => {
-  const renter = await renterDetailModel.findOne({ roomId: data });
+const GetRenterDetail = async (id, res) => {
+  const renter = await renterDetailModel.findOne({ roomId: id });
   if (!renter) {
     return res.status(404).json({
       success: false,
@@ -340,6 +343,65 @@ const CreateRenterDeatails = async (userId, contactData, res) => {
   })
 }
 
+const GetVehicle = async (res) => {
+  const vehicles = await vehicleModel.find({}).exec();
+  if (!vehicles) {
+    return res.status(404).json({
+      success: false,
+      message: "Vehicle not found",
+      vehicles: null
+    });
+  }
+  return res.status(200).json({
+    success: true,
+    message: "Vehicle detail",
+    vehicles,
+  });
+}
+
+const GetFloorFilter = async (floorId, res) => {
+  try {
+    const floors = await floorsModel.findOne({ _id: floorId }).populate({ path: "rooms", populate: { path: "status" } });
+    if (!floors) {
+      return res.status(404).json({
+        success: false,
+        message: "Floor not found",
+        floors: null
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Floor detail",
+      floors,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      floors: null
+    });
+  }
+}
+
+
+const GetFloorById = async (dormitoryId, res) => {
+  const dormitory = await dormitoryModel.findOne({ _id: dormitoryId }).populate({ path: "floors" });
+  const floors = dormitory.floors;
+  if (!dormitory) {
+    return res.status(404).json({
+      success: false,
+      message: "Dormitory not found",
+      floors: null
+    });
+  }
+  return res.status(200).json({
+    success: true,
+    message: "Floor detail",
+    floors,
+  });
+}
+
 module.exports = {
   CalculateContact,
   CreateContactForm,
@@ -350,5 +412,8 @@ module.exports = {
   GetRenterDetail,
   ContactPayment,
   DeleteContactPayment,
-  CreateRenterDeatails
+  CreateRenterDeatails,
+  GetVehicle,
+  GetFloorFilter,
+  GetFloorById,
 };
