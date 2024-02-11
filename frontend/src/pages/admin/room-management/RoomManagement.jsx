@@ -128,8 +128,8 @@ const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName }) =>
                     </div>
                   </div>
                   <div className="w-full border-b-2 border-bgLine"></div>
-                  <div className="overflow-y-auto lg:max-h-[40vh] xl:max-h-[50vh]">
-                    <div className="grid grid-cols-6 gap-y-4 items-center py-5 lg:mx-2 xl:mx-4">
+                  <div className="overflow-y-auto lg:max-h-[40vh] xl:max-h-[45vh]">
+                    <div className="grid grid-cols-7 gap-y-4 items-center py-5 lg:mx-2 xl:mx-4">
                       {floor.rooms &&
                         floor.rooms.length > 0 &&
                         floor.rooms.map((room, index) => (
@@ -138,7 +138,7 @@ const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName }) =>
                             key={index}
                           >
                             <p>{room.name}</p>
-                            <div className='relative w-full lg:h-[110px] xl:h-[140px] p-1'>
+                            <div className='relative lg:w-full lg:h-[110px] xl:w-5/5 xl:h-[135px] p-1'>
                               <div
                                 className={` flex items-center justify-center ${
                                   room.status.name === "ว่าง"
