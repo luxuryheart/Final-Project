@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const waterUnitSchema = new mongoose.Schema({
     oldUnit: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Room",
+        type: Number,
+        default: 0,
     },
     latedUnit: {
         type: Number,
@@ -12,23 +12,31 @@ const waterUnitSchema = new mongoose.Schema({
     },
     totalUnit: {
         type: Number,
-        default: () => {oldUnit - latedUnit < 0 ? 0 : oldUnit - latedUnit}
-    },
-    floor: {
-        type: mongoose.Schema.Types.ObjectId
+        // default: function() {
+        //     return (this.oldUnit - this.latedUnit) < 0 ? 0 : (this.oldUnit - this.latedUnit);
+        // },
+        default: 0
     },
     roomId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Room",
-    }
+    },
+    floorId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Floor",
+    },
+    dormitoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Dormitory",
+    },
 }, { timestamps: true } );
 
 const waterUnitModel = mongoose.model('WaterUnit', waterUnitSchema)
 
 const electricalUnitSchema = new mongoose.Schema({
     oldUnit: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Room",
+        type: Number,
+        default: 0,
     },
     latedUnit: {
         type: Number,
@@ -37,12 +45,23 @@ const electricalUnitSchema = new mongoose.Schema({
     },
     totalUnit: {
         type: Number,
-        default: () => {oldUnit - latedUnit < 0 ? 0 : oldUnit - latedUnit}
+        // default: function() {
+        //     return (this.oldUnit - this.latedUnit) < 0 ? 0 : (this.oldUnit - this.latedUnit);
+        // },
+        default: 0,
     },
     roomId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Room",
-    }
+    },
+    floorId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Floor",
+    },
+    dormitoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Dormitory",
+    },
 }, { timestamps: true } );
 
 const electricalUnitModel = mongoose.model('ElectricalUnit', electricalUnitSchema)

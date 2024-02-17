@@ -18,9 +18,10 @@ const port = process.env.PORT || 3000;
 const userRouter = require('./routes/user.route');
 const dormitoryRouter = require('./routes/dormitory/dormitory.route')
 const backofficeRouter = require('./routes/backoffice/backoffice.route')
+const paymentRouter = require('./routes/payment/payment.route')
 
 // user routes
-app.use('/api/v1', userRouter, dormitoryRouter, backofficeRouter);
+app.use('/api/v1', userRouter, dormitoryRouter, backofficeRouter, paymentRouter);
 
 // db connection and server listening
 dbConnect()

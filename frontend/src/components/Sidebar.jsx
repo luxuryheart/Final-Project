@@ -66,15 +66,15 @@ const Sidebar = () => {
   }, []);
 
   return (
-    <div className="h-screen bg-colorBlueDark text-bgColor lg:w-full">
+    <div className="h-screen bg-colorBlueDark text-bgColor lg:w-full md:w-1/5">
       <div className="flex flex-col items-center justify-between h-screen">
-        <div className="xl:w-full lg:w-full">
+        <div className="xl:w-full lg:w-full md:w-full">
           <div className="flex flex-col items-center justify-center mt-5 mb-5 relative">
-            <div className="text-2xl">{dormitory.name}</div>
-            <div className="text-sm absolute top-6">BACKOFFICE</div>
-            <div className="absolute -top-1 right-16">
-              <FaCircle className="h-2 w-2 text-green-500" />
+            <div className="indicator">
+              <div className="text-2xl">{dormitory.name}</div>
+              <FaCircle className="h-2 w-2 text-green-500 indicator-item " />
             </div>
+            <div className="text-sm absolute top-6">BACKOFFICE</div>
           </div>
           <div className="border-b-2 border-bgColor/70 w-full"></div>
           {menu.map((item, index) => (
@@ -83,6 +83,8 @@ const Sidebar = () => {
                 className={`hover:bg-bgColor/60 hover:text-colorDark cursor-pointer ${
                   (path[0] === item.path && path[0] === "water-meter") || (item.name === "จดมิเตอร์" && path[0] === "electrical-meter")
                     ? "bg-colorBlueGray/60 rounded-sm text-colorDark"
+                    : (path[0] === item.path && path[0] == "bill") || (item.name === "บิล" && path[0] == "bill-all") 
+                    ? "bg-colorBlueGray/60 rounded-sm text-colorDark" 
                     : path[0] === item.path
                     ? "bg-bgColor rounded-e-full text-colorDark"
                     : " "
@@ -114,9 +116,9 @@ const Sidebar = () => {
                 {subMenuState.map((subItem, subIndex) => {
                   if (item.name === subItem.name) {
                     return subItem.open ? (
-                      <IoIosArrowUp className="inline" />
+                      <IoIosArrowUp className="inline" key={subIndex}/>
                     ) : (
-                      <IoIosArrowDown className="inline" />
+                      <IoIosArrowDown className="inline" key={subIndex}/>
                     );
                   }
                 })}
@@ -147,7 +149,7 @@ const Sidebar = () => {
                         }`}
                         key={subSubIndex}
                       >
-                        <div className="flex items-center gap-x-1">
+                        <div className="flex items-center gap-x-1" key={index}>
                           <FaRegCircle className="h-3 w-3 text-colorBlueGray font-bold" />
                           {subSubItem.subname}
                         </div>

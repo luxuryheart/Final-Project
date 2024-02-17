@@ -5,7 +5,7 @@ import { getTitle } from '../../store/titleSlice'
 import axios from 'axios'
 import { Link, useParams } from 'react-router-dom';
 
-const RoomsManagement = () => {
+const RoomsManagement = ({ setStateManegeRoom }) => {
   const { dormitory } = useSelector((state) => state.dormitory)
   const dispatch = useDispatch()
   const text = "กำหนดผังห้อง"
@@ -182,6 +182,7 @@ const RoomsManagement = () => {
               <Link to={`/dormitory/home/${id}`} className='w-full flex justify-center'>
                 <button
                   className="py-2 rounded-md  hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95 w-1/2 bg-colorBlueDark text-bgColor font-extralight text-base font-serif text-center"
+                  onClick={setStateManegeRoom(true)}
                 >
                   เสร็จสิ้น
                 </button>

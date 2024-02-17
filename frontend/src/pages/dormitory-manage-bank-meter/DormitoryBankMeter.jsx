@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { banks } from "../../utils/data/bank/bank";
 import { Link, useParams } from "react-router-dom";
 
-const DormitoryBankMeter = () => {
+const DormitoryBankMeter = ({ setStateManegeBankMeter }) => {
 
   const [bankAccount, setBankAccount] = useState([]);
   const [meters, setMeters] = useState([]);
@@ -431,7 +431,8 @@ const DormitoryBankMeter = () => {
               to={`/dormitory/home/${id}`}
               className="w-[70vh] flex justify-center mb-5"
             >
-              <button className="py-2 rounded-md  hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95 w-1/2 bg-colorBlueDark text-bgColor font-extralight text-base font-serif text-center">
+              <button className="py-2 rounded-md  hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95 w-1/2 bg-colorBlueDark text-bgColor font-extralight text-base font-serif text-center"
+              onClick={setStateManegeBankMeter(true)}>
                 เสร็จสิ้น
               </button>
             </Link>

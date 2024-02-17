@@ -1,9 +1,9 @@
 export const menu = [
-    {
-        name: "Dashboard",
-        path: "dashboard",
-        // icon: <MdDashboard />,
-    },
+    // {
+    //     name: "Dashboard",
+    //     path: "dashboard",
+    //     // icon: <MdDashboard />,
+    // },
     {
         name: "ข้อมูลห้องพัก",
         path: "room-management",
@@ -15,30 +15,30 @@ export const menu = [
         // icon: <FaTachometerAlt />,
     },
     {
-        name: "บัญชี",
-        path: "account",
-        // icon: <FaMoneyCheckAlt />,
-    },
-    {
-        name: "ข้อมูลผู้ใช้",
-        path: "users-detail",
-        // icon: <BiSolidUserAccount />,
-    },
-    {
-        name: "ข้อมูลหอพัก",
-        path: "dormitory-detail",
-        // icon: <MdOutlineApartment />,
-    },
-    {
-        name: "จ่ายบิล",
+        name: "บิล",
         path: "bill",
         // icon: <RiBillLine />,
     },
     {
-        name: "รายงาน",
-        path: "report",
-        // icon: <TbReportSearch />,
+        name: "ข้อมูลผู้ใช้",
+        path: "user-management",
+        // icon: <BiSolidUserAccount />,
     },
+    // {
+    //     name: "บัญชี",
+    //     path: "account",
+    //     // icon: <FaMoneyCheckAlt />,
+    // },
+    {
+        name: "ข้อมูลหอพัก",
+        path: "dormitory-setting",
+        // icon: <MdOutlineApartment />,
+    },
+    // {
+    //     name: "รายงาน",
+    //     path: "report",
+    //     // icon: <TbReportSearch />,
+    // },
     {
         name: "หน้าหลัก",
         path: "/",
@@ -59,8 +59,18 @@ export const subMenu = [
     {
         name: "ข้อมูลผู้ใช้",
         submenu: [
-            {subname: "ผู้เช่า", path: "renter-detail"},
-            {subname: "พนักงาน", path: "employee-detail"},
+            {subname: "ผู้เช่า", path: "user-management"},
+            {subname: "พนักงาน", path: "employee-management"},
+        ],
+        open: false,
+        path: "/",
+        // icon: <FaRegCircle />,
+    },
+    {
+        name: "บิล",
+        submenu: [
+            {subname: "จ่ายบิล", path: "bill"},
+            {subname: "บิลทั้งหมด", path: "bill-all"},
         ],
         open: false,
         path: "/",

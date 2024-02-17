@@ -122,7 +122,7 @@ const ContactPayment = CatchAsyncError(async (req, res, next) => {
   try {
     const { contactBill, contactData, dormitoryId } = req.body
 
-	const userId = req.user._id
+	const userId = contactData.userId
 	
 	// สร้าง contact bill 
 	const contactPayment = await backofficeService.ContactPayment(contactBill, userId, dormitoryId, res);
@@ -143,7 +143,7 @@ const ContactPayment = CatchAsyncError(async (req, res, next) => {
 	if (contactPayment.paid === true) {
 		const contact = await backofficeService.CreateContactForm(contactData, userId, date, res);
     if (contact) {
-      await backofficeService.CreateRenterDeatails(userId, contactData, res)
+      await backofficeService.CreateRenterDeatails(userId, dormitoryId, contactData, res)
     }
 	} else {
 		await backofficeService.DeleteContactPayment(contactPayment._id, res)
@@ -181,4 +181,215 @@ const GetFloorById = CatchAsyncError(async (req, res, next) => {
   }
 })
 
-module.exports = { CreateContact, UpdateRenterDetails, MeterCalculate, CreateInvoice, GetRenterDetail, ContactPayment, GetVehicle, GetFLoorFilter, GetFloorById }
+// get unit 
+const GetWaterUnits = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetWaterUnits(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetElectricUnits = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetElectricUnits(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+// Create meter unit per month
+const CreateMeterUnit = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { date, dormitoryId } = req.body;
+    // const day = date.split("-")[2];
+    // const month = date.split("-")[1];
+    // const year =  date.split("-")[0];
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return
+  }
+  const [year, month, day] = date.split("-");
+
+  const dateData = {
+    day: day,
+    month: month,
+    year: year,
+    date: date,
+  }
+  console.log(day, month, year);
+    await backofficeService.CreateMeterUnit(dateData, dormitoryId, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+// getMeter with dormitoryId and date 
+
+const CreateElectricUnitPerMonth = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { date, dormitoryId } = req.body;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return
+    }
+    const [year, month, day] = date.split("-");
+    
+    const dateData = {
+      day: day,
+      month: month,
+      year: year,
+      date: date,
+    }
+    await backofficeService.CreateElectricalMeterUnit(dateData, dormitoryId, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+//create invoice
+const CreateInvoiced = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { date, roomId, dormitoryId } = req.body;
+    
+    const [year, month, day] = date.split("-");
+    
+    const dateData = {
+      day: day,
+      month: month,
+      year: year,
+      date: date,
+    }
+    await backofficeService.CreateInvoiced(dormitoryId, roomId, dateData, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const UpdateInvoicedList = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { invoiceId, roomId, dormitoryId, list } = req.body;
+    await backofficeService.UpdateInvoicedList(invoiceId, roomId, list, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetRoomByMeterUnit = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { date, dormitoryId } = req.query
+    
+    const [year, month] = date.split("-");
+    
+    const dateData = {
+      year: year,
+      month: month,
+      date: date,
+    }
+    await backofficeService.GetRoomByMeterUnit(id, dateData, dormitoryId, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const UpdateMeterUnit = CatchAsyncError(async (req, res, next) => {
+  try { 
+    const data = req.body;
+    await backofficeService.UpdateMeterUnit(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetElectricalMeterUnit = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { date, dormitoryId } = req.query
+    
+    const [year, month] = date.split("-");
+    
+    const dateData = {
+      year: year,
+      month: month,
+      date: date,
+    }
+    await backofficeService.GetElectricalMeterUnit(id, dateData, dormitoryId, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const UpdateElectricUnitPerMonth = CatchAsyncError(async (req, res, next) => {
+  try { 
+    const data = req.body;
+    await backofficeService.UpdateElectricUnit(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetInvoicedList = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { date } = req.query
+    const [year, month] = date.split("-");
+    const newDate = {
+      year: year,
+      month: month,
+      date: date,
+    }
+    await backofficeService.GetInvoicedList(id, newDate, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetInvoicedByID = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetInvoicedByID(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const DeleteInvoicedList = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { index, listid } = req.query
+    console.log(listid);
+    await backofficeService.DeleteInvoicedList(index, listid, id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const UpdateList = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    await backofficeService.UpdateList(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const DeleteInvoiced = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.DeleteInvoiced(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+module.exports = { 
+  CreateContact, UpdateRenterDetails, MeterCalculate,
+  CreateInvoice, GetRenterDetail, ContactPayment,
+  GetVehicle, GetFLoorFilter, GetFloorById,
+  GetWaterUnits, GetElectricUnits, CreateMeterUnit,
+  GetElectricalMeterUnit, CreateInvoiced, CreateElectricUnitPerMonth,
+  UpdateInvoicedList, GetRoomByMeterUnit, UpdateMeterUnit,
+  UpdateElectricUnitPerMonth, GetInvoicedList, GetInvoicedByID,
+  DeleteInvoicedList, UpdateList, DeleteInvoiced
+};

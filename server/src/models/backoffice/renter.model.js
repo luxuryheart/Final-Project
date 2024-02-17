@@ -84,6 +84,10 @@ const renterDetailSchema = new mongoose.Schema({
     roomId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Room"
+    },
+    dormitoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Dormitory"
     }
 }, { timestamps: true });
 

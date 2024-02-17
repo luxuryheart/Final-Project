@@ -5,7 +5,7 @@ import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import ModalRoomPrice from "../../components/ModalRoomPrice";
 
-const RoomsPrice = () => {
+const RoomsPrice = ({ setStateManegeRoomPrice }) => {
   const dispatch = useDispatch();
   const text = "กำหนดค่าห้อง";
   const [rooms, setRooms] = useState({});
@@ -87,9 +87,9 @@ const RoomsPrice = () => {
       {openMadal && <ModalRoomPrice selectRooms={selectRooms} setSelectRooms={setSelectRooms} setOpenModal={setOpenModal} getRooms={getRooms}/>}
       <div id="contained" className="container mx-auto relative z-0">
         <div className="flex justify-center pb-5">
-          <div className="bg-bgForm py-10 px-4 mt-5 w-8/12 lg:w-6/12 xl:w-7/12 drop-shadow-lg rounded-md">
+          <div className="bg-bgForm pt-10 pb-5 px-4 mt-5 w-8/12 lg:w-6/12 xl:w-7/12 drop-shadow-lg rounded-md">
             <div className="flex flex-col">
-              <div className="overflow-y-scroll overscroll-auto  max-h-[80vh] mb-5">
+              <div className="overflow-y-scroll overscroll-auto  max-h-[70vh] mb-5">
                 {rooms &&
                   rooms.floors &&
                   rooms.floors.map((floor, i) => (
@@ -172,7 +172,8 @@ const RoomsPrice = () => {
                   to={`/dormitory/home/${id}`}
                   className="w-full flex justify-center"
                 >
-                  <button className="py-2 rounded-md  hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95 w-1/2 bg-colorBlueDark text-bgColor font-extralight text-base font-serif text-center">
+                  <button className="py-2 rounded-md  hover:bg-slate-400 hover:scale-105 duration-300 active:scale-95 w-1/2 bg-colorBlueDark text-bgColor font-extralight text-base font-serif text-center"
+                  onClick={setStateManegeRoomPrice(true)}>
                     เสร็จสิ้น
                   </button>
                 </Link>

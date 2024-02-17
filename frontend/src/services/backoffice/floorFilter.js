@@ -22,3 +22,28 @@ export const GetFloorByDormitoryID = async (id) => {
         console.log(error);
     }
 }
+
+export const GetRoomByMeterUnit = async(floorId, date, dormitoryId) => {
+    try {
+        const res = await axios.get(`/api/v1/backoffice/room-by-meter-units/${floorId}?date=${date}&dormitoryId=${dormitoryId}`)
+        if (res.data.success) {
+            return res.data.meterUnitRoom
+        } else {
+            return res.data.meterUnitRoom   
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+export const GetRoomByElectricalMeterUnit = async(floorId, date, dormitoryId) => {
+    try {
+        const res = await axios.get(`/api/v1/backoffice/room-by-elec-meter-units/${floorId}?date=${date}&dormitoryId=${dormitoryId}`)
+        if (res.data.success) {
+            return res.data.electricalMeterUnitRoom
+        } else {
+            return res.data.electricalMeterUnitRoom
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}

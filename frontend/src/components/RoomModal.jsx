@@ -7,6 +7,7 @@ import BookingRoom from "./room-renter/BookingRoom";
 import ContactCreate from "./room-renter/ContactCreate";
 import ContactPayment from "./room-renter/ContactPayment";
 import Contact from "./room-renter/Contact";
+import SettingRoom from "./room-renter/SettingRoom";
 
 const RoomModal = ({
   setRoomModal,
@@ -106,6 +107,16 @@ const RoomModal = ({
               >
                 สัญญาเช่า
               </button>
+              <button
+                className={`duration-300 rounded-b-lg py-1 ${
+                  tabMenu === 3
+                    ? " bg-colorBlueDark text-bgColor px-2 py-1 hover:bg-colorBlueDark cursor-pointer "
+                    : " "
+                }`}
+                onClick={() => setTabMenu(3)}
+              >
+                ตั้งค่าห้องพัก
+              </button>
             </div>
             <div className="">
               {tabMenu === 0 ? (
@@ -114,7 +125,9 @@ const RoomModal = ({
                 <BookingRoom />
               ) : tabMenu === 2 ? (
                 <Contact floorId={floorId} roomId={roomId} getRenterDetail={getRenterDetail} setRoomModal={setRoomModal}/>
-              )  : null}
+              )  : tabMenu === 3 ? (
+                <SettingRoom floorId={floorId} roomId={roomId}/> 
+              ) : null}
             </div>
           </div>
         </div>

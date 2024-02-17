@@ -21,6 +21,9 @@ const Contact = ({ floorId, roomId, getRenterDetail, setRoomModal }) => {
     address: "",
     floorId: floorId,
     roomId: roomId,
+    waterTypeId: "",
+    electricalTypeId: "",
+    userId: "",
   });
 
   const [list, setList] = useState([

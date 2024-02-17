@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { rangeMonth } from '../../utils/admin/rangeContactDate';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 const ContactCreate = ({ next, setNext, contactData, setContactData, users }) => {
+    const [meters, setMeters] = useState({});
+    const { id } = useParams()
+    const token = localStorage.getItem("token");
+    const [usersConnect, setUsersConnect] = useState([]);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setContactData((prevContactData) => ({
@@ -17,6 +23,7 @@ const ContactCreate = ({ next, setNext, contactData, setContactData, users }) =>
             setContactData((prevContactData) => ({
                 ...prevContactData,
                 name: selectedUser.profile.firstname + " " + selectedUser.profile.lastname,
+                userId: selectedUser._id
                 /* 
                     TODO: เดี๋ยวจะไปเพิ่มข้อมูล user => ให้มีเบอร์โทร ที่อยู่(อาจจะ) IDCard
                     IDcard: selectedUser.profile.IDcard,
@@ -68,8 +75,40 @@ const ContactCreate = ({ next, setNext, contactData, setContactData, users }) =>
 
     }
 
+    const getMeter = async() => {
+        try {
+          const res = await axios.get(`/api/v1/get-meter-by-dormitory/${id}`, {
+            headers: {
+              authtoken: `${token}`,
+            },
+          })
+          if (res.data.success) { 
+            setMeters(res.data.meters)
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+    const getUserInDormitory = async () => {
+        try {
+            const res = await axios.get(`/api/v1/dormitory-connection/${id}`, {
+                headers: {
+                    authtoken: `${token}`,
+                },
+            });
+            if (res.data.success) {
+                setUsersConnect(res.data.users);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     useEffect(() => {
         currentDate()
+        getMeter()
+        getUserInDormitory()
     }, [])
     
   return (
@@ -79,7 +118,7 @@ const ContactCreate = ({ next, setNext, contactData, setContactData, users }) =>
                 <p className='mb-1'>กรุณากรอกรายละเอียดสัญญาเช่า</p>
                 <select className="select select-bordered w-full max-w-full select-sm" onChange={handleSelect}>
                     <option disabled selected>เลือกข้อมูลจากผู้เช่า</option>
-                    {users.map((user, index) => (
+                    {usersConnect.map((user, index) => (
                         <option value={user.username} key={index}>{user.username}</option>
                     ))}
                 </select>
@@ -141,13 +180,25 @@ const ContactCreate = ({ next, setNext, contactData, setContactData, users }) =>
             <div>
                 <p>สัญญาสำหรับผู้เข้าพักใหม่ (ระบบจะใช้เลขมิเตอร์แรกเข้าในการคำนวณเงิน)</p>
                 <div className='grid grid-cols-2 items-center gap-x-10 mt-1 mb-2'>
+                    <select className="select select-bordered w-full max-w-sm select-sm mb-2" name={"waterTypeId"} onChange={(e) => handleChange(e)}>
+                        <option disabled selected>เลือกประเภทค่าน้ำ</option>
+                        {meters.waterMeter && meters.waterMeter.map((item, index) => (
+                            <option value={item._id} key={index}>{item.name}</option>
+                        ))}
+                    </select>
+                    <select className="select select-bordered w-full max-w-sm select-sm mb-2" name='electricalTypeId' onChange={(e) => handleChange(e)}>
+                        <option disabled selected>เลือกประเภทค่าน้ำ</option>
+                        {meters.electricalMeter && meters.electricalMeter.map((item, index) => (
+                            <option value={item._id} key={index}>{item.name}</option>
+                        ))}
+                    </select>
                     <div>
                         <p className='text-sm mb-1'>เลขมิเตอร์น้ำประปา (เข้าพัก)</p>
-                        <input type="text" placeholder="0" name='waterMeterStart' value={contactData.waterMeterStart} onChange={(e) => handleChange(e)} className="input input-bordered w-full max-w-xl input-sm" />
+                        <input type="text" placeholder="0" name='waterMeter' value={contactData.waterMeter} onChange={(e) => handleChange(e)} className="input input-bordered w-full max-w-xl input-sm" />
                     </div>
                     <div>
                         <p className='text-sm mb-1'>เลขมิเตอร์ไฟฟ้า (เข้าพัก)</p>
-                        <input type="text" placeholder="0" name='electricalMeterStart' value={contactData.electricalMeterStart} onChange={(e) => handleChange(e)} className="input input-bordered w-full max-w-xl input-sm" />
+                        <input type="text" placeholder="0" name='electricalMeter' value={contactData.electricalMeter} onChange={(e) => handleChange(e)} className="input input-bordered w-full max-w-xl input-sm" />
                     </div>
                 </div>
                 <textarea className="textarea textarea-bordered w-full" name="note" value={contactData.note} onChange={(e) => handleChange(e)} placeholder="หมายเหตุ"></textarea>

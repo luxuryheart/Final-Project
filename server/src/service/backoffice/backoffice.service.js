@@ -1,7 +1,16 @@
 const moment = require("moment");
-const { contactModel, contactPaymentModel } = require("../../models/backoffice/contact.model");
-const { renterDetailModel, vehicleModel } = require("../../models/backoffice/renter.model");
-const { invoiceModel } = require("../../models/backoffice/invoice.model");
+const {
+  contactModel,
+  contactPaymentModel,
+} = require("../../models/backoffice/contact.model");
+const {
+  renterDetailModel,
+  vehicleModel,
+} = require("../../models/backoffice/renter.model");
+const {
+  invoiceModel,
+  invoicedModel,
+} = require("../../models/backoffice/invoice.model");
 const {
   waterUnitModel,
   electricalUnitModel,
@@ -14,6 +23,12 @@ const {
   dormitoryModel,
   floorsModel,
 } = require("../../models/dormitory/dormitory.model");
+const {
+  meterUnitModel,
+  meterPerMonthModel,
+  electricalMeterUnitModel,
+  electricalMeterPerMonthModel,
+} = require("../../models/backoffice/meterUnit.model");
 
 const CalculateContact = async (startDate, durationInMonths, res) => {
   // Parse the startDate using a specific format
@@ -47,8 +62,8 @@ const CalculateContact = async (startDate, durationInMonths, res) => {
 
 const CreateContactForm = async (data, userId, date, res) => {
   let totalPrice = data.deposit;
-  if (data.refundAmount === undefined) {
-    return (totalPrice = data.deposit - data.refundAmount);
+  if (data.refundAmount !== undefined) {
+    totalPrice = data.deposit - data.refundAmount;
   }
 
   const status = await statusModel.findOne({ name: "มีผู้เช่า" });
@@ -85,19 +100,32 @@ const CreateContactForm = async (data, userId, date, res) => {
         status: status._id,
         waterMeter: data.waterMeter,
         electricalMeter: data.electricalMeter,
+        // waterID: data.waterTypeId,
+        // electricID: data.electricalTypeId,
+      }
+    );
+    
+    await meterUnitModel.findOneAndUpdate(
+      { roomId: data.roomId },
+      {
+        $set: {
+          initialReading: data.waterMeter,
+          finalReading: 0,
+          consumption: 0,
+        },
       }
     )
-
-    // TODO: ใช้เมื่อคิดว่าจะสร้าง invoice ยังไง
-    {/* 
-      คอมเม้นไว้ก่อนนึกออกเดี๋ยวมาทำ
-      return res.status(201).json({
-        success: true,
-        message: "Contact created successfully",
-        contact,
-      });
-    */}
-    return contact
+    await electricalMeterUnitModel.findOneAndUpdate(
+      { roomId: data.roomId },
+      {
+        $set: {
+          initialReading: data.electricalMeter,
+          finalReading: 0,
+          consumption: 0,
+        },
+      }
+    )
+    return contact;
 
     // return contact;
   } catch (error) {
@@ -112,50 +140,47 @@ const CreateContactForm = async (data, userId, date, res) => {
 // TODO: Invoice
 // create invoice
 const CreateInvoice = async (data, res) => {
-	try {
-	  const water = await waterModel.findOne({ _id: data.room.waterID });
-	  const electrical = await electricalModel.findOne({
-		_id: data.room.electricID,
-	  });
-  
-	  const waterPrice =
-		water.name === "คิดตามหน่วยจริง"
-		  ? data.waterUnit.totalUnit * water.price
-		  : water.price;
-  
-	  const electricalPrice =
-		electrical.name === "คิดตามหน่วยจริง"
-		  ? data.electricalUnit.totalUnit * electrical.price
-		  : electrical.price;
+  try {
+    const water = await waterModel.findOne({ _id: data.room.waterID });
+    const electrical = await electricalModel.findOne({
+      _id: data.room.electricID,
+    });
 
-		console.log(electricalPrice);
-  
-	  const totalPrice = waterPrice + electricalPrice;
-  
-	  await invoiceModel.create({
-		roomId: data.room._id,
-		renterDetailId: data.renterDetail._id,
-		"description.roomDesc.roomPrice": data.room.roomCharge,
-		"description.waterDesc.waterPrice": waterPrice,
-		"description.electricalDesc.electricalPrice": electricalPrice,
-		totalPrice: totalPrice,
-		grandTotal: totalPrice,
-		dormitoryId: data.dormitoryId,
-	  });
-  
-	  return res.status(201).json({
-		success: true,
-		message: "Contact created successfully",
-	  });
-	} catch (error) {
-	  console.error(error);
-	  return res.status(500).json({
-		success: false,
-		message: "Internal Server Error",
-	  });
-	}
-  };
-  
+    const waterPrice =
+      water.name === "คิดตามหน่วยจริง"
+        ? data.waterUnit.totalUnit * water.price
+        : water.price;
+
+    const electricalPrice =
+      electrical.name === "คิดตามหน่วยจริง"
+        ? data.electricalUnit.totalUnit * electrical.price
+        : electrical.price;
+
+    const totalPrice = waterPrice + electricalPrice;
+
+    await invoiceModel.create({
+      roomId: data.room._id,
+      renterDetailId: data.renterDetail._id,
+      "description.roomDesc.roomPrice": data.room.roomCharge,
+      "description.waterDesc.waterPrice": waterPrice,
+      "description.electricalDesc.electricalPrice": electricalPrice,
+      totalPrice: totalPrice,
+      grandTotal: totalPrice,
+      dormitoryId: data.dormitoryId,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Contact created successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
 
 // user details
 const UpdateRenterDetails = async (data, userId, res) => {
@@ -182,12 +207,18 @@ const UpdateRenterDetails = async (data, userId, res) => {
     userId: userId,
   };
 
-  if (await renterDetailModel.findOne({ userId: userId })) {
-    const userDetails = await renterDetailModel.findOneAndUpdate(renterDatail);
+  if (await renterDetailModel.findOne({ roomId: data.roomId })) {
+    const userDetails = await renterDetailModel.findOneAndUpdate(
+      { roomId: data.roomId },
+      renterDatail,
+      { new: true }
+    );
+
+    console.log(userDetails);
 
     return res.status(200).json({
       success: true,
-      message: "Contact updated successfully",
+      message: "User details updated successfully",
       userDetails,
     });
   }
@@ -205,7 +236,7 @@ const WaterCalculate = async (data, res) => {
   for (const room of data.meterUnit) {
     const roomId = await roomsModel.findOne({ _id: room.roomId });
     const totalUnit = room.latedUnit - roomId.waterMeter;
-    const water = await waterModel.findOne({ _id: room.waterId });
+    const water = await waterModel.findOne({ _id: room.waterID });
     const roomIsExists = await waterUnitModel.findOne({ roomId: room.roomId });
 
     // TODO: ทำเช็คว่ามี invoice ยังถ้ามีแล้วให้อัปเดต ถ้ายังไม่มีให้ผ่านไปก่อน
@@ -250,7 +281,7 @@ const ElectricalCalculate = async (data, res) => {
     const roomId = await roomsModel.findOne({ _id: room.roomId });
     const totalUnit = room.latedUnit - roomId.electricalMeter;
     const electrical = await electricalModel.findOne({
-      _id: room.electricalId,
+      _id: room.electricID,
     });
     const roomIsExists = await electricalUnitModel.findOne({
       roomId: room.roomId,
@@ -298,7 +329,7 @@ const GetRenterDetail = async (id, res) => {
     return res.status(404).json({
       success: false,
       message: "Renter not found",
-      renter: null
+      renter: null,
     });
   }
   return res.status(200).json({
@@ -306,7 +337,7 @@ const GetRenterDetail = async (id, res) => {
     message: "Renter detail",
     renter,
   });
-}
+};
 
 const ContactPayment = async (contactBill, userId, dormitoryId, res) => {
   const contact = await contactPaymentModel.create({
@@ -317,11 +348,13 @@ const ContactPayment = async (contactBill, userId, dormitoryId, res) => {
     paymentDate: contactBill.paymentDate,
     account: contactBill.account,
     paid: contactBill.paid,
-    dormitoryId: dormitoryId
-  })
-  const contactPayment = await contactPaymentModel.findOne({ _id: contact._id });
-  return contactPayment
-}
+    dormitoryId: dormitoryId,
+  });
+  const contactPayment = await contactPaymentModel.findOne({
+    _id: contact._id,
+  });
+  return contactPayment;
+};
 
 const DeleteContactPayment = async (id, res) => {
   await contactPaymentModel.deleteOne({ _id: id });
@@ -329,19 +362,20 @@ const DeleteContactPayment = async (id, res) => {
     success: true,
     message: "Contact deleted successfully because paid is false",
   });
-}
+};
 
-const CreateRenterDeatails = async (userId, contactData, res) => {
+const CreateRenterDeatails = async (userId, dormitoryId, contactData, res) => {
   const renter = await renterDetailModel.create({
     userId: userId,
     roomId: contactData.roomId,
-  })
+    dormitoryId: dormitoryId,
+  });
   return res.status(200).json({
     success: true,
     message: "Renter created successfully",
-    renter
-  })
-}
+    renter,
+  });
+};
 
 const GetVehicle = async (res) => {
   const vehicles = await vehicleModel.find({}).exec();
@@ -349,7 +383,7 @@ const GetVehicle = async (res) => {
     return res.status(404).json({
       success: false,
       message: "Vehicle not found",
-      vehicles: null
+      vehicles: null,
     });
   }
   return res.status(200).json({
@@ -357,16 +391,18 @@ const GetVehicle = async (res) => {
     message: "Vehicle detail",
     vehicles,
   });
-}
+};
 
 const GetFloorFilter = async (floorId, res) => {
   try {
-    const floors = await floorsModel.findOne({ _id: floorId }).populate({ path: "rooms", populate: { path: "status" } });
+    const floors = await floorsModel
+      .findOne({ _id: floorId })
+      .populate({ path: "rooms", populate: { path: "status" } });
     if (!floors) {
       return res.status(404).json({
         success: false,
         message: "Floor not found",
-        floors: null
+        floors: null,
       });
     }
     return res.status(200).json({
@@ -379,20 +415,21 @@ const GetFloorFilter = async (floorId, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
-      floors: null
+      floors: null,
     });
   }
-}
-
+};
 
 const GetFloorById = async (dormitoryId, res) => {
-  const dormitory = await dormitoryModel.findOne({ _id: dormitoryId }).populate({ path: "floors" });
+  const dormitory = await dormitoryModel
+    .findOne({ _id: dormitoryId })
+    .populate({ path: "floors" });
   const floors = dormitory.floors;
   if (!dormitory) {
     return res.status(404).json({
       success: false,
       message: "Dormitory not found",
-      floors: null
+      floors: null,
     });
   }
   return res.status(200).json({
@@ -400,7 +437,812 @@ const GetFloorById = async (dormitoryId, res) => {
     message: "Floor detail",
     floors,
   });
+};
+
+// get unit
+const GetWaterUnits = async (dormitoryId, res) => {
+  try {
+    const waterUnits = await waterUnitModel.find({ dormitoryId: dormitoryId });
+    if (!waterUnits || waterUnits.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Water unit not found",
+        waterUnits: null,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Water unit detail",
+      waterUnits,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+const GetElectricUnits = async (dormitoryId, res) => {
+  try {
+    const electricUnits = await electricalUnitModel.find({
+      dormitoryId: dormitoryId,
+    });
+    if (!electricUnits || electricUnits.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Electric unit not found",
+        electricUnits: null,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Electric unit detail",
+      electricUnits,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// Create meter unit per month
+// const CreateMeterUnit = async (dateDate, dormitoryId, res) => {
+//   //เช็ควันไม่ควรเป็นอดีต เป็นปัจจุบัน หรืออนาคตได้
+//   const dateCurrent = await checkCurrentDate(dateDate);
+//   if (!dateCurrent) {
+//     return res.status(404).json({
+//       success: false,
+//       message: "วันที่ไม่ควรเป็นอดีต",
+//       date: null
+//     });
+//   }
+//   const dormitory = await dormitoryModel.findOne({ _id: dormitoryId });
+//   const floorId = []
+//   for (let i = 0; i < dormitory.floors.length; i++) {
+//     floorId.push(dormitory.floors[i]._id)
+//   }
+
+//   if (!dormitory || !dormitory.floors || !Array.isArray(dormitory.floors)) {
+//     return res.status(404).json({
+//       success: false,
+//       message: "Dormitory not found or missing valid floors",
+//       dormitory: null
+//     });
+//   }
+
+//   for (let i = 0; i < dormitory.floors.length; i++) {
+//     if (!dormitory.floors[i].rooms || !Array.isArray(dormitory.floors[i].rooms)) {
+//       continue;
+//     }
+//     for (let j = 0; j < dormitory.floors[i].rooms.length; j++) {
+//       await meterUnitModel.create({
+//         roomId: dormitory.floors[i].rooms[j],
+//         oldUnit: 0,
+//         newUnit: 0,
+//         totalUnit: 0,
+//       })
+//     }
+//   }
+
+//   const meterUnit = await meterUnitModel.find()
+//   let meterArray =  []
+//   for (let i = 0; i < dormitory.floors.length; i++) {
+//     for (let j = 0; j < dormitory.floors[i].rooms.length; j++) {
+//       for (let k = 0; k < meterUnit.length; k++) {
+//         if (meterUnit[k].roomId == dormitory.floors[i].rooms[j]) {
+//           meterArray.push(meterUnit[k])
+//         }
+//       }
+//     }
+//   }
+//   const meterUnitPerMonth = await meterPerMonthModel.create({
+//     date: dateDate,
+//     meterUnit: meterArray,
+//     dormitoryId: dormitoryId
+//   });
+
+//   if (!meterUnitPerMonth) {
+//     return res.status(404).json({
+//       success: false,
+//       message: "Meter unit not found",
+//       meterUnitPerMonth: null
+//     });
+//   }
+
+//   return res.status(200).json({
+//     success: true,
+//     message: "Meter unit created successfully",
+//     meterUnitPerMonth
+//   })
+// }
+
+
+const CreateMeterUnit = async (dateDate, dormitoryId, res) => {
+  try {
+    // Check if the date is not in the past
+    const currentDate = new Date();
+    if (dateDate.date < currentDate) {
+      return res.status(404).json({
+        success: false,
+        message: "Date should not be in the past",
+        date: null,
+      });
+    }
+
+    // Find dormitory
+    const dormitory = await dormitoryModel
+      .findOne({ _id: dormitoryId })
+      .populate("floors");
+    if (!dormitory || !dormitory.floors || dormitory.floors.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Dormitory not found or missing valid floors",
+        dormitory: null,
+      });
+    }
+
+    const floorIds = [];
+    for (let i = 0; i < dormitory.floors.length; i++) {
+      floorIds.push(dormitory.floors[i]);
+    }
+
+    const roomsIds = [];
+    for (let i = 0; i < floorIds.length; i++) {
+      for (let j = 0; j < floorIds[i].rooms.length; j++) {
+        roomsIds.push(floorIds[i].rooms[j]);
+      }
+    }
+    // for (let i = 0; i < roomsIds.length; i++) {
+    //   await meterUnitModel.create({
+    //     roomId: roomsIds[i],
+    //     month: dateDate.month,
+    //     year: dateDate.year,
+    //     initialReading: roomsIds[i].waterMeter || 0,
+    //     finalReading: 0,
+    //     consumption: 0,
+    //     meterType: "water"
+    //   })
+    // }
+
+    const roomsArray = await roomsModel.find({ _id: { $in: roomsIds } });
+
+    for (const roomId of roomsArray) {
+      await meterUnitModel.create({
+        roomId: roomId,
+        month: dateDate.month,
+        year: dateDate.year,
+        initialReading: roomId.waterMeter || 0,
+        finalReading: 0,
+        consumption: 0,
+        meterType: "water",
+      });
+    }
+
+    const meterUnit = await meterUnitModel.find({
+      month: dateDate.month,
+      year: dateDate.year,
+      meterType: "water",
+    });
+    const meterUnitPerMonth = await meterPerMonthModel.create({
+      date: dateDate,
+      meterUnitId: meterUnit,
+      dormitoryId: dormitoryId,
+    });
+
+    if (!meterUnitPerMonth) {
+      return res.status(404).json({
+        success: false,
+        message: "Meter unit not found",
+        meterUnitPerMonth: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Meter units created successfully",
+      meterUnitPerMonth,
+      meterUnit,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const CreateElectricalMeterUnit = async (dateData, dormitoryId, res) => {
+  try {
+    const currentDate = new Date();
+    if (dateData.date < currentDate) {
+      return res.status(404).json({
+        success: false,
+        message: "Date should not be in the past",
+        date: null,
+      });
+    }
+
+    // Find dormitory
+    const dormitory = await dormitoryModel
+      .findOne({ _id: dormitoryId })
+      .populate("floors");
+    if (!dormitory || !dormitory.floors || dormitory.floors.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Dormitory not found or missing valid floors",
+        dormitory: null,
+      });
+    }
+
+    const floorIds = [];
+    for (let i = 0; i < dormitory.floors.length; i++) {
+      floorIds.push(dormitory.floors[i]);
+    }
+
+    const roomsIds = [];
+    for (let i = 0; i < floorIds.length; i++) {
+      for (let j = 0; j < floorIds[i].rooms.length; j++) {
+        roomsIds.push(floorIds[i].rooms[j]);
+      }
+    }
+    const roomsArray = await roomsModel.find({ _id: { $in: roomsIds } });
+
+    for (const roomId of roomsArray) {
+      await electricalMeterUnitModel.create({
+        roomId: roomId,
+        month: dateData.month,
+        year: dateData.year,
+        initialReading: roomId.electricalMeter || 0,
+        finalReading: 0,
+        consumption: 0,
+        meterType: "electrical",
+      });
+    }
+
+    const meterUnit = await electricalMeterUnitModel.find({
+      month: dateData.month,
+      year: dateData.year,
+      meterType: "electrical",
+    });
+    const meterUnitPerMonth = await electricalMeterPerMonthModel.create({
+      date: dateData,
+      electricalMeterUnitId: meterUnit,
+      dormitoryId: dormitoryId,
+    });
+
+    if (!meterUnitPerMonth) {
+      return res.status(404).json({
+        success: false,
+        message: "Meter unit not found",
+        meterUnitPerMonth: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Meter units created successfully",
+      meterUnitPerMonth,
+      meterUnit,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+// create invoice
+const CreateInvoiced = async (dormitoryId, roomId, dateData, res) => {
+  try {
+    const meterUnit = await meterPerMonthModel
+      .findOne({
+        dormitoryId: dormitoryId,
+        "date.month": dateData.month,
+        "date.year": dateData.year,
+      })
+      .populate({
+        path: "meterUnitId",
+        match: { roomId: roomId },
+        populate: {
+          path: "roomId",
+          populate: [{ path: "waterID" }, { path: "electricID" }],
+        },
+      });
+
+    if (!meterUnit) {
+      return res.status(404).json({
+        success: false,
+        message: "Room not found",
+        meterUnit: null,
+      });
+    }
+
+    const electricalUnit = await electricalMeterPerMonthModel
+      .findOne({
+        dormitoryId: dormitoryId,
+        "date.month": dateData.month,
+        "date.year": dateData.year,
+      })
+      .populate({
+        path: "electricalMeterUnitId",
+        match: { roomId: roomId },
+        populate: {
+          path: "roomId",
+          populate: [{ path: "waterID" }, { path: "electricID" }],
+        },
+      });
+
+    const meterStatus = meterUnit.meterUnitId[0].invoiceStatus;
+    const meterType = meterUnit.meterUnitId[0].roomId.waterID.name;
+    const electricalType = electricalUnit.electricalMeterUnitId[0].roomId.electricID.name;
+    const electricalStatus = electricalUnit.electricalMeterUnitId[0].invoiceStatus;
+
+    const lists = [
+      {
+        description: "ค่าห้องเช่า",
+        meter: null,
+        amount: 1,
+        unit: "เดือน",
+        price: meterUnit.meterUnitId[0].roomId.roomCharge,
+        total: meterUnit.meterUnitId[0].roomId.roomCharge,
+      },
+      {
+        description: "ค่าไฟฟ้า",
+        meter: `${electricalUnit.electricalMeterUnitId[0].initialReading} - ${
+          electricalUnit.electricalMeterUnitId[0].finalReading
+        } ${electricalType === "คิดตามหน่วยจริง" ? "" : "เหมาจ่ายรายเดือน"}`,
+        amount:
+          electricalType === "คิดตามหน่วยจริง"
+            ? electricalUnit.electricalMeterUnitId[0].consumption
+            : 1,
+        unit: electricalType === "คิดตามหน่วยจริง" ? "ยูนิต" : "เดือน",
+        price: electricalUnit.electricalMeterUnitId[0].roomId.electricID.price,
+        total:
+          electricalType === "คิดตามหน่วยจริง"
+            ? electricalUnit.electricalMeterUnitId[0].consumption *
+              electricalUnit.electricalMeterUnitId[0].roomId.electricID.price
+            : electricalUnit.electricalMeterUnitId[0].roomId.electricID.price,
+      },
+      {
+        description: "ค่าน้ำ",
+        meter: `${meterUnit.meterUnitId[0].initialReading} - ${
+          meterUnit.meterUnitId[0].finalReading
+        } ${meterType === "คิดตามหน่วยจริง" ? "" : "เหมาจ่ายรายเดือน"}`,
+        amount:
+          meterType === "คิดตามหน่วยจริง"
+            ? meterUnit.meterUnitId[0].consumption
+            : 1,
+        unit: meterType === "คิดตามหน่วยจริง" ? "ยูนิต" : "เดือน",
+        price: meterUnit.meterUnitId[0].roomId.waterID.price,
+        total:
+          meterType === "คิดตามหน่วยจริง"
+            ? meterUnit.meterUnitId[0].consumption *
+              meterUnit.meterUnitId[0].roomId.waterID.price
+            : meterUnit.meterUnitId[0].roomId.waterID.price,
+      },
+    ];
+
+    const renterDetail = await renterDetailModel.findOne({ roomId: roomId });
+
+    if (!meterStatus && !electricalStatus) {
+      const invoice = await invoicedModel.create({
+        roomId: roomId,
+        renterDetailId: renterDetail._id,
+        "date.day": dateData.day,
+        "date.month": dateData.month,
+        "date.year": dateData.year,
+        "date.date": dateData.date,
+        lists: lists,
+        total: lists[0].total + lists[1].total + lists[2].total,
+        discount: 0,
+        grandTotal: lists[0].total + lists[1].total + lists[2].total,
+        dormitoryId: dormitoryId,
+      });
+      await meterUnitModel.findOneAndUpdate(
+        { _id: meterUnit.meterUnitId[0]._id },
+        { invoiceStatus: true },
+        { new: true }
+      );
+      await electricalMeterUnitModel.findOneAndUpdate(
+        { _id: electricalUnit.electricalMeterUnitId[0]._id },
+        { invoiceStatus: true },
+        { new: true }
+      );
+
+      if (!invoice) {
+        return res.status(500).json({
+          success: false,
+          message: "สร้างใบเสร็จไม่สำเร็จ",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Meter unit detail",
+        meterUnit,
+        electricalUnit,
+        invoice,
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: "มีใบเสร็จแล้ว",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const UpdateInvoicedList = async (invoiceId, roomId, list, res) => {
+  try {
+    const invoice = await invoicedModel.findOne({
+      _id: invoiceId,
+      roomId: roomId,
+    });
+    const invoiceLists = invoice.lists;
+    invoiceLists.push(list);
+    let totalPrice = 0;
+    for (const item of invoiceLists) {
+      totalPrice += item.total;
+    }
+    const invoiceUpdate = await invoicedModel.findOneAndUpdate(
+      { _id: invoiceId, roomId: roomId },
+      {
+        $set: {
+          lists: invoiceLists,
+          total: totalPrice,
+          grandTotal: totalPrice,
+        },
+      },
+      { new: true }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Update success",
+      invoice: invoiceUpdate,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const GetRoomByMeterUnit = async (floorId, dateData, dormitoryId, res) => {
+  try {
+    const meterUnit = await meterPerMonthModel
+      .findOne({
+        dormitoryId: dormitoryId,
+        "date.month": dateData.month,
+        "date.year": dateData.year,
+      })
+      .populate({
+        path: "meterUnitId",
+        populate: {
+          path: "roomId",
+          populate: [
+            { path: "electricID" },
+            { path: "waterID" },
+            { path: "status" },
+          ],
+        },
+      })
+      .populate({
+        path: "dormitoryId",
+        populate: {
+          path: "floors",
+          match: { _id: floorId },
+          populate: { path: "rooms" },
+        },
+      });
+
+    if (!meterUnit) {
+      return res.status(404).json({
+        success: false,
+        message: "Meter unit not found",
+        meterUnit: null,
+      });
+    }
+
+    const dormitory = await dormitoryModel
+      .findOne({ _id: dormitoryId })
+      .populate({
+        path: "floors",
+        match: { _id: floorId },
+        populate: { path: "rooms" },
+      });
+
+    const meterUnitRoom = [];
+    for (const meter of meterUnit.meterUnitId) {
+      for (const floor of dormitory.floors) {
+        for (const room of floor.rooms) {
+          if (room._id.toString() === meter.roomId._id.toString()) {
+            meterUnitRoom.push(meter);
+          }
+        }
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Room detail by meter unit success",
+      meterUnitRoom,
+      meterUnit,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+const UpdateMeterUnit = async (data, res) => {
+  try {
+    for (const meter of data.meterUnit) {
+      const totalPrice = meter.finalReading - meter.initialReading;
+      await meterUnitModel.findOneAndUpdate(
+        { _id: meter._id },
+        {
+          $set: {
+            initialReading: meter.initialReading,
+            finalReading: meter.finalReading,
+            consumption: totalPrice < 0 ? 0 : totalPrice,
+          },
+        },
+        { new: true }
+      );
+      if (meter.roomId._id === data.roomId) {
+        await roomsModel.findOneAndUpdate(
+          { _id: data.roomId },
+          { $set: { waterMeter: meter.finalReading } },
+          { new: true }
+        );
+      }
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Update success",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+const GetElectricalMeterUnit = async (floorId, dateData, dormitoryId, res) => {
+  try {
+    const electricalMeterUnit = await electricalMeterPerMonthModel
+    .findOne({
+      dormitoryId: dormitoryId,
+      "date.month": dateData.month,
+      "date.year": dateData.year,
+    })
+    .populate({
+      path: "electricalMeterUnitId",
+      populate: {
+        path: "roomId",
+        populate: [
+          { path: "electricID" },
+          { path: "waterID" },
+          { path: "status" },
+        ],
+      },
+    })
+    .populate({
+      path: "dormitoryId",
+      populate: {
+        path: "floors",
+        match: { _id: floorId },
+        populate: { path: "rooms" },
+      },
+    });
+
+  if (!electricalMeterUnit) {
+    return res.status(404).json({
+      success: false,
+      message: "Meter unit not found",
+      electricalMeterUnit: null,
+    });
+  }
+
+  const dormitory = await dormitoryModel
+    .findOne({ _id: dormitoryId })
+    .populate({
+      path: "floors",
+      match: { _id: floorId },
+      populate: { path: "rooms" },
+    });
+
+  const electricalMeterUnitRoom = [];
+  for (const elecMeter of electricalMeterUnit.electricalMeterUnitId) {
+    for (const floor of dormitory.floors) {
+      for (const room of floor.rooms) {
+        if (room._id.toString() === elecMeter.roomId._id.toString()) {
+          electricalMeterUnitRoom.push(elecMeter);
+        }
+      }
+    }
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Room detail by meter unit success",
+    electricalMeterUnitRoom,
+    electricalMeterUnit,
+  });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const UpdateElectricUnit = async (data, res) => {
+  try {
+    for (const meter of data.electricalMeterUnit) {
+      const totalPrice = meter.finalReading - meter.initialReading;
+      await electricalMeterUnitModel.findOneAndUpdate(
+        { _id: meter._id },
+        {
+          $set: {
+            initialReading: meter.initialReading,
+            finalReading: meter.finalReading,
+            consumption: totalPrice < 0 ? 0 : totalPrice,
+          },
+        },
+        { new: true }
+      );
+      if (meter.roomId._id === data.roomId) {
+        await roomsModel.findOneAndUpdate(
+          { _id: data.roomId },
+          { $set: { electricalMeter: meter.finalReading } },
+          { new: true }
+        );
+      }
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Update success",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
 }
+
+const GetInvoicedList = async (dormitoryId, date, res) => {
+  try {
+    const invoice = await invoicedModel
+      .find({ dormitoryId: dormitoryId, "date.month": date.month, "date.year": date.year })
+      .populate({
+        path: "dormitoryId",
+        populate: {
+          path: "floors",
+          populate: { path: "rooms" },
+        },
+      })
+      .populate({
+        path: "roomId",
+        populate: [
+          { path: "waterID" },
+          { path: "electricID" },
+          { path: "status" },
+        ]
+      })
+      .populate({
+        path: "renterDetailId",
+        populate: { path: "userId" },
+      })
+      console.log(invoice);
+    return res.status(200).json({
+      success: true,
+      message: "Get invoice list success",
+      invoice,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+}
+
+const GetInvoicedByID = async (invoicedId, res) => {
+  try {
+    const invoice = await invoicedModel
+      .findOne({ _id: invoicedId })
+      .populate({
+        path: "dormitoryId",
+        populate: {
+          path: "floors",
+          populate: { path: "rooms" },
+        },
+      })
+      .populate({
+        path: "roomId",
+        populate: [
+          { path: "waterID" },
+          { path: "electricID" },
+          { path: "status" },
+        ]
+      })
+      .populate({
+        path: "renterDetailId",
+        populate: { path: "userId" },
+      })
+    return res.status(200).json({
+      success: true,
+      message: "Get invoice list success",
+      invoice,
+    })
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+}
+
+const DeleteInvoicedList = async (index, listid, id, res) => {
+  try {
+    const invoice = await invoicedModel.findOne({ _id: id });
+    
+    // ตรวจสอบว่ารายการที่ต้องการลบมีอยู่ในใบแจ้งหนี้หรือไม่
+    if (invoice && invoice.lists[index]._id.toString() === listid) {
+      // ลบรายการ
+      invoice.lists.splice(index, 1);
+
+      // คำนวณราคารวมใหม่
+      let totalPrice = 0;
+      invoice.lists.forEach(item => {
+        totalPrice += item.total;
+      });
+
+      // ปรับปรุงราคารวมและราคารวมทั้งหมดของใบแจ้งหนี้
+      invoice.total = totalPrice;
+      invoice.grandTotal = totalPrice;
+
+      // บันทึกการเปลี่ยนแปลง
+      await invoice.save();
+      return res.status(200).json({ success: true, message: "Delete success" });
+    } else {
+      return res.status(404).json({ success: false, message: "List not found" });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+const DeleteInvoiced = async (id, res) => {
+  try {
+    const invoiced = await invoicedModel.findOne({ _id: id });
+
+    await meterUnitModel.findOneAndUpdate({ roomId: invoiced.roomId, month: invoiced.date.month, year: invoiced.date.year }, { invoiceStatus: false }, { new: true });
+    await electricalMeterUnitModel.findOneAndUpdate({ roomId: invoiced.roomId, month: invoiced.date.month, year: invoiced.date.year }, { invoiceStatus: false }, { new: true });
+
+    await invoicedModel.deleteOne({ _id: id });
+
+    return res.status(200).json({ success: true, message: "Delete success" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
 
 module.exports = {
   CalculateContact,
@@ -416,4 +1258,18 @@ module.exports = {
   GetVehicle,
   GetFloorFilter,
   GetFloorById,
+  GetWaterUnits,
+  GetElectricUnits,
+  CreateMeterUnit,
+  GetElectricalMeterUnit,
+  CreateInvoiced,
+  CreateElectricalMeterUnit,
+  UpdateInvoicedList,
+  GetRoomByMeterUnit,
+  UpdateMeterUnit,
+  UpdateElectricUnit,
+  GetInvoicedList,
+  GetInvoicedByID,
+  DeleteInvoicedList,
+  DeleteInvoiced
 };

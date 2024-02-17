@@ -1,15 +1,19 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
-import { GetFloorFilter } from "../../../services/backoffice/floorFilter";
 import { useParams } from "react-router-dom";
 import { GetFloorByDormitoryID } from "../../../services/backoffice/floorFilter";
+import { GetRoomByMeterUnit } from "../../../services/backoffice/floorFilter";
 
 const WaterMeter = () => {
   const [floorId, setFloorId] = useState("");
   const [floor, setFloor] = useState([]);
   const [rooms, setRooms] = useState([]);
   const { id } = useParams();
+  const token = localStorage.getItem("token");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 7));
+  // const [date, setDate] = useState("2024-04");
+  const [meterUnit, setMeterUnit] = useState({})
 
   // pagination for rooms
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,16 +40,20 @@ const WaterMeter = () => {
     setCurrentPage(id);
   }
 
-  const getFloorFilter = async (floorId) => {
+  const getRoomByMeterUnit = async(floorId, date) => {
     try {
-      const res = await GetFloorFilter(floorId);
+      const dormitoryId = id
+      const res = await GetRoomByMeterUnit(floorId, date, dormitoryId);
       if (res) {
-        setRooms(res);
+        setRooms(res)
+        setMeterUnit(res)
+      } else {
+        setMeterUnit(res)
       }
     } catch (error) {
       console.log(error);
     }
-  };
+  }
 
   const getFloorById = async () => {
     try {
@@ -62,21 +70,68 @@ const WaterMeter = () => {
   const handleSelectFloor = async (e) => {
     const selectedFloorId = e.target.value;
     setFloorId(selectedFloorId);
-    // อันเก่า: await getFloorFilter(floorId);
-    await getFloorFilter(selectedFloorId); // แก้เป็นการส่ง selectedFloorId แทน floorId
+    // await getFloorFilter(selectedFloorId);
   };
+
+  const handleChange = (e, roomId, waterID) => {
+    const { name, value } = e.target;
+    setRooms((prevRooms) => 
+      prevRooms.map((room) => 
+        room._id === roomId && room.waterID === waterID 
+          ? { ...room, [name]: value }
+          : room
+      )
+    );
+  }
+  
+
+  const handleWaterUpdate = async(e, meterId, roomId) => {
+    e.preventDefault()
+    try {
+      const res = await axios.put(`/api/v1/backoffice/meter-units`, {
+        dormitoryId: id,
+        floorId: floorId,
+        flag: "0",
+        meterUnit: rooms,
+        meterId: meterId,
+        roomId: roomId
+      }, {
+        headers: {
+          authtoken: `${token}`,
+        },
+      })
+      if (res.data.success) {
+        setTimeout(() => getRoomByMeterUnit(floorId, date), 500)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const CreateMeterUnit = async() => {
+    try {
+      const newDate = `${date}-${new Date().toLocaleDateString("th-TH").slice(0, 2)}`;
+      const res = await axios.post(`/api/v1/backoffice/meter-units`, {
+        dormitoryId: id,
+        date: newDate
+      })
+      if (res.data.success) {
+        setTimeout(() => getRoomByMeterUnit(floorId, date), 500)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
     getFloorById();
   }, []);
 
   useEffect(() => {
-    // อันเก่า: getFloorFilter(floorId);
-    if (floorId) {
-      // เพิ่มการตรวจสอบว่า floorId มีค่าหรือไม่ก่อนเรียกฟังก์ชัน
-      getFloorFilter(floorId);
+    if (floorId || date) {
+      getRoomByMeterUnit(floorId, date);
     }
-  }, [floorId]);
+  }, [date, floorId])
 
   return (
     <div className="px-5 mt-6">
@@ -97,67 +152,74 @@ const WaterMeter = () => {
             </select>
           </div>
           <div className="relative flex items-center text-sm text-colorBlueDark">
-            <IoMdSearch className="absolute ml-2 h-5 w-5 text-colorBlueGray cursor-pointer hover:scale-105 duration-300" />
+            {/* <IoMdSearch className="absolute ml-2 h-5 w-5 text-colorBlueGray cursor-pointer hover:scale-105 duration-300" />
             <input
               type="text"
               placeholder="ค้นหาด้วยเลขห้อง"
               className="px-8 py-1 border border-colorBlueDark/20 rounded-md bg-colorBlueDark/10"
-            />
+            /> */}
+            <input type="month" name="date" id="date" value={date} min={new Date().toISOString().slice(0, 7)} className="input input-bordered input-sm" onChange={(e) => setDate(e.target.value)}/>
           </div>
         </div>
+        {(meterUnit === undefined) || (meterUnit === null) ? (
+          <div className="text-center mt-10">
+            <p>ไม่พบรายการ</p>
+            <button className="btn btn-sm bg-colorBlueDark text-bgColor mt-5" onClick={CreateMeterUnit}>สร้างรายการจดมิเตอร์</button>
+          </div>
+        ) : (
         <div id="table">
           <div className="overflow-x-auto max-h-[75vh] mb-5">
             <table className="table text-colorBlueDark">
-              {/* head */}
               <thead>
                 <tr className="bg-base-300 text-center">
                   <th>เลขห้อง</th>
                   <th className="w-20">สถานะ</th>
                   <th>เลขมิเตอร์ครั้งก่อน</th>
                   <th>เลขมิเตอร์ล่าสุด</th>
-                  <th>เขหน่วยที่ใช้</th>
+                  <th>เลขหน่วยที่ใช้</th>
                   <th>action</th>
                 </tr>
               </thead>
               <tbody className="">
-                {records.map((room, i) => (
-                  <tr
-                    className={`text-center ${
-                      i % 2 !== 0 ? "bg-base-300" : " "
-                    }`}
-                    key={i}
-                  >
-                    <th>{room.name}</th>
-                    <td>{room.status.name}</td>
-                    {/* TODO: เดี๋ยวมาทำเปลี่ยนค่า value ใหม่หลังจากทำ waterUnit */}
-                    <td>
-                      <input
-                        type="text"
-                        placeholder="Type here"
-                        className="input bg-transparent input-bordered w-xs max-w-xs input-sm"
-                        name="waterMeter"
-                        value={room.waterMeter}
-                      />
-                    </td>
-                    {/* TODO: เดี๋ยวมาทำเปลี่ยนค่า value ใหม่หลังจากทำ waterUnit */}
-                    <td>
-                      <input
-                        type="text"
-                        placeholder="Type here"
-                        className="input bg-transparent input-bordered w-xs max-w-xs input-sm"
-                        name="waterMeter"
-                        value={room.waterMeter}
-                      />
-                    </td>
-                    {/* TODO: เดี๋ยวมาทำเปลี่ยนค่า value ใหม่หลังจากทำ waterUnit */}
-                    <td>{room.waterMeter}</td>
-                    <td>
-                      <button className="btn btn-sm bg-colorBlueDark text-bgColor">
-                        อัพเดต
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {records.map((room, i) => {
+                  return (
+                    <tr
+                      className={`text-center ${i % 2 !== 0 ? "bg-base-300" : ""}`}
+                      key={i}
+                    >
+                      <th>{room.roomId.name}</th>
+                      <td>{room.roomId.status.name}</td>
+                      <td>
+                        <input
+                          type="text"
+                          placeholder="Type here"
+                          className="input bg-transparent input-bordered w-xs max-w-xs input-sm"
+                          name="initialReading"
+                          value={room.initialReading}
+                          onChange={(e) => handleChange(e, room._id, room.waterID)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          placeholder="Type here"
+                          className="input bg-transparent input-bordered w-xs max-w-xs input-sm"
+                          name="finalReading"
+                          value={room.finalReading}
+                          onChange={(e) => handleChange(e, room._id, room.waterID)}
+                        />
+                      </td>
+                      <td>{room.consumption}</td>
+                      <td>
+                        <button className="btn btn-sm bg-colorBlueDark text-bgColor"
+                        disabled={room.invoiceStatus}
+                        onClick={(e) => handleWaterUpdate(e, room._id, room.roomId._id)}>
+                          อัพเดต
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -175,7 +237,7 @@ const WaterMeter = () => {
                     ? " active:bg-colorBlueDark/20 focus:bg-colorBlueDark/20 "
                     : " "
                 }`}
-                key={i}
+                key={n}
                 onClick={() => changePage(n)}
               >
                 {n}
@@ -189,7 +251,7 @@ const WaterMeter = () => {
             </button>
           </div>
         </div>
-
+        ) }
       </div>
     </div>
   );

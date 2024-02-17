@@ -27,6 +27,7 @@ const RenterDetail = ({ roomId }) => {
 
   const [vehicleTypes, setVehicleTypes] = useState([]);
   const [renter, setRenter] = useState({});
+  const token = localStorage.getItem("token");
 
   const addVehicle = () => {
     setVehicle([
@@ -276,6 +277,7 @@ const RenterDetail = ({ roomId }) => {
                       name="type"
                       id="vehicle"
                       className="text-xs px-2 py-1 border rounded-md bg-slate-100 duration-300"
+                      value={item.name}
                       onChange={(e) => handleVehicleChange(e, index)}
                     >
                       <option disabled selected>เลือกยานพาหนะ</option>
@@ -323,8 +325,8 @@ const RenterDetail = ({ roomId }) => {
           ></textarea>
         </div>
       </div>
-      <div className="border-b-2 border-colorBlueDark/40 mt-5"></div>
-      <div className="text-center mt-2">
+      <div className="border-b-2 border-colorBlueDark/40 mt-8"></div>
+      <div className="text-center mt-3">
         <button className="duration-300 bg-colorBlueDark rounded-md text-bgColor hover:bg-slate-400 px-4 py-2 text-sm"
         onClick={handleUpdate}>
           แก้ไข

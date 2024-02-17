@@ -106,6 +106,8 @@ const ContactPayment = ({ setNext, contactData, users, list, setList, getRenterD
                     dormitoryId: id,
                     floorId: contactData.floorId,
                     roomId: contactData.roomId,
+                    waterTypeId: contactData.waterTypeId,
+                    electricalTypeId: contactData.electricalTypeId,
                 },
                 contactBill: {
                     list: list,

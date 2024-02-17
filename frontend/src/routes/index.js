@@ -9,7 +9,7 @@ export const Login = lazy(
 export const Register = lazy(
   () =>
     new Promise((resolve) => {
-      setTimeout(() => resolve(import("../pages/register/register")), 1000);
+      setTimeout(() => resolve(import("../pages/register/Register")), 1000);
     })
 );
 export const UserDetail = lazy(
@@ -109,5 +109,54 @@ export const ElectricalMeter = lazy(
   () =>
     new Promise((resolve) => {
       setTimeout(() => resolve(import("../pages/admin/meter/ElectricalMeter")), 1000);
+    })
+)
+
+export const Bill = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/bill/Bill")), 1000);
+    })
+)
+
+export const BillAll = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/bill/BillAll")), 1000);
+    })
+)
+
+export const BillDetail = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/bill/Billdetail")), 1000);
+    })
+)
+
+export const UserManagement = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/user-management/UserManagement")), 1000);
+    })
+)
+
+export const EmployeeManagement = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/user-management/EmployeeManagement")), 1000);
+    })
+)
+
+export const InvoiceForUser = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/payment/InvoiceForUser")), 1000);
+    })
+)
+
+export const DormitorySetting = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/dormitory-setting/DormitorySetting")), 1000);
     })
 )

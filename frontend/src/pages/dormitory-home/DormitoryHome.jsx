@@ -4,7 +4,7 @@ import { getTitle } from "../../store/titleSlice";
 import { manageDetail } from "../../utils/data/dormitory-home/data";
 import { Link, useParams } from 'react-router-dom';
 
-const DormitoryHome = () => {
+const DormitoryHome = ({ stateManegeBankMeter, stateManegeRoom, stateManegeRoomPrice, stateManegeRoomMeterPrice }) => {
   const dispatch = useDispatch();
   const text = "สร้างหอพัก";
 
@@ -33,6 +33,15 @@ const DormitoryHome = () => {
           </Link>
         </div>
       ))}
+      {/* {!stateManegeBankMeter && !stateManegeRoom && !stateManegeRoomPrice && !stateManegeRoomMeterPrice && (
+        <div>ตั้งค่าให้ครบทั้งหมด</div>
+      )} */}
+      {/* <Link className={`flex items-center justify-center mt-40 ${!stateManegeBankMeter || !stateManegeRoom || !stateManegeRoomPrice || !stateManegeRoomMeterPrice ? " btn-disabled" : " "}`} to={"/"}>
+        <button className={`btn bg-colorBlueDark text-bgColor w-full max-w-lg `} disabled={!stateManegeBankMeter || !stateManegeRoom || !stateManegeRoomPrice || !stateManegeRoomMeterPrice}>เสร็จสิ้น</button>
+      </Link> */}
+      <Link className={`flex items-center justify-center mt-40 `} to={"/"}>
+        <button className={`btn bg-colorBlueDark text-bgColor w-full max-w-lg `}>เสร็จสิ้น</button>
+      </Link>
     </div>
     </div>
   );

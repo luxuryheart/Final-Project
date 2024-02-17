@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const floorsSchema = new mongoose.Schema({
     name: {
@@ -100,6 +101,12 @@ const dormitorySchema = new mongoose.Schema({
         type: String,
         required: [true, "Dormitory name is required"],
     },
+    numberId: {
+        type: String,
+        required: [true, "Number ID is required"],
+        unique: true,
+        default: () => generateNumericUUID(),
+    },
     address: {
         address: {
             type: String,
@@ -165,6 +172,10 @@ const bankSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Dormitory"
     },
+    userConnectId: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "User"
+    }
 }, { timestamps: true });
 
 const dormitoryModel = mongoose.model("Dormitory", dormitorySchema);
@@ -174,5 +185,9 @@ const statusModel = mongoose.model("Status", statusSchema);
 const waterModel = mongoose.model("Water", waterSchema);
 const electricalModel = mongoose.model("Electrical", electricalSchema)
 const bankModel = mongoose.model("Bank", bankSchema)
+
+function generateNumericUUID() {
+    return uuidv4().replace(/\D/g, '').slice(0, 6);
+}
 
 module.exports = { dormitoryModel, floorsModel, roomsModel, statusModel, waterModel, electricalModel, bankModel }

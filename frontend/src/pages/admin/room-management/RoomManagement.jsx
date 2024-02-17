@@ -129,7 +129,7 @@ const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName }) =>
                   </div>
                   <div className="w-full border-b-2 border-bgLine"></div>
                   <div className="overflow-y-auto lg:max-h-[40vh] xl:max-h-[45vh]">
-                    <div className="grid grid-cols-7 gap-y-4 items-center py-5 lg:mx-2 xl:mx-4">
+                    <div className="grid xl:grid-cols-7 lg:grid-cols-6 gap-y-4 items-center py-5 lg:mx-2 xl:mx-4">
                       {floor.rooms &&
                         floor.rooms.length > 0 &&
                         floor.rooms.map((room, index) => (
@@ -162,18 +162,18 @@ const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName }) =>
               ))}
           </div>
           <div id="footer" className="w-full mb-5">
-            <div className="flex flex-col items-center justify-center text-colorDark">
+            <div className="flex flex-col items-center justify-center text-colorDark tooltip" data-tip="เพิ่มชั้น">
               <IoAddCircleOutline
                 className="h-10 w-10 text-green-800 cursor-pointer hover:text-green-500 duration-300"
-                onMouseEnter={(e) => setFloorOpen(true)}
-                onMouseLeave={(e) => setFloorOpen(false)}
+                // onMouseEnter={(e) => setFloorOpen(true)}
+                // onMouseLeave={(e) => setFloorOpen(false)}
                 onClick={increaseFloor}
               />
-              {floorOpen && (
+              {/* {floorOpen && (
                 <div className="bg-bgForm shadow-lg px-3 py-1 rounded-md text-sm">
                   เพิ่มชั้น
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>
