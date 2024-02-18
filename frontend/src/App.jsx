@@ -13,7 +13,7 @@ axios.defaults.headers.common["authtoken"] = token;
 axios.defaults.headers.post["Content-Type"] =
   "application/x-www-form-urlencoded";
 
-import { Bill, BillAll, Home, Login, UserManagement, EmployeeManagement, BillDetail, InvoiceForUser, DormitorySetting } from "./routes/index";
+import { Bill, BillAll, Home, Login, UserManagement, EmployeeManagement, BillDetail, InvoiceForUser, DormitorySetting, DormitoryBank } from "./routes/index";
 import { Register } from "./routes/index";
 import { UserDetail } from "./routes/index";
 import { Layout } from "./routes/index";
@@ -122,6 +122,7 @@ function App() {
                       setRoomId={setRoomId}
                       setFloorId={setFloorId}
                       setRoomName={setRoomName}
+                      roomModal={roomModal}
                     />
                   }
                 />
@@ -133,6 +134,8 @@ function App() {
                 <Route path="user-management/:id" element={<UserManagement />}/>
                 <Route path="employee-management/:id" element={<EmployeeManagement />}/>
                 <Route path="dormitory-setting/:id" element={<DormitorySetting />}/>
+                <Route path="dormitory-bank/:id" element={<DormitoryBank />}/>
+                {/* <Route path="dormitory-meter/:id" element={<DormitoryMeter />}/> */}
                 {/* TODO: เดี๋ยวมาทำ route path sidebar ทีหลัง */}
                 {/* <Route path="meter" element={<MeterLayout />}>
                   <Route index path="water/:id" element={<WaterMeter />}/>

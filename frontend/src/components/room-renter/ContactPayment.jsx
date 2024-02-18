@@ -108,6 +108,7 @@ const ContactPayment = ({ setNext, contactData, users, list, setList, getRenterD
                     roomId: contactData.roomId,
                     waterTypeId: contactData.waterTypeId,
                     electricalTypeId: contactData.electricalTypeId,
+                    userId: contactData.userId
                 },
                 contactBill: {
                     list: list,
@@ -124,9 +125,8 @@ const ContactPayment = ({ setNext, contactData, users, list, setList, getRenterD
                 },
             })
             if (res.data.success) {
-                getRenterDetail();
-                getDormitoryById();
                 setRoomModal(false);
+                setTimeout(() => getDormitoryById(), 1000)
             }
         } catch (error) {
             console.log(error);

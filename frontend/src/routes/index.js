@@ -160,3 +160,17 @@ export const DormitorySetting = lazy(
       setTimeout(() => resolve(import("../pages/dormitory-setting/DormitorySetting")), 1000);
     })
 )
+
+export const DormitoryBank = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/dormitory-setting/DormitoryBank")), 1000);
+    })
+)
+
+// export const DormitoryMeter = lazy(
+//   () =>
+//     new Promise((resolve) => {
+//       setTimeout(() => resolve(import("../pages/dormitory-setting/DormitoryMeter")), 1000);
+//     })
+// )

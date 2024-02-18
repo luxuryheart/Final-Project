@@ -141,4 +141,13 @@ const getUserDetail = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-module.exports = { Register, Login, getAllUser, updateProfileUser, getUserDetail };
+const GetInvoicedByID = CatchAsyncError(async(req, res, next) => {
+    try {
+        const { id } = req.params;
+        await userService.GetInvoicedByID(id, res);
+      } catch (error) {
+        return next(new ErrorHandler(error, 500));
+      }
+})
+
+module.exports = { Register, Login, getAllUser, updateProfileUser, getUserDetail, GetInvoicedByID };

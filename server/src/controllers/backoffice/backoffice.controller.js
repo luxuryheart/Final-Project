@@ -123,6 +123,7 @@ const ContactPayment = CatchAsyncError(async (req, res, next) => {
     const { contactBill, contactData, dormitoryId } = req.body
 
 	const userId = contactData.userId
+  console.log(userId);
 	
 	// สร้าง contact bill 
 	const contactPayment = await backofficeService.ContactPayment(contactBill, userId, dormitoryId, res);
@@ -358,7 +359,6 @@ const DeleteInvoicedList = CatchAsyncError(async (req, res, next) => {
   try {
     const { id } = req.params;
     const { index, listid } = req.query
-    console.log(listid);
     await backofficeService.DeleteInvoicedList(index, listid, id, res);
   } catch (error) {
     return next(new ErrorHandler(error, 500));
@@ -383,6 +383,53 @@ const DeleteInvoiced = CatchAsyncError(async (req, res, next) => {
   }
 })
 
+const GetDormitoryByID = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetDormitoryByID(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const UpdateDormitory = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    console.log(data);
+    await backofficeService.UpdateDormitory(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const DeleteDormitory = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.DeleteDormitory(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const UpdateBank = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    await backofficeService.UpdateBank(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const DeleteBank = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { dormitoryid } = req.query
+    await backofficeService.DeleteBank(id, dormitoryid, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
 module.exports = { 
   CreateContact, UpdateRenterDetails, MeterCalculate,
   CreateInvoice, GetRenterDetail, ContactPayment,
@@ -391,5 +438,7 @@ module.exports = {
   GetElectricalMeterUnit, CreateInvoiced, CreateElectricUnitPerMonth,
   UpdateInvoicedList, GetRoomByMeterUnit, UpdateMeterUnit,
   UpdateElectricUnitPerMonth, GetInvoicedList, GetInvoicedByID,
-  DeleteInvoicedList, UpdateList, DeleteInvoiced
+  DeleteInvoicedList, UpdateList, DeleteInvoiced,
+  GetDormitoryByID, UpdateDormitory, DeleteDormitory,
+  UpdateBank, DeleteBank
 };

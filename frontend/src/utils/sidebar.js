@@ -63,7 +63,7 @@ export const subMenu = [
             {subname: "พนักงาน", path: "employee-management"},
         ],
         open: false,
-        path: "/",
+        // path: "/",
         // icon: <FaRegCircle />,
     },
     {
@@ -73,7 +73,17 @@ export const subMenu = [
             {subname: "บิลทั้งหมด", path: "bill-all"},
         ],
         open: false,
-        path: "/",
+        // path: "/",
         // icon: <FaRegCircle />,
     },
+    {
+        name: "ข้อมูลหอพัก",
+        submenu: [
+            {subname: "หอพัก", path: "dormitory-setting"},
+            {subname: "บัญชีธนาคาร", path: "dormitory-bank"},
+            // {subname: "กำหนดมิเตอร์", path: "dormitory-meter"},
+        ],
+        open: false,
+        // path: "/",
+    }
 ]

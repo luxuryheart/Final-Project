@@ -586,13 +586,14 @@ const UpdateWater = async (id, price, res) => {
 }
 
 // TODO: สร้างบัญชีธนาคาร
-const CreateBankAccount = async (dormitoryId, name, accountNumber, bankName, res) => {
+const CreateBankAccount = async (dormitoryId, name, accountNumber, bankName, img, res) => {
   try {
     const newBank = await bankModel.create({
       dormitoryId: dormitoryId,
       name: name,
       account: accountNumber,
-      bank: bankName
+      bank: bankName,
+      img: img
     });
 
     await dormitoryModel.findOneAndUpdate({ _id: dormitoryId }, { $push: { banks: newBank._id } }, { new: true });

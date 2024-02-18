@@ -1,6 +1,7 @@
 const { userModel, roleModel } = require("../models/user.model")
 const jwt = require("jsonwebtoken");
 const ErrorHandler = require("../utils/ErrorHandler");
+const { invoicedModel } = require("../models/backoffice/invoice.model");
 
 const register = async(data, res) => {
     const user = await userModel.create(data)
@@ -122,4 +123,39 @@ const getUserDetail = async(user, res) => {
         });
 }
 
-module.exports = { register, login, getUserAll, updateProfile, getUserDetail }
+const GetInvoicedByID = async(invoicedId, res) => {
+  try {
+    const invoice = await invoicedModel
+      .findOne({ _id: invoicedId })
+      .populate({
+        path: "dormitoryId",
+        populate: {
+          path: "floors",
+          populate: { path: "rooms" },
+        },
+      })
+      .populate({
+        path: "roomId",
+        populate: [
+          { path: "waterID" },
+          { path: "electricID" },
+          { path: "status" },
+        ]
+      })
+      .populate({
+        path: "renterDetailId",
+        populate: { path: "userId" },
+      })
+    return res.status(200).json({
+      success: true,
+      message: "Get invoice list success",
+      invoice,
+    })
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+}
+
+module.exports = { register, login, getUserAll, updateProfile, getUserDetail, GetInvoicedByID }

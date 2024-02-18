@@ -22,6 +22,7 @@ const {
   statusModel,
   dormitoryModel,
   floorsModel,
+  bankModel,
 } = require("../../models/dormitory/dormitory.model");
 const {
   meterUnitModel,
@@ -29,6 +30,8 @@ const {
   electricalMeterUnitModel,
   electricalMeterPerMonthModel,
 } = require("../../models/backoffice/meterUnit.model");
+const { paymentModel } = require("../../models/payment/payment.model");
+const { userInDormitoryModel } = require("../../models/dormitory/userindormitory.model");
 
 const CalculateContact = async (startDate, durationInMonths, res) => {
   // Parse the startDate using a specific format
@@ -1243,6 +1246,154 @@ const DeleteInvoiced = async (id, res) => {
   }
 }
 
+const GetDormitoryByID = async (dormitoryId, res) => {
+  try {
+    const dormitory = await dormitoryModel
+      .findOne({ _id: dormitoryId })
+      .populate({
+        path: "floors",
+        populate: { path: "rooms" },
+      });
+    return res.status(200).json({
+      success: true,
+      message: "Get dormitory success",
+      dormitory,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+}
+
+const UpdateDormitory = async (data, res) => {
+  try {
+    const dormitory = await dormitoryModel.findOneAndUpdate(
+      { _id: data._id },
+      {
+        name: data.name,
+        address: data.address,
+        contact: data.contact,
+        promptpay: data.promptpay,
+      }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Update dormitory success",
+      dormitory,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+}
+
+const DeleteDormitory = async (id, res) => {
+  try {
+    const invoice = await invoicedModel.find({ dormitoryId: id });
+    if (invoice && invoice.length > 0) {
+      const payment = await paymentModel.find({ invoiceId: { $in: invoice.map(item => item._id) } });
+      if (payment && payment.length > 0) {
+        await paymentModel.deleteMany({ invoiceId: { $in: invoice.map(item => item._id) } });
+      }
+      await invoicedModel.deleteMany({ dormitoryId: id });
+    }
+    const meterUnit = await meterPerMonthModel.find({ dormitoryId: id });
+    if (meterUnit && meterUnit.length > 0) {
+      for (const item of meterUnit) {
+        for (const meter of item.meterUnitId){
+          await meterUnitModel.deleteOne({ _id: meter });
+        }
+        await meterPerMonthModel.deleteOne({ _id: item._id });
+      }
+    } 
+    const electricalUnit = await electricalMeterPerMonthModel.find({ dormitoryId: id });
+    if (electricalUnit && electricalUnit.length > 0) {
+      for (const item of electricalUnit) {
+        for (const meter of item.meterUnitId){
+          await electricalMeterUnitModel.deleteOne({ _id: meter });
+        }
+        await electricalMeterPerMonthModel.deleteOne({ _id: item._id });
+      }
+    }
+    const contactPayment = await contactPaymentModel.find({ dormitoryId: id });
+    if (contactPayment && contactPayment.length > 0) {
+      await contactPaymentModel.deleteMany({ dormitoryId: id });
+    }
+    const contact = await contactModel.find({ dormitoryId: id });
+    if (contact && contact.length > 0) {
+      await contactModel.deleteMany({ dormitoryId: id });
+    }
+    const userInDormitory = await userInDormitoryModel.find({ dormitoryId: id });
+    if (userInDormitory && userInDormitory.length > 0) {
+      await userInDormitoryModel.deleteMany({ dormitoryId: id });
+    }
+    const water = await waterModel.find({ dormitoryId: id });
+    if (water && water.length > 0) {
+      await waterModel.deleteMany({ dormitoryId: id });
+    }
+    const electrical = await electricalModel.find({ dormitoryId: id });
+    if (electrical && electrical.length > 0) {
+      await electricalModel.deleteMany({ dormitoryId: id });
+    }
+    const bank = await bankModel.find({ dormitoryId: id });
+    if (bank && bank.length > 0) {
+      await bankModel.deleteMany({ dormitoryId: id });
+    }
+    const dormitory = await dormitoryModel.findOne({ _id: id });
+    if (dormitory) {
+      for (const floor of dormitory.floors) {
+        const floors = await floorsModel.findOne({ _id: floor });
+        for (const room of floors.rooms) {
+          await roomsModel.deleteOne({ _id: room });
+        }
+        await floorsModel.deleteOne({ _id: floor });
+      }
+    }
+    await dormitoryModel.deleteOne({ _id: id });
+      
+    return res.status(200).json({ success: true, message: "Delete success" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+const UpdateBank = async(data, res) => {
+  try {
+    const bank = await bankModel.findOneAndUpdate(
+      { _id: data.bankId },
+      {
+        name: data.name,
+        account: data.account,
+      }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Update bank success",
+      bank
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+}
+
+const DeleteBank = async(id, dormitoryId, res) => {
+  try {
+    const bank = await bankModel.findOneAndDelete({ _id: id });
+    await dormitoryModel.findOneAndUpdate({ _id: dormitoryId }, { $pull: { banks: id } }, { new: true });
+    return res.status(200).json({
+      success: true,
+      message: "Delete bank success",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+}
 
 module.exports = {
   CalculateContact,
@@ -1271,5 +1422,10 @@ module.exports = {
   GetInvoicedList,
   GetInvoicedByID,
   DeleteInvoicedList,
-  DeleteInvoiced
+  DeleteInvoiced,
+  GetDormitoryByID,
+  UpdateDormitory,
+  DeleteDormitory,
+  UpdateBank,
+  DeleteBank,
 };

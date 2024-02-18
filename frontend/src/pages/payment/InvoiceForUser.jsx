@@ -12,7 +12,7 @@ const InvoiceForUser = () => {
 
   const getBillById = async() => {
     try {
-      const res = await axios.get(`/api/v1/backoffice/inoviced/${invoiceid}`, {
+      const res = await axios.get(`/api/v1/inoviced/${invoiceid}`, {
         headers: {
           authtoken: `${token}`,
         },

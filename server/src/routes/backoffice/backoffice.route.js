@@ -49,4 +49,11 @@ backofficeRouter.put('/backoffice/room', auth.isAuthenticated, auth.authorizeRol
 backofficeRouter.put('/backoffice/water-meter', auth.isAuthenticated, auth.authorizeRoles('admin'), roomBOController.UpdateWaterMeter)
 backofficeRouter.put('/backoffice/electric-meter', auth.isAuthenticated, auth.authorizeRoles('admin'), roomBOController.UpdateElectricMeter)
 
+// get dormitory
+backofficeRouter.get('/backoffice/dormitory/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetDormitoryByID)
+backofficeRouter.put('/backoffice/dormitory', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateDormitory)
+backofficeRouter.delete('/backoffice/dormitory/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.DeleteDormitory)
+backofficeRouter.put('/backoffice/bank', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateBank)
+backofficeRouter.delete('/backoffice/bank/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.DeleteBank)
+
 module.exports = backofficeRouter;

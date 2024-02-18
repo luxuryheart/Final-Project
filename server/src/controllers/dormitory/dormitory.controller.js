@@ -193,9 +193,9 @@ const GetBankByDormitoryId = CatchAsyncError(async(req, res, next) => {
 
 const BankAccount = CatchAsyncError(async(req, res, next) => {
     try {
-        const { dormitoryId, name, account, bank, flag, bankId } = req.body;
+        const { dormitoryId, name, account, bank, img, flag, bankId } = req.body;
         if (flag === "0") {
-            await dormitoryService.CreateBankAccount(dormitoryId, name, account, bank, res);
+            await dormitoryService.CreateBankAccount(dormitoryId, name, account, bank, img, res);
         } else if (flag === "1") {
             await dormitoryService.DeleteBankAccount(dormitoryId, bankId, res);
         }

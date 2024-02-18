@@ -16,9 +16,11 @@ const ContactCreate = ({ next, setNext, contactData, setContactData, users }) =>
         }));
     }
 
+    console.log(contactData);
+
     const handleSelect = (e) => {
         const { value } = e.target;
-        const selectedUser = users.find((user) => user.username === value);
+        const selectedUser = usersConnect.find((user) => user.username === value);
         if (selectedUser) {
             setContactData((prevContactData) => ({
                 ...prevContactData,

@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { FaCircle } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const UserHome = ({ setSearchModal }) => {
   const [renter, setRenter] = useState([]);
@@ -16,7 +17,7 @@ const UserHome = ({ setSearchModal }) => {
       if (res.data.success) {
         setRenter(res.data.renterArray);
       } else {
-        setRenter(res.data.renterArray);
+        setRenter(null);
       }
     } catch (error) {
       console.log(error);
@@ -58,26 +59,12 @@ const UserHome = ({ setSearchModal }) => {
                   <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
                     จัดการห้อง
                   </button>
-                  <Link
-                    to={`${
-                      renter.invoice !== null || renter.invoice !== undefined
-                        ? `/invoice/${renter.invoice._id}`
-                        : ""
-                    }`}
-                    className="indicator"
-                  >
-                    {renter.invoice !== null || renter.invoice !== undefined ? (
-                      <span className="indicator-item badge badge-error text-xs text-bgColor h-5 w-3">
-                        1
-                      </span>
-                    ) : null}
-                        <Link to={`${(renter.invoice !== null || renter.invoice !== undefined) && renter.invoice.invoiceStatus === "unpaid" ? `/invoice/${renter.invoice._id}` : ""}`} className="indicator">
-                          {(renter.invoice !== null || renter.invoice !== undefined) && renter.invoice.invoiceStatus === "unpaid" ? <span className="indicator-item badge badge-error text-xs text-bgColor h-5 w-3">1</span> : null}
+                  <Link to={`${(renter.invoice !== null || renter.invoice !== undefined) && renter.invoice?.invoiceStatus === "unpaid" ? `/invoice/${renter.invoice?._id}` : ""}`} className="indicator">
+                          {(renter.invoice !== null || renter.invoice !== undefined) && renter.invoice?.invoiceStatus === "unpaid" ? <span className="indicator-item badge badge-error text-xs text-bgColor h-5 w-3">1</span> : null}
                           <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
                             บิล
                           </button>
                         </Link>
-                  </Link>
                   <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
                     แจ้งซ้อม
                   </button>

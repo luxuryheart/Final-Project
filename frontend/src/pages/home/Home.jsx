@@ -145,47 +145,53 @@ const Home = () => {
             <div className="mt-8 bg-bgForm text-colorBlueDark rounded-lg shadow-md py-3">
               <div className="text-center text-xl">สำหรับเจ้าของหอพัก</div>
               <div id="line" className="border-b-2 border-colorBlueDark"></div>
-              <div className="mt-3 px-8 overflow-y-scroll max-h-[80vh]">
-                {dormitory.map((dormitory, i) => (
-                  <div className="mb-3" key={i}>
-                    <div className="text-lg">{dormitory.name}</div>
-                    <div className="grid grid-cols-2 px-10 text-sm mb-3 text-colorDark/80">
-                      <div>
-                        <FaCircle className="inline h-3 w-3 text-green-500" />{" "}
-                        ห้องว่าง {roomFree[0].freeRoomsCount} ห้อง
+              {dormitory && dormitory.length > 0 ? (
+                <div className="mt-3 px-8 overflow-y-scroll max-h-[80vh]">
+                  {dormitory.map((dormitory, i) => (
+                    <div className="mb-3" key={i}>
+                      <div className="text-lg">{dormitory.name}</div>
+                      <div className="grid grid-cols-2 px-10 text-sm mb-3 text-colorDark/80">
+                        <div>
+                          <FaCircle className="inline h-3 w-3 text-green-500" />{" "}
+                          ห้องว่าง {roomFree[0].freeRoomsCount} ห้อง
+                        </div>
+                        {roomsCountPerDormitory.map((item, i) => {
+                          if (item.dormitoryName === dormitory.name) {
+                            return (
+                              <div className="text-start pl-16" key={i}>
+                                <FaCircle className="inline h-3 w-3 text-gray-400" />{" "}
+                                ห้องทั้งหมด {item.roomsCount} ห้อง
+                              </div>
+                            );
+                          }
+                        })}
+                        <div>
+                          <FaCircle className="inline h-3 w-3 text-red-500" />{" "}
+                          ค้างชำระ 0 (ยังไม่ได้ตั้งสถานะ) ห้อง
+                        </div>
+                        <div className="text-start pl-16">
+                          <FaCircle className="inline h-3 w-3 text-purple-500" />{" "}
+                          จอง {roomBooked[0].bookedRoomsCount} ห้อง
+                        </div>
                       </div>
-                      {roomsCountPerDormitory.map((item, i) => {
-                        if (item.dormitoryName === dormitory.name) {
-                          return (
-                            <div className="text-start pl-16" key={i}>
-                              <FaCircle className="inline h-3 w-3 text-gray-400" />{" "}
-                              ห้องทั้งหมด {item.roomsCount} ห้อง
-                            </div>
-                          );
-                        }
-                      })}
-                      <div>
-                        <FaCircle className="inline h-3 w-3 text-red-500" />{" "}
-                        ค้างชำระ 0 (ยังไม่ได้ตั้งสถานะ) ห้อง
-                      </div>
-                      <div className="text-start pl-16">
-                        <FaCircle className="inline h-3 w-3 text-purple-500" />{" "}
-                        จอง {roomBooked[0].bookedRoomsCount} ห้อง
+                      <div className="text-end px-10">
+                        <button
+                          className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg"
+                          onClick={() =>
+                            navigate(`/admin/room-management/${dormitory._id}`)
+                          }
+                        >
+                          จัดการหอ
+                        </button>
                       </div>
                     </div>
-                    <div className="text-end px-10">
-                      <button
-                        className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg"
-                        onClick={() =>
-                          navigate(`/admin/room-management/${dormitory._id}`)
-                        }
-                      >
-                        จัดการหอ
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              ): (
+                <div className="text-center text-base text-colorBlueGray mb-3 mt-3">
+                โปรดเพิ่มหอพัก
               </div>
+              )}
               <div className="w-full px-8">
                 <Link to={"/dormitory"}>
                   <button className="w-full px-3 py-1 rounded-md bg-colorBlueDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">

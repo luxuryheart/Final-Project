@@ -26,6 +26,15 @@ const paymentSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: [true, "Price is required"],
+    },
+    paymentType: {
+        type: String,
+        required: [true, "Payment type is required"],
+        enum: ["promptpay", "credit card", "cash"]
+    },
+    note: {
+        type: String,
+        default: ""
     }
 }, { timestamps: true });
 

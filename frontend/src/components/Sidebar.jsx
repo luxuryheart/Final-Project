@@ -85,6 +85,10 @@ const Sidebar = () => {
                     ? "bg-colorBlueGray/60 rounded-sm text-colorDark"
                     : (path[0] === item.path && path[0] == "bill") || (item.name === "บิล" && path[0] == "bill-all") 
                     ? "bg-colorBlueGray/60 rounded-sm text-colorDark" 
+                    : (path[0] === item.path && path[0] == "dormitory-setting") || (item.name === "ข้อมูลหอพัก" && path[0] == "dormitory-bank") || (item.name === "ข้อมูลหอพัก" && path[0] == "dormitory-meter") 
+                    ? "bg-colorBlueGray/60 rounded-sm text-colorDark"
+                    : (path[0] === item.path && path[0] == "employee-management") || (item.name === "ข้อมูลผู้ใช้" && path[0] == "user-management")
+                    ? "bg-colorBlueGray/60 rounded-sm text-colorDark"
                     : path[0] === item.path
                     ? "bg-bgColor rounded-e-full text-colorDark"
                     : " "

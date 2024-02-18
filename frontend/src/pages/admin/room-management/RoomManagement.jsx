@@ -7,7 +7,7 @@ import axios from 'axios';
 import { IoAddCircleOutline } from "react-icons/io5";
 import { MdCancel } from "react-icons/md";
 
-const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName }) => {
+const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName, roomModal }) => {
   const [dormitory, setDormitory] = useState({})
   const [floorOpen, setFloorOpen] = useState(false)
   
@@ -76,7 +76,7 @@ const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName }) =>
 
   useEffect(() => {
     getDormitoryById()
-  }, [])
+  }, [roomModal])
 
   return (
     <div className='relative'>

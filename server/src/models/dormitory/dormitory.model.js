@@ -153,6 +153,10 @@ const dormitorySchema = new mongoose.Schema({
         ref: "Bank",
         default: null,
     },
+    promptpay: {
+        type: String,
+        default: null
+    }
 }, { timestamps:true });
 // TODO: model สร้างใหม่
 const bankSchema = new mongoose.Schema({
@@ -172,9 +176,13 @@ const bankSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Dormitory"
     },
-    userConnectId: {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: "User"
+    // userConnectId: {
+    //     type: [mongoose.Schema.Types.ObjectId],
+    //     ref: "User"
+    // },
+    img: {
+        type: String,
+        default: null
     }
 }, { timestamps: true });
 
