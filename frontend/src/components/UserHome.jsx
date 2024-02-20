@@ -30,7 +30,7 @@ const UserHome = ({ setSearchModal }) => {
 
   return (
     <>
-      <div className="mt-8 bg-bgForm text-colorBlueDark rounded-lg shadow-md py-3 max-h-[31vh]">
+      <div className="mt-8 xl:mx-32 bg-bgForm text-colorBlueDark rounded-lg shadow-md py-3 max-h-[31vh]">
         <div className="text-center text-xl">สำหรับผู้เช่า</div>
         <div id="line" className="border-b-2 border-colorBlueDark"></div>
         <div className="mt-3 px-8 overflow-y-scroll max-h-[80vh]">

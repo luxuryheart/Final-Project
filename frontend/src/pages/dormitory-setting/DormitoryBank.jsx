@@ -198,9 +198,10 @@ const DormitoryBank = () => {
           </div>
         </div>
         <div className="bg-bgForm px-5 py-5">
-          {bankAccount.map((bank, index) => (
-            <div>
-              <div className="flex items-center justify-between" key={index}>
+        {bankAccount.length > 0 ? (
+          bankAccount.map((bank, index) => (
+            <div key={index}>
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2">
                   <img src={bank.img} alt="" className="w-16 h-16" />
                   <div className="text-sm">
@@ -211,7 +212,6 @@ const DormitoryBank = () => {
                 </div>
                 <div className="flex items-center gap-x-2">
                   <div className="tooltip" data-tip="แก้ไข">
-                    {/* <FaCheck className="cursor-pointer hover:scale-110 duration-300 text-green-600" onClick={(e) => { UpdateList(e, list._id, index); setButtonSwitch(false) }}/> */}
                     <FaPen
                       className="cursor-pointer hover:scale-110 duration-300"
                       onClick={() => { setOpenEdit(!openEdit); setRow(index) }}
@@ -250,7 +250,10 @@ const DormitoryBank = () => {
               )}
               <div className="divider"></div>
             </div>
-          ))}
+          ))
+        ) : (
+          <div className="text-colorBlueGray text-center text-xl">ยังไม่มีบัญชีธนาคาร</div>
+        )}
         </div>
       </div>
     </div>

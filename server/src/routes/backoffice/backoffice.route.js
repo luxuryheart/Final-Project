@@ -42,6 +42,7 @@ backofficeRouter.get('/backoffice/inoviced/:id', auth.isAuthenticated, auth.auth
 backofficeRouter.delete('/backoffice/list/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.DeleteInvoicedList)
 backofficeRouter.put('/backoffice/list', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateList)
 backofficeRouter.delete('/backoffice/invoiced/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.DeleteInvoiced)
+backofficeRouter.put('/backoffice/list-update', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateListData)
 
 // room backoffice
 backofficeRouter.get('/backoffice/room/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), roomBOController.GetRoomByID)
@@ -55,5 +56,13 @@ backofficeRouter.put('/backoffice/dormitory', auth.isAuthenticated, auth.authori
 backofficeRouter.delete('/backoffice/dormitory/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.DeleteDormitory)
 backofficeRouter.put('/backoffice/bank', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateBank)
 backofficeRouter.delete('/backoffice/bank/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.DeleteBank)
+
+// user 
+backofficeRouter.get('/backoffice/user/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetUserByDormitoryID)
+
+// payment by admin
+backofficeRouter.post('/backoffice/payment', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.PaymentByAdmin)
+backofficeRouter.get('/backoffice/payment/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetPaymentByAdmin)
+backofficeRouter.post('/backoffice/bank-transfer', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.BankTransferPayment)
 
 module.exports = backofficeRouter;

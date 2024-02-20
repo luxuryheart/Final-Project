@@ -1,4 +1,5 @@
 const moment = require("moment");
+const { v4: uuidv4 } = require("uuid");
 const {
   contactModel,
   contactPaymentModel,
@@ -1204,7 +1205,7 @@ const GetInvoicedByID = async (invoicedId, res) => {
 const DeleteInvoicedList = async (index, listid, id, res) => {
   try {
     const invoice = await invoicedModel.findOne({ _id: id });
-    
+
     // ตรวจสอบว่ารายการที่ต้องการลบมีอยู่ในใบแจ้งหนี้หรือไม่
     if (invoice && invoice.lists[index]._id.toString() === listid) {
       // ลบรายการ
@@ -1220,8 +1221,10 @@ const DeleteInvoicedList = async (index, listid, id, res) => {
       invoice.total = totalPrice;
       invoice.grandTotal = totalPrice;
 
-      // บันทึกการเปลี่ยนแปลง
-      await invoice.save();
+      // บันทึกการเปลี่ยนแปลงโดยใช้ findOneAndUpdate
+      await invoicedModel.findOneAndUpdate({ _id: id }, { lists: invoice.lists, total: invoice.total, grandTotal: invoice.grandTotal });
+
+      console.log("Delete success");
       return res.status(200).json({ success: true, message: "Delete success" });
     } else {
       return res.status(404).json({ success: false, message: "List not found" });
@@ -1394,6 +1397,206 @@ const DeleteBank = async(id, dormitoryId, res) => {
       .json({ success: false, message: "Internal server error" });
   }
 }
+const UpdateListData = async (data, res) => {
+  try {
+    const invoice = await invoicedModel.findOne({ _id: data.invoiceId });
+
+    if (invoice) {
+        // อัปเดตค่าใน subdocument
+        invoice.lists[data.index].description = data.description;
+        invoice.lists[data.index].amount = data.amount;
+        invoice.lists[data.index].price = data.price;
+        invoice.lists[data.index].total = data.amount * data.price;
+        invoice.lists[data.index].grandTotal = data.amount * data.price
+
+      // คำนวณ grandTotal จากค่าใน subdocument
+      let totalPrice = 0;
+      invoice.lists.forEach(item => {
+        totalPrice += item.total;
+      });
+
+      // อัปเดต grandTotal ในเอกสารหลัก
+      await invoicedModel.findOneAndUpdate(
+        { _id: data.invoiceId },
+        { $set: { "grandTotal": totalPrice, "lists.$[elem].description": data.description, "lists.$[elem].amount": data.amount, "lists.$[elem].price": data.price, "lists.$[elem].total": data.amount * data.price } },
+        { new: true, arrayFilters: [{ "elem._id": data.listId }] }
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Update list success",
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "Invoice not found",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+const GetUserByDormitoryID = async (id, res) => {
+  try {
+    const user = await userInDormitoryModel.findOne({ dormitoryId: id })
+      .populate({
+        path: "userId",
+        populate: { path: "role" }
+      })
+    return res.status(200).json({
+      success: true,
+      message: "Get user success",
+      user
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+const PaymentByAdmin = async (data, res) => {
+  try {
+    // อัปเดต grandTotal ในใบแจ้งหนี้
+    const invoice = await invoicedModel.findOneAndUpdate(
+      { _id: data.invoiceId },
+      { $set: { grandTotal: data.grandTotal - data.amount } },
+      { new: true } // เพิ่ม option new เพื่อให้ return document ที่อัปเดตแล้วออกมา
+    );
+
+    const orderId = uuidv4();
+    // สร้างรายการชำระเงินใหม่
+    const payment = await paymentModel.create({
+      invoiceId: data.invoiceId,
+      date: data.date,
+      price: data.amount,
+      paymentType: "cash",
+      userId: data.userId,
+      orderId: orderId,
+      sessionId: uuidv4(),
+    });
+
+    if (invoice) {
+      if (invoice.grandTotal > 0) {
+        // หากยอดคงเหลือในใบแจ้งหนี้ยังมากกว่าศูนย์
+        payment.price = invoice.grandTotal;
+        await payment.save();
+      } else if (invoice.grandTotal === 0) {
+        // หากยอดคงเหลือในใบแจ้งหนี้เป็นศูนย์ แสดงว่าชำระเงินครบแล้ว
+        payment.price = data.amount;
+        payment.status = "completed";
+        await payment.save();
+
+        invoice.total = data.amount;
+        invoice.grandTotal = data.amount;
+        invoice.invoiceStatus = "paid";
+        await invoicedModel.findOneAndUpdate({ _id: data.invoiceId }, invoice, { new: true }); // ใช้ findByIdAndUpdate แทนการ save()
+        
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Payment success",
+        payment,
+        invoice,
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "Invoice not found",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const GetPaymentByAdmin = async (id, res) => {
+  try {
+    const payment = await paymentModel.findOne({ invoiceId: id });
+    return res.status(200).json({
+      success: true,
+      message: "Get payment success",
+      payment
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+const BankTransferPayment = async (data, res) => {
+  try {
+    const payment = await paymentModel.findOneAndUpdate({ invoiceId: data.invoiceId }, {
+      $set: {
+        status: "completed",
+      }
+    }, { new: true });
+    if (!payment) {
+      return res.status(404).json({
+        success: false,
+        message: "Payment not found",
+      });
+    }
+    await invoicedModel.findOneAndUpdate({ _id: data.invoiceId }, {
+      $set: {
+        invoiceStatus: "paid",
+      }
+    })
+    return res.status(200).json({
+      success: true,
+      message: "Payment success",
+      payment
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+const CancelPayment = async (data, res) => {
+  try {
+    const payment = await paymentModel.findOneAndUpdate({ invoiceId: data.invoiceId }, {
+      $set: {
+        status: "cancelled",
+        img: "",
+      }
+    }, { new: true });
+    if (!payment) {
+      return res.status(404).json({
+        success: false,
+        message: "Payment not found",
+      });
+    }
+    await invoicedModel.findOneAndUpdate({ _id: data.invoiceId }, {
+      $set: {
+        invoiceStatus: "unpaid",
+      }
+    })
+    return res.status(200).json({
+      success: true,
+      message: "Payment success",
+      payment
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
 
 module.exports = {
   CalculateContact,
@@ -1428,4 +1631,10 @@ module.exports = {
   DeleteDormitory,
   UpdateBank,
   DeleteBank,
+  UpdateListData,
+  GetUserByDormitoryID,
+  PaymentByAdmin,
+  GetPaymentByAdmin,
+  BankTransferPayment,
+  CancelPayment,
 };

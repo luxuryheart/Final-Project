@@ -30,11 +30,20 @@ const paymentSchema = new mongoose.Schema({
     paymentType: {
         type: String,
         required: [true, "Payment type is required"],
-        enum: ["promptpay", "credit card", "cash"]
+        enum: ["promptpay", "credit card", "cash", "bank transfer"],
     },
     note: {
         type: String,
         default: ""
+    },
+    date: {
+        type: String,
+        required: [true, "Date is required"],
+        default: Date.now()
+    },
+    img: {
+        type: String,
+        default: null
     }
 }, { timestamps: true });
 

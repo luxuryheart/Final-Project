@@ -233,4 +233,28 @@ const GetDormitoryByUser = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId, GetBankByDormitoryId, UpdateMeter, BankAccount, GetDormitoryByUser }
+const GetBankByDormitoryIdForUser = CatchAsyncError(async(req, res, next) => {
+    try {
+        const dormitoryId = req.params; 
+        const bank = await bankModel.find({ dormitoryId: dormitoryId.id });
+
+        if (!bank) {
+            res.status(400).json({
+                success: false,
+                message: "Bank not found in this dormitory",
+                bank
+            })
+        }
+        
+        res.status(200).json({
+            success: true,
+            message: "Get bank information successfully",
+            bank
+        })
+        
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId, GetBankByDormitoryId, UpdateMeter, BankAccount, GetDormitoryByUser, GetBankByDormitoryIdForUser }

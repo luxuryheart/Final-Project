@@ -262,7 +262,6 @@ const DormitoryBankMeter = ({ setStateManegeBankMeter }) => {
                 <p>ยังไม่มีบัญชีธนาคาร</p>
               </div>
             ) : (
-              // TODO: มาทำตารางให้เสร็จเหลือแค่นี้
               <div className="overflow-x-auto w-full">
                 <div className="h-[22vh]">
                   <table className="table">

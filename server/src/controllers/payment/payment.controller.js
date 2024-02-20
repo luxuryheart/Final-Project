@@ -16,6 +16,12 @@ const omiseClient = omise({
 const { v4: uuidv4 } = require("uuid");
 const { paymentModel } = require("../../models/payment/payment.model");
 const { invoicedModel } = require("../../models/backoffice/invoice.model");
+const cloudinary = require('cloudinary').v2;
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const PostPayment = async (req, res, next) => {
   try {
@@ -49,6 +55,7 @@ const PostPayment = async (req, res, next) => {
       price: invoice.price,
       status: session.status,
       sessionId: session.id,
+      paymentType: "promptpay",
     };
 
     const payment = await paymentModel.create(orderData);
@@ -164,11 +171,67 @@ const GetPayment = async (req, res, next) => {
          
         return res.status(200).json({ success: true, data: payment });
 
-        res.status(200).json({ success: true, data: payment });
     } catch (error) {
         console.log(error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 }
 
-module.exports = { PostPayment, GetOrder, PaymentHook, GetPayment };
+const BankTransferPayment = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const data = req.body;
+
+    const uploadedResponse = await cloudinary.uploader.upload(data.img, {
+      upload_preset: "final_img",
+      public_id: `${user._id}`,
+    });
+
+    const payment = await paymentModel.findOne({ invoiceId: data.invoiceId });
+    if (!payment) {
+      const payment = await paymentModel.create({
+        invoiceId: data.invoiceId,
+        date: new Date(),
+        price: data.price,
+        paymentType: "bank transfer",
+        userId: user._id,
+        orderId: uuidv4(),
+        sessionId: uuidv4(),
+        img: uploadedResponse.secure_url,
+        status: "pending",
+      })
+      if (payment) {
+        await invoicedModel.findOneAndUpdate({ _id: data.invoiceId }, {
+          invoiceStatus: "pending",
+          img: uploadedResponse.secure_url,
+        }, { new: true })
+        return res.status(200).json({
+          success: true,
+          message: "Payment success",
+          payment,
+        })
+      }
+    }
+    await paymentModel.findOneAndUpdate({ invoiceId: data.invoiceId }, {
+      $set: {
+        img: uploadedResponse.secure_url,
+        status: "pending",
+      }
+    })
+    await invoicedModel.findOneAndUpdate({ _id: data.invoiceId }, {
+      $set: {
+        invoiceStatus: "pending",
+        img: uploadedResponse.secure_url,
+      }
+    })
+    return res.status(200).json({
+      success: true,
+      message: "Payment success",
+      payment
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+module.exports = { PostPayment, GetOrder, PaymentHook, GetPayment, BankTransferPayment };

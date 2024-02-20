@@ -203,7 +203,7 @@ const Home = () => {
             <div className="mt-8 bg-bgForm text-colorBlueDark rounded-lg shadow-md py-3 max-h-[31vh]">
               <div className="text-center text-xl">สำหรับผู้เช่า</div>
               <div id="line" className="border-b-2 border-colorBlueDark"></div>
-              <div className="mt-3 px-8 overflow-y-scroll max-h-[80vh]">
+              <div className="mt-3 px-8 overflow-y-scroll max-h-[80vh] xl:mb-8 lg:mb-4">
                 {/* TODO: เดี๋ยวจะกลับมาทำตอนทำระบบจองห้องพักเสร็จ */}
                 {renter.length === 0 ? (
                   <div className="text-center text-base text-colorBlueGray mb-3">
@@ -223,8 +223,8 @@ const Home = () => {
                         <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
                           จัดการห้อง
                         </button>
-                        <Link to={`${(renter.invoice !== null || renter.invoice !== undefined) && renter.invoice.invoiceStatus === "unpaid" ? `/invoice/${renter.invoice._id}` : ""}`} className="indicator">
-                          {(renter.invoice !== null || renter.invoice !== undefined) && renter.invoice.invoiceStatus === "unpaid" ? <span className="indicator-item badge badge-error text-xs text-bgColor h-5 w-3">1</span> : null}
+                        <Link to={(renter.invoice && renter.invoice.invoiceStatus === "unpaid") ? `/invoice/${renter.invoice._id}` : ""} className="indicator">
+                          {(renter.invoice && renter.invoice.invoiceStatus === "unpaid") ? <span className="indicator-item badge badge-error text-xs text-bgColor h-5 w-3">1</span> : null}
                           <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
                             บิล
                           </button>

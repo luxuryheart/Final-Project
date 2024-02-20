@@ -18,9 +18,7 @@ const DormitoryConnectionRenter = async (userId, newdate, res) => {
             .populate({
                 path: "dormitoryId",
             });
-
         const renterArray = [];
-
         for (const renterDetail of renter) {
             const invoice = await invoicedModel.findOne({ renterDetailId: renterDetail._id, "date.year": newdate.year, "date.month": newdate.month });
             renterArray.push({ renter: renterDetail, invoice: invoice || null });

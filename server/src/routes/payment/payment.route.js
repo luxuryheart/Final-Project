@@ -7,6 +7,7 @@ paymentRouter.post('/checkout', auth.isAuthenticated, paymentController.PostPaym
 paymentRouter.get('/order/:id', auth.isAuthenticated, paymentController.GetOrder);
 paymentRouter.post('/webhook', express.raw({ type: "application/json" }), paymentController.PaymentHook)
 paymentRouter.get('/payment/:id', auth.isAuthenticated, paymentController.GetPayment);
+paymentRouter.post('/bank-transfer', auth.isAuthenticated, paymentController.BankTransferPayment);
 
 // Omise
 // paymentRouter.post('/api/omise', paymentController.OmisePayment)

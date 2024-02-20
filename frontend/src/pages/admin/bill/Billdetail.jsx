@@ -22,6 +22,16 @@ const Billdetail = () => {
   const [buttonSwitch, setButtonSwitch] = useState(false);
   const navigate = useNavigate();
   const [row, setRow] = useState(0);
+  const [paymentData, setPaymentData] = useState({
+    amount: 0,
+    paymentType: "",
+    date: new Date().toLocaleDateString("th-TH"),
+    note: "",
+    userId: bill.renterDetailId?.userId?._id,
+    invoiceId: invoiceid,
+    grandTotal: 0,
+  });
+  const [payment, setPayment] = useState([]);
 
   const unitArray = [
     "ยูนิต",
@@ -43,8 +53,7 @@ const Billdetail = () => {
         headers: {
           authtoken: `${token}`,
         },
-      });
-      console.log(res.data.invoice);
+      }); 
       if (res.data.success) {
         setBill(res.data.invoice);
         setBillUpdate(res.data.invoice);
@@ -106,41 +115,30 @@ const Billdetail = () => {
     }
   };
 
-  const handleChange = (e, index, listId) => {
-    const { value, name } = e.target;
-    setBill((prevBill) => {
-      const updatedLists = prevBill.lists.map((listItem, i) => {
-        if (i === index) {
-          return { ...listItem, [name]: value };
-        }
-        return listItem;
-      });
-      return {
-        ...prevBill,
-        lists: updatedLists,
-      };
-    });
-  };
-
   const UpdateList = async (e, listId, index) => {
     try {
-      // const res = await axios.put(`/api/v1/backoffice/list`, {
-      //   description: description,
-      //   amount: amount,
-      //   price: price,
-      //   unit: unit
-      // }, {
-      //   headers: {
-      //     authtoken: `${token}`
-      //   }
-      // })
-      // if (res.data.success) {
-      //   setDescription("")
-      //   setAmount(0)
-      //   setPrice(0)
-      //   setUnit("")
-      //   getBillById()
-      // }
+      if (listId === billUpdate.lists[index]._id) {
+        const res = await axios.put(
+          `/api/v1/backoffice/list-update`,
+          {
+            description: billUpdate.lists[index]?.description,
+            amount: billUpdate.lists[index]?.amount,
+            price: billUpdate.lists[index]?.price,
+            listId: billUpdate.lists[index]?._id,
+            index: index,
+            invoiceId: invoiceid,
+          },
+          {
+            headers: {
+              authtoken: `${token}`,
+            },
+          }
+        );
+        if (res.data.success) {
+          setButtonSwitch(false);
+          setTimeout(() => getBillById(), 1000);
+        }
+      }
     } catch (error) {
       console.log(error);
     }
@@ -164,9 +162,118 @@ const Billdetail = () => {
     }
   };
 
+  const handleChangeList = (e, index, listId) => {
+    const { value, name } = e.target;
+    setBillUpdate((prevBill) => {
+      const updatedLists = prevBill.lists.map((listItem, i) => {
+        if (i === index) {
+          return { ...listItem, [name]: value };
+        }
+        return listItem;
+      });
+      return {
+        ...prevBill,
+        lists: updatedLists,
+      };
+    });
+  };
+
+  const handlePaymentChange = (e) => {
+    const { name, value } = e.target;
+    setPaymentData((prevPayment) => ({
+      ...prevPayment,
+      [name]: value,
+    }));
+  }
+
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        `/api/v1//backoffice/payment`,
+        {
+          data: paymentData
+        },
+        {
+          headers: {
+            authtoken: `${token}`,
+          },
+        }
+      );
+      if (res.data.success) {
+        setTimeout(() => navigate(`/admin/bill-all/${id}`), 1000);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getPayment = async () => {
+    try {
+      const res = await axios.get(`/api/v1/backoffice/payment/${invoiceid}`, {
+        headers: {
+          authtoken: `${token}`,
+        },
+      });
+      if (res.data.success) {
+        setPayment(res.data.payment);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const ConfirmPayment = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('/api/v1/backoffice/bank-transfer', {
+        flag: "1",
+        invoiceId: invoiceid,
+      }, {
+        headers: {
+          authtoken: `${token}`
+        }
+      })
+      if (res.data.success) {
+        setTimeout(() => navigate(`/admin/bill-all/${id}`), 1000);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const CancelPayment = async () => {
+    try {
+      const res = await axios.post('/api/v1/backoffice/bank-transfer', {
+        flag: "2",
+        invoiceId: invoiceid,
+      }, {
+        headers: {
+          authtoken: `${token}`
+        }
+      })
+      if (res.data.success) {
+        getBillById();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     getBillById();
+    getPayment();
   }, []);
+
+  useEffect(() => {
+    // อัปเดต paymentData เมื่อ bill ถูกเซ็ตค่า
+    setPaymentData(prevPaymentData => ({
+      ...prevPaymentData,
+      grandTotal: bill?.grandTotal || 0, // กำหนดค่า grandTotal จาก bill หรือถ้าไม่มีกำหนดให้เป็น 0
+      userId: bill?.renterDetailId?.userId?._id || "", // กำหนด userId จาก bill หรือถ้าไม่มีกำหนดให้เป็น ""
+    }));
+  }, [bill]);
+
   return (
     <div className="px-5 py-3 text-colorBlueDark ">
       <div className="text-2xl flex items-center mt-2 font-bold mb-5">
@@ -246,7 +353,7 @@ const Billdetail = () => {
                   <th>จํานวน</th>
                   <th>ราคา</th>
                   <th>รวมเงิน</th>
-                  {bill.invoiceStatus === "paid" ? null : <th>action</th>}
+                  {bill.invoiceStatus === "paid" || bill.invoiceStatus === "pending" ? null : <th>action</th>}
                 </tr>
               </thead>
               <tbody>
@@ -260,7 +367,7 @@ const Billdetail = () => {
                           className="input text-center input-bordered w-full max-w-xs input-sm"
                           name="description"
                           value={billUpdate.lists[index]?.description}
-                          onChange={(e) => handleChange(e, index, list._id)}
+                          onChange={(e) => handleChangeList(e, index, list._id)}
                         />
                       ) : (
                         list.description
@@ -279,7 +386,8 @@ const Billdetail = () => {
                           type="number"
                           className="input text-center input-bordered w-[80px] max-w-xs input-sm"
                           value={billUpdate.lists[index]?.amount}
-                          onChange={(e) => setAmount(e.target.value)}
+                          name="amount"
+                          onChange={(e) => handleChangeList(e, index, list._id)}
                         />
                       ) : (
                         list.amount + " " + list.unit
@@ -291,7 +399,8 @@ const Billdetail = () => {
                           type="number"
                           className="input text-center input-bordered w-[100px] max-w-xs input-sm"
                           value={billUpdate.lists[index]?.price}
-                          onChange={(e) => setPrice(e.target.value)}
+                          name="price"
+                          onChange={(e) => handleChangeList(e, index, list._id)}
                         />
                       ) : (
                         list.price
@@ -301,9 +410,11 @@ const Billdetail = () => {
                     {index >= 3 && bill.invoiceStatus !== "paid" ? (
                       <td>
                         {!buttonSwitch && index >= 3 ? (
-                          <div className={`flex items-center justify-center gap-x-3 ${
-                            buttonSwitch ? " mt-2" : ""
-                          }`}>
+                          <div
+                            className={`flex items-center justify-center gap-x-3 ${
+                              buttonSwitch ? " mt-2" : ""
+                            }`}
+                          >
                             <div className="tooltip" data-tip="แก้ไข">
                               <FaPen
                                 className="cursor-pointer hover:scale-110 duration-300"
@@ -320,25 +431,32 @@ const Billdetail = () => {
                               />
                             </div>
                           </div>
-                        ) : (
-                          <div className={`flex items-center justify-center gap-x-3`}>
+                        ) : buttonSwitch && index === row ? (
+                          <div
+                            className={`flex items-center justify-center gap-x-3`}
+                          >
                             <div className="tooltip" data-tip="แก้ไข">
                               <FaCheck
                                 className="cursor-pointer hover:scale-110 duration-300 text-green-600"
-                                onClick={() => {
-                                  setButtonSwitch(!buttonSwitch);
-                                  setRow(index);
+                                onClick={(e) => {
+                                  UpdateList(e, list._id, index);
                                 }}
                               />
                             </div>
-                            <div className="tooltip flex items-center" data-tip="ยกเลิก">
+                            <div
+                              className="tooltip flex items-center"
+                              data-tip="ยกเลิก"
+                            >
                               <BsDashSquareFill
                                 className="cursor-pointer text-red-600 hover:scale-110 duration-300 text-xl font-bold"
-                                onClick={(e) => { setButtonSwitch(false); getBillById()}}
+                                onClick={(e) => {
+                                  setButtonSwitch(false);
+                                  getBillById();
+                                }}
                               />
                             </div>
                           </div>
-                        )}
+                        ) : null}
                       </td>
                     ) : null}
                   </tr>
@@ -353,7 +471,7 @@ const Billdetail = () => {
           >
             รวมเป็นเงิน {bill.grandTotal} บาท
           </div>
-          {bill.invoiceStatus === "paid" ? null : (
+          {bill.invoiceStatus === "paid" || bill.invoiceStatus === "pending" ? null : (
             <div className="mt-4 px-1 text-lg mb-5">
               <div className="mb-2">เพิ่มค่าบริการ</div>
               <div className="flex items-center justify-around gap-x-2">
@@ -446,65 +564,112 @@ const Billdetail = () => {
             </div>
           </div>
           <div className="bg-bgForm px-4 py-5 my-2 rounded-md shadow-md border-2 border-green-600">
-            <div className="text-lg">รับเงิน</div>
-            <div className="grid lg:grid-cols-2 gap-x-2 gap-y-4 items-center">
-              <div className="xl:col-span-2">
-                <p className="text-sm mb-1">จำนวนเงิน</p>
-                <label className="input input-bordered flex items-center gap-2">
-                  <input
-                    type="number"
-                    className="grow text-end px-2"
-                    placeholder="จำนวนเงิน"
-                  />
-                  <div>บาท</div>
-                </label>
+            {bill.invoiceStatus !== "pending" ? (
+              <div>
+                <div className="text-lg">รับเงิน</div>
+                <div className="grid lg:grid-cols-2 gap-x-2 gap-y-4 items-center">
+                  <div className="xl:col-span-2">
+                    <p className="text-sm mb-1">จำนวนเงิน</p>
+                    <label className="input input-bordered flex items-center gap-2">
+                      <input
+                        type="number"
+                        className="grow text-end px-2"
+                        placeholder="จำนวนเงิน"
+                        name="amount"
+                        value={paymentData.amount}
+                        max={bill.grandTotal}
+                        onChange={handlePaymentChange}
+                      />
+                      <div>บาท</div>
+                    </label>
+                  </div>
+                  <div className="xl:col-span-2">
+                    <p className="text-sm mb-1">
+                      ชำระเงินโดย{" "}
+                      <span className="text-red-600 text-sm">*จำเป็น</span>
+                    </p>
+                    <select
+                      className="select select-bordered w-full max-w-sm"
+                      required
+                      name="paymentType"
+                      onChange={handlePaymentChange}
+                    >
+                      <option disabled selected>
+                        วิธีการชำระ
+                      </option>
+                      <option>เงินสด</option>
+                      <option>โอนเงิน</option>
+                    </select>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-sm mb-1">
+                      วันที่รับเงิน{" "}
+                      <span className="text-red-600 text-sm">*จำเป็น</span>
+                    </p>
+                    <input
+                      type="date"
+                      placeholder="Type here"
+                      className="input input-bordered w-full max-w-xs"
+                      required
+                      name="date"
+                      value={paymentData.date}
+                      onChange={handlePaymentChange}
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-sm mb-1">หมายเหตุ</p>
+                    <textarea className="textarea textarea-bordered w-full" name="note" onChange={handlePaymentChange}></textarea>
+                  </div>
+                </div>
               </div>
-              <div className="xl:col-span-2">
-                <p className="text-sm mb-1">
-                  ชำระเงินโดย{" "}
-                  <span className="text-red-600 text-sm">*จำเป็น</span>
-                </p>
-                <select
-                  className="select select-bordered w-full max-w-sm"
-                  required
-                >
-                  <option disabled selected>
-                    วิธีการชำระ
-                  </option>
-                  <option>เงินสด</option>
-                  <option>โอนเงิน</option>
-                </select>
+            ) : 
+            (
+              <div>
+                <div className="text-lg mb-5">หลักฐานการชำระ</div>
+                <div className="flex items-center justify-center ring ring-colorBlueDark/30 ring-offset-2">
+                  <img src={payment.img} alt={payment.img} className="xl:h-[300px] xl:w-[200px] lg:h-[500px] lg:w-[400px] lg:max-w-[500px] xl:max-w-[300px]"/>
+                </div>
               </div>
-              <div className="col-span-2">
-                <p className="text-sm mb-1">
-                  วันที่รับเงิน{" "}
-                  <span className="text-red-600 text-sm">*จำเป็น</span>
-                </p>
-                <input
-                  type="date"
-                  placeholder="Type here"
-                  className="input input-bordered w-full max-w-xs"
-                  required
-                />
-              </div>
-              <div className="col-span-2">
-                <p className="text-sm mb-1">หมายเหตุ</p>
-                <textarea className="textarea textarea-bordered w-full"></textarea>
-              </div>
-            </div>
+            )}
             <div className="text-center mt-4">
               <p>รับเงินทั้งหมด</p>
               <div className="text-3xl font-bold">{bill.grandTotal}</div>
             </div>
-            <div className="mt-5">
-              <button
-                className={`btn btn-success w-full text-bgColor text-lg ${
-                  bill.invoiceStatus === "paid" ? " btn-disabled" : " "
-                }`}
-              >
-                รับเงิน
-              </button>
-            </div>
+            {bill.invoiceStatus !== "pending" ? (
+              <div className="mt-5">
+                <button
+                  className={`btn btn-success w-full text-bgColor text-lg ${
+                    bill.invoiceStatus === "paid" ? " btn-disabled" : " "
+                  }`}
+                  onClick={handlePaymentSubmit}
+                >
+                  รับเงิน
+                </button>
+              </div>
+            ): (
+              <div className="lg:grid lg:grid-cols-[70%30%] gap-x-2 xl:flex xl:flex-col">
+                <div className="mt-5">
+                  <button
+                    className={`btn btn-success w-full text-bgColor text-lg ${
+                      bill.invoiceStatus === "paid" ? " btn-disabled" : " "
+                    }`}
+                    onClick={ConfirmPayment}
+                  >
+                    ยืนยันการชำระ
+                  </button>
+                </div>
+                <div className="xl:mt-2 lg:mt-5">
+                  <button
+                    className={`btn btn-error w-full text-bgColor text-lg ${
+                      bill.invoiceStatus === "paid" ? " btn-disabled" : " "
+                    }`}
+                    onClick={CancelPayment}
+                  >
+                    ยกเลิก
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

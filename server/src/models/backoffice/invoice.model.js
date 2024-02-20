@@ -210,6 +210,10 @@ const invoicedSchema = new mongoose.Schema({
     note: {
         type: String,
         default: null,
+    },
+    img: {
+        type: String,
+        default: null,
     }
 }, { timestamps: true });
 

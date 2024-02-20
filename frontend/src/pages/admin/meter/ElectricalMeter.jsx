@@ -134,8 +134,6 @@ const ElectricalMeter = () => {
     }
   }, [date, floorId])
 
-  console.log(rooms);
-
   return (
     <div className="px-5 mt-6">
       <div className="flex flex-col justify-center text-colorBlueDark">

@@ -430,6 +430,55 @@ const DeleteBank = CatchAsyncError(async (req, res, next) => {
   }
 })
 
+const UpdateListData = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    await backofficeService.UpdateListData(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetUserByDormitoryID = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetUserByDormitoryID(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const PaymentByAdmin = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { data } = req.body;
+    await backofficeService.PaymentByAdmin(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetPaymentByAdmin = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetPaymentByAdmin(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const BankTransferPayment = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    if (data.flag === "1") {
+      await backofficeService.BankTransferPayment(data, res);
+    } else if (data.flag === "2") {
+      await backofficeService.CancelPayment(data, res);
+    }
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
 module.exports = { 
   CreateContact, UpdateRenterDetails, MeterCalculate,
   CreateInvoice, GetRenterDetail, ContactPayment,
@@ -440,5 +489,6 @@ module.exports = {
   UpdateElectricUnitPerMonth, GetInvoicedList, GetInvoicedByID,
   DeleteInvoicedList, UpdateList, DeleteInvoiced,
   GetDormitoryByID, UpdateDormitory, DeleteDormitory,
-  UpdateBank, DeleteBank
+  UpdateBank, DeleteBank, UpdateListData, GetUserByDormitoryID,
+  PaymentByAdmin, GetPaymentByAdmin, BankTransferPayment
 };
