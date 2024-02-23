@@ -10,6 +10,9 @@ import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
 import { Elements } from "@stripe/react-stripe-js";
 const stripe = Stripe("pk_test_ตัวเอง")
+{/*
+  จะใช้การชำระเงินด้วย credit crad หรือ promptpay ไม่ได้ต้องใส่ key ของตัวเองก่อนจะใช้งานได้
+*/}
 
 
 const PaymentType = ({
