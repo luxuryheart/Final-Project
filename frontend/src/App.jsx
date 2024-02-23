@@ -23,12 +23,10 @@ import { RoomsPrice } from "./routes/index";
 import { RoomsMeterPrice } from "./routes/index";
 import { DormitoryBankMeter } from "./routes/index";
 import { AdminLayout } from "./routes/index";
-import { Dashboard } from "./routes/index";
 import AdminRoute from "./routes/protected-route/AdminRoute";
 import { RoomManagementBo } from "./routes/index";
 import { WaterMeter } from "./routes/index";
 import { ElectricalMeter } from "./routes/index";
-import { MeterLayout } from "./routes/index";
 import Success from "./pages/payment/Success";
 
 function App() {
