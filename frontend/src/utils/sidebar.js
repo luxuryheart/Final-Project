@@ -10,6 +10,10 @@ export const menu = [
         // icon: <PiListDashesFill />,
     },
     {
+        name: "แจ้งซ่อม",
+        path: "repair",
+    },
+    {
         name: "จดมิเตอร์",
         path: "water-meter" || "electric-meter",
         // icon: <FaTachometerAlt />,
@@ -21,7 +25,7 @@ export const menu = [
     },
     {
         name: "ข้อมูลผู้ใช้",
-        path: "user-management",
+        path: "renter-management",
         // icon: <BiSolidUserAccount />,
     },
     // {
@@ -59,8 +63,8 @@ export const subMenu = [
     {
         name: "ข้อมูลผู้ใช้",
         submenu: [
-            {subname: "ผู้เช่า", path: "user-management"},
-            {subname: "พนักงาน", path: "employee-management"},
+            {subname: "ผู้เช่า", path: "renter-management"},
+            {subname: "ผู้ใช้งานทั่วไป", path: "users-management"},
         ],
         open: false,
         // path: "/",

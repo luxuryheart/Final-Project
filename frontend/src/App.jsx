@@ -13,7 +13,7 @@ axios.defaults.headers.common["authtoken"] = token;
 axios.defaults.headers.post["Content-Type"] =
   "application/x-www-form-urlencoded";
 
-import { Bill, BillAll, Home, Login, UserManagement, EmployeeManagement, BillDetail, InvoiceForUser, DormitorySetting, DormitoryBank } from "./routes/index";
+import { Bill, BillAll, Home, Login, RenterManagement, UsersManagement, BillDetail, InvoiceForUser, DormitorySetting, DormitoryBank, Repair } from "./routes/index";
 import { Register } from "./routes/index";
 import { UserDetail } from "./routes/index";
 import { Layout } from "./routes/index";
@@ -54,13 +54,6 @@ function App() {
     axios.defaults.headers.common["authtoken"] = storedToken;
   }, [token]);
 
-  // useEffect(() => {
-  //   const fetchStripe = async () => {
-  //     const stripe = await loadStripe(vite_public_key); 
-  //     console.log(stripe);
-  //   };
-  //   fetchStripe();
-  // }, []);
   return (
     <>
       <div className="bg-bgColor h-screen w-screen max-h-full">
@@ -75,7 +68,6 @@ function App() {
             }
           >
             <Routes>
-              {/* <Route path="/admin/*" element={<Layout />}/> */}
 
               {/* Public Pages */}
               <Route path="/" element={<Home />} />
@@ -131,10 +123,11 @@ function App() {
                 <Route path="bill/:id" element={<Bill />}/>
                 <Route path="bill-all/:id" element={<BillAll />}/>
                 <Route path="bill-detail/:id/:invoiceid" element={<BillDetail />}/>
-                <Route path="user-management/:id" element={<UserManagement />}/>
-                <Route path="employee-management/:id" element={<EmployeeManagement />}/>
+                <Route path="renter-management/:id" element={<RenterManagement />}/>
+                <Route path="users-management/:id" element={<UsersManagement />}/>
                 <Route path="dormitory-setting/:id" element={<DormitorySetting />}/>
                 <Route path="dormitory-bank/:id" element={<DormitoryBank />}/>
+                <Route path="repair/:id" element={<Repair />} />
               </Route>
             </Routes>
           </Suspense>

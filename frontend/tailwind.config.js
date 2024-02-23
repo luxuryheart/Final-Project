@@ -1,8 +1,13 @@
-/** @type {import('tailwindcss').Config} */
+// ตรวจสอบว่าได้ใช้ tailwindcss เวอร์ชันล่าสุดหรือไม่
+import daisyui from 'daisyui'
+import fb from 'flowbite/plugin'
+
 export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    'node_modules/flowbite-react/lib/esm/**/*.js',
+    "./node_modules/flowbite/**/*.js",
   ],
   theme: {
     extend: {
@@ -22,6 +27,9 @@ export default {
       }
     },
   },
-  plugins: [require("daisyui")],
+  plugins: [
+    daisyui,
+  ],
 }
+
 

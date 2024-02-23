@@ -123,7 +123,6 @@ const ContactPayment = CatchAsyncError(async (req, res, next) => {
     const { contactBill, contactData, dormitoryId } = req.body
 
 	const userId = contactData.userId
-  console.log(userId);
 	
 	// สร้าง contact bill 
 	const contactPayment = await backofficeService.ContactPayment(contactBill, userId, dormitoryId, res);
@@ -479,6 +478,125 @@ const BankTransferPayment = CatchAsyncError(async (req, res, next) => {
   }
 })
 
+const BookingByAdmin = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    await backofficeService.BookingByAdmin(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetBookingByRoomID = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetBookingByRoomID(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const CancelBookingByAdmin = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { roomId } = req.query;
+    await backofficeService.CancelBookingByAdmin(id, roomId, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetContactByRoomID = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetContactByRoomID(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const CancelContactByID = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { roomId } = req.query
+    await backofficeService.CancelContactByID(id, roomId, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const UpdateBookingByAdmin = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    await backofficeService.UpdateBookingByAdmin(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetRenterByDormitoryID = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await backofficeService.GetRenterByDormitoryID(id, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const DisconnectUser = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    await backofficeService.DisconnectUser(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const CreateInvoicedAll = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    {/* roomId[], dormitoryId, date = "2024-02" */}
+    const [year, month, day] = data.date.split("-");
+    
+    const dateData = {
+      day: day,
+      month: month,
+      year: year,
+      date: data.date,
+    }
+    await backofficeService.CreateInvoicedAll(data, dateData, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const RepairByAdmin  = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    await backofficeService.RepairByAdmin(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const GetRepair = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { status } = req.query;
+    await backofficeService.GetRepair(status, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
+const UpdateRepairByAdmin = CatchAsyncError(async (req, res, next) => {
+  try {
+    const data = req.body;
+    await backofficeService.UpdateRepairByAdmin(data, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
 module.exports = { 
   CreateContact, UpdateRenterDetails, MeterCalculate,
   CreateInvoice, GetRenterDetail, ContactPayment,
@@ -490,5 +608,9 @@ module.exports = {
   DeleteInvoicedList, UpdateList, DeleteInvoiced,
   GetDormitoryByID, UpdateDormitory, DeleteDormitory,
   UpdateBank, DeleteBank, UpdateListData, GetUserByDormitoryID,
-  PaymentByAdmin, GetPaymentByAdmin, BankTransferPayment
+  PaymentByAdmin, GetPaymentByAdmin, BankTransferPayment,
+  BookingByAdmin, GetBookingByRoomID, CancelBookingByAdmin,
+  GetContactByRoomID, CancelContactByID, UpdateBookingByAdmin,
+  GetRenterByDormitoryID, DisconnectUser, CreateInvoicedAll,
+  RepairByAdmin, GetRepair, UpdateRepairByAdmin
 };

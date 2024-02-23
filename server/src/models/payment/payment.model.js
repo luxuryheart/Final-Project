@@ -18,11 +18,6 @@ const paymentSchema = new mongoose.Schema({
         type: String,
         default: "unpaid",
     }, 
-    sessionId: {
-        type: String,
-        required: [true, "Session id is required"],
-        unique: true    
-    },
     price: {
         type: Number,
         required: [true, "Price is required"],
@@ -30,7 +25,7 @@ const paymentSchema = new mongoose.Schema({
     paymentType: {
         type: String,
         required: [true, "Payment type is required"],
-        enum: ["promptpay", "credit card", "cash", "bank transfer"],
+        enum: ["promptpay", "card", "cash", "bank transfer"],
     },
     note: {
         type: String,

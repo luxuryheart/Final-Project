@@ -50,6 +50,10 @@ const updateProfile = async (data, user, key, res) => {
           "profile.firstname": data.firstname,
           "profile.lastname": data.lastname,
           "profile.gender": data.gender,
+          "profile.img": data.img,
+          personalId: data.personalId,
+          address: data.address,
+          tel: data.tel,
           role: roles._id,
         },
         { new: true }
@@ -158,4 +162,57 @@ const GetInvoicedByID = async(invoicedId, res) => {
   }
 }
 
-module.exports = { register, login, getUserAll, updateProfile, getUserDetail, GetInvoicedByID }
+const GetUser = async(userId, res) => {
+  try {
+    const user = await userModel
+      .findOne({ _id: userId })
+      .populate("role")
+      .populate("status")
+      .populate("dormitory")
+      .populate("room");
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+}
+
+const UpdateUser = async (data, userId, res) => {
+  try {
+    const userUpdate = await userModel.findOneAndUpdate(
+      { _id: userId }, 
+      {
+        "profile.firstname": data.profile?.firstname,
+        "profile.lastname": data.profile?.lastname,
+        "profile.img": data.profile?.img,
+        address: data.address,
+        tel: data.tel,
+      },
+      { new: true }
+    );
+    
+    if (!userUpdate) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      userUpdate,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+module.exports = { UpdateUser, register, login, getUserAll, updateProfile, getUserDetail, GetInvoicedByID, GetUser }

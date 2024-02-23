@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-const UserManagement = () => {
+const RenterManagement = () => {
   const { id } = useParams();
   const [users, setUsers] = useState([]);
 
@@ -15,14 +15,11 @@ const UserManagement = () => {
   const totalPages = Math.ceil(users.length / recordsPerPage);
   const numbers = [...Array(totalPages + 1).keys()].slice(1);
 
-  const GetUser = async () => {
+  const GetRenterByDormitoryID = async () => {
     try {
-      const res = await axios.get(`/api/v1/backoffice/user/${id}`);
+      const res = await axios.get(`/api/v1/backoffice/renter/${id}`);
       if (res.data.success) {
-        const filteredUsers = res.data.user.userId.filter(
-          (user) => user.role?.name === "user"
-        );
-        setUsers(filteredUsers);
+        setUsers(res.data.renter)
       } else {
         setUsers([]);
       }
@@ -48,7 +45,7 @@ const UserManagement = () => {
   }
 
   useEffect(() => {
-    GetUser();
+    GetRenterByDormitoryID();
   }, []);
   return (
     <div className="px-5 mt-6">
@@ -78,14 +75,14 @@ const UserManagement = () => {
                         key={i}
                       >
                         <td>
-                          {user.profile?.firstname} {user.profile?.lastname}
+                          {user.userId?.profile?.firstname} {user.userId?.profile?.lastname}
                         </td>
-                        <td>{user.email}</td>
-                        <td>{user.username}</td>
-                        <td>{user.role?.name === "user" && "ผู้เช่า"}</td>
+                        <td>{user.userId?.email}</td>
+                        <td>{user.userId?.tel === "" ? "-" : user.userId?.tel}</td>
+                        <td>{"ผู้เช่า"}</td>
                         <td>
-                          <button className="btn btn-sm bg-red-600 text-bgColor">
-                            ลบ
+                          <button className="btn btn-sm">
+                            รายละเอียด
                           </button>
                         </td>
                       </tr>
@@ -132,4 +129,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement;
+export default RenterManagement;

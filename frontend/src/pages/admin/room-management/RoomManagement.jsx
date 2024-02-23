@@ -10,6 +10,7 @@ import { MdCancel } from "react-icons/md";
 const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName, roomModal }) => {
   const [dormitory, setDormitory] = useState({})
   const [floorOpen, setFloorOpen] = useState(false)
+  const [search, setSearch] = useState("");
   
   const { id } = useParams()
 
@@ -109,6 +110,7 @@ const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName, room
                           type="text"
                           placeholder="ค้นหาด้วยเลขห้อง"
                           className="px-8 py-1 border rounded-md bg-bgColor"
+                          onChange={(e) => setSearch(e.target.value)}
                         />
                       </div>
                     </div>
@@ -132,7 +134,8 @@ const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName, room
                     <div className="grid xl:grid-cols-7 lg:grid-cols-6 gap-y-4 items-center py-5 lg:mx-2 xl:mx-4">
                       {floor.rooms &&
                         floor.rooms.length > 0 &&
-                        floor.rooms.map((room, index) => (
+                        floor.rooms.filter((room) => room.name.startsWith(floor.name)) 
+                        .filter((room) => room.name.includes(search)).map((room, index) => (
                           <div
                             className="mx-3 text-center text-colorDark"
                             key={index}
@@ -143,11 +146,15 @@ const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName, room
                                 className={` flex items-center justify-center ${
                                   room.status.name === "ว่าง"
                                     ? " bg-sky-100 "
+                                    : room.status?.name === "จอง"
+                                    ? " bg-purple-200 "
                                     : " bg-green-200 "
                                 }  rounded-lg cursor-pointer duration-300 hover:bg-sky-200 h-full`}
                               onClick={(e) => openRoom(e, floor._id, room._id, room.name)}>
                                 {room.status.name === "ว่าง" ? (
                                   <div>ห้องว่าง</div>
+                                ) : room.status?.name === "จอง" ? (
+                                  <div>จอง</div>
                                 ) : (
                                   <div>มีผู้เช่า</div>
                                 )}

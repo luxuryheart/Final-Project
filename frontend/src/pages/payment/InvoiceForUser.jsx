@@ -7,6 +7,7 @@ const stripe = Stripe("pk_test_51Ok68OGiPTOivo4lR6KXzErE300ae1AAvi0xI5OG9zValZII
 import { GiMoneyStack } from "react-icons/gi";
 import { paymentType } from '../../utils/admin/paymentType';
 import PaymentType from "../../components/payment/PaymentType";
+import { loadStripe } from '@stripe/stripe-js';
 
 const InvoiceForUser = () => {
   const [bill, setBill] = useState({});
@@ -14,6 +15,10 @@ const InvoiceForUser = () => {
   const token = localStorage.getItem("token");
   const [paymentTypeOpen, setPaymentTypeOpen] = useState(false);
   const [banks, setBanks] = useState([]);
+  const [stripePromise, setStripePromise] = useState(null);
+  const [stripePromisePrompt, setStripePromisePrompt] = useState(null);
+  const [clientSecret, setClientSecret] = useState("");
+  const [clientSecretPrompt, setClientSecretPrompt] = useState("");
 
   const getBillById = async() => {
     try {
@@ -27,31 +32,6 @@ const InvoiceForUser = () => {
       }
     } catch (error) {
         console.log(error);
-    }
-  }
-
-  const CreatePayment = async() => {
-    try {
-      const res = await axios.post(`/api/v1/checkout`, {
-        invoice: {
-          invoiceId: invoiceid,
-          price: bill.grandTotal
-        },
-        userId: bill.renterDetailId?.userId?._id
-      }, {
-        headers: {
-          authtoken: `${token}`
-        }
-      })
-      if (res.data.success) {
-        const sessionId = res.data.sessionId
-        stripe.redirectToCheckout({
-          sessionId
-        })
-        getBillById()
-      }
-    } catch (error) {
-      console.log(error)
     }
   }
 
@@ -77,7 +57,7 @@ const InvoiceForUser = () => {
 
   return (
     <div className="relative">
-      {paymentTypeOpen && <PaymentType banks={banks} setPaymentTypeOpen={setPaymentTypeOpen} bill={bill}/>}
+      {paymentTypeOpen && <PaymentType banks={banks} bill={bill} setPaymentTypeOpen={setPaymentTypeOpen} />}
       <div className="container mx-auto">
         <div className="flex flex-col items-center justify-center pt-10 gap-x-4 overflow-y-auto max-h-[90vh] text-colorBlueDark xl:mx-80 lg:mx-60 ">
           <div className="text-2xl mb-5">ใบแจ้งหนี้</div>
@@ -177,7 +157,7 @@ const InvoiceForUser = () => {
                   รวมเป็นเงิน {bill.grandTotal} บาท
                 </div>
                 <div>
-                  <button className="btn btn-sm btn-success text-bgColor hover:scale-110 duration-300" onClick={() => setPaymentTypeOpen(true)}><GiMoneyStack />ชำระเงิน</button>
+                  <button className="btn btn-sm btn-success text-bgColor hover:scale-110 duration-300" onClick={() => {setPaymentTypeOpen(true)}}><GiMoneyStack />ชำระเงิน</button>
                 </div>
               </div>
             </div>

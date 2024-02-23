@@ -7,6 +7,7 @@ import { GetFloorByDormitoryID } from "../../../services/backoffice/floorFilter"
 import { GetWaterMeter } from "../../../services/backoffice/meterUnit";
 import { GetRoomByMeterUnit } from "../../../services/backoffice/floorFilter";
 import { FaCheckCircle } from "react-icons/fa";
+import { GetRoomByElectricalMeterUnit } from "../../../services/backoffice/floorFilter";
 
 const Bill = () => {
     const [floorId, setFloorId] = useState("");
@@ -18,6 +19,7 @@ const Bill = () => {
     const [date, setDate] = useState(new Date().toISOString().slice(0, 7));
     // const [date, setDate] = useState("2024-04");
     const [meterUnit, setMeterUnit] = useState({})
+    const [electricalMeterUnit, setElectricalMeterUnit] = useState({})
   
     // pagination for rooms
     const [currentPage, setCurrentPage] = useState(1);
@@ -53,6 +55,21 @@ const Bill = () => {
           setMeterUnit(res)
         } else {
           setMeterUnit(res)
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    const getRoomByElectricalMeterUnit = async(floorId, date) => {
+      try {
+        const dormitoryId = id
+        const res = await GetRoomByElectricalMeterUnit(floorId, date, dormitoryId);
+        if (res) {
+          setRooms(res)
+          setElectricalMeterUnit(res)
+        } else {
+          setElectricalMeterUnit(res)
         }
       } catch (error) {
         console.log(error);
@@ -99,6 +116,29 @@ const Bill = () => {
         console.log(error);
       }
     }
+
+    const createAllInvoice = async() => {
+      try {
+        const newMeterRooms = rooms.filter((room) => room.invoiceStatus === false && room.roomId?.status?.name === "มีผู้เช่า");
+        const newElectricalMeterRooms = electricalMeterUnit.filter((room) => room.invoiceStatus === false && room.roomId?.status?.name === "มีผู้เช่า");
+        const newDate = `${date}-${new Date().toLocaleDateString("th-TH").slice(0, 2)}`;
+        const res = await axios.post(`/api/v1/backoffice/invoiced-all`, {
+            meterId: newMeterRooms,
+            elecId: newElectricalMeterRooms,
+            dormitoryId: id,
+            date: newDate,
+        }, {
+          headers: {
+            authtoken: `${token}`,
+          },
+        })
+        if (res.data.success) {
+          setTimeout(() => getRoomByMeterUnit(floorId, date), 500)
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
   
     useEffect(() => {
       getFloorById();
@@ -107,6 +147,7 @@ const Bill = () => {
     useEffect(() => {
       if (floorId || date) {
         getRoomByMeterUnit(floorId, date);
+        getRoomByElectricalMeterUnit(floorId, date);
       }
     }, [date, floorId])
     return (
@@ -118,7 +159,11 @@ const Bill = () => {
                 {/*
                     TODO: ชื่อชั้นไม่ไดนามิกตามเวลาชั้นเปลี่ยน
                 */}
-              <div className="text-base font-semibold">ชั้นที่ {floorName}</div>
+              <div className="text-base font-semibold">
+                {floor.filter((item) => item._id === floorId).map((selectedFloor) => (
+                  `ชั้นที่ ${selectedFloor.name}`
+                ))}
+              </div>
               <select
                 className="select select-bordered w-xs max-w-xs select-xs"
                 onChange={handleSelectFloor}
@@ -132,7 +177,7 @@ const Bill = () => {
             </div>
             <div className="relative flex items-center gap-x-2 text-sm text-colorBlueDark">
               <input type="month" name="date" id="date" value={date} min={new Date().toISOString().slice(0, 7)} className="input input-bordered input-sm" onChange={(e) => setDate(e.target.value)}/>
-              <button className="btn btn-sm btn-outline btn-success"><FaCheckCircle className="text-green-600 h-3 w-3"/>สร้างใบแจ้งหนี้ทุกห้อง</button>
+              <button className="btn btn-sm btn-outline btn-success" onClick={createAllInvoice}><FaCheckCircle className="text-green-600 h-3 w-3"/>สร้างใบแจ้งหนี้ทุกห้อง</button>
             </div>
           </div>
           {(meterUnit === undefined) || (meterUnit === null) ? (

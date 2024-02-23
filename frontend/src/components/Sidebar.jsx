@@ -19,6 +19,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowUp } from "react-icons/io";
 import { FaPowerOff } from "react-icons/fa6";
 import { IoHome } from "react-icons/io5";
+import { FaScrewdriverWrench } from "react-icons/fa6";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ const Sidebar = () => {
                     ? "bg-colorBlueGray/60 rounded-sm text-colorDark" 
                     : (path[0] === item.path && path[0] == "dormitory-setting") || (item.name === "ข้อมูลหอพัก" && path[0] == "dormitory-bank") || (item.name === "ข้อมูลหอพัก" && path[0] == "dormitory-meter") 
                     ? "bg-colorBlueGray/60 rounded-sm text-colorDark"
-                    : (path[0] === item.path && path[0] == "employee-management") || (item.name === "ข้อมูลผู้ใช้" && path[0] == "user-management")
+                    : (path[0] === item.path && path[0] == "users-management") || (item.name === "ข้อมูลผู้ใช้" && path[0] == "renter-management")
                     ? "bg-colorBlueGray/60 rounded-sm text-colorDark"
                     : path[0] === item.path
                     ? "bg-bgColor rounded-e-full text-colorDark"
@@ -112,9 +113,10 @@ const Sidebar = () => {
                     <TbReportSearch className="h-5 w-5" />
                   ) : item.name === "หน้าหลัก" ? (
                     <IoHome />
-                  ) : (
-                    <RiBillLine className="h-5 w-5" />
-                  )}
+                  ) : item.name === "แจ้งซ่อม" ? (
+                    <FaScrewdriverWrench />
+                  ) : <RiBillLine />  
+                  }
                   <div className="inline">{item.name}</div>{" "}
                 </div>{" "}
                 {subMenuState.map((subItem, subIndex) => {

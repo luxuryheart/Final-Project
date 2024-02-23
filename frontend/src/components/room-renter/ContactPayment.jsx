@@ -178,15 +178,6 @@ const ContactPayment = ({ setNext, contactData, users, list, setList, getRenterD
                     </div>
                     <div className='mb-4'>
                         <div className='text-lg'>ใบเสร็จแรกเข้า</div>
-                        <div className='px-3 mb-2'>
-                            <p className='text-sm mb-1'>รายละเอียดหัวบิล</p>
-                            <select className="select select-bordered w-full max-w-xs select-sm">
-                                <option disabled selected>เลือกข้อมูลจากผู้เช่า</option>
-                                {users.map((user) => (
-                                    <option key={user.id} value={user.id}>{user.username}</option>
-                                ))}
-                            </select>
-                        </div>
                         <div className='px-3 flex items-center text-base gap-x-2'>
                             <div className=''>รายการชำระเงิน</div>
                             <button className='bg-colorBlueDark text-bgColor text-xs rounded-md px-1 py-1 hover:bg-slate-400 hover:scale-105 duration-300'
@@ -248,7 +239,7 @@ const ContactPayment = ({ setNext, contactData, users, list, setList, getRenterD
                                 </div>
                                 <div className='text-center mt-3 w-full flex items-center justify-center'>
                                     {/* <img src={qrCode} alt={qrCode} className='w-[180px] h-[180px]' /> */}
-                                    <img src={`https://promptpay.io/${dormitory.contact?.tel[0]}/${totalPrice}.png`} alt='qrcode-promptpay' className='w-[180px] h-[180px]'/>
+                                    <img src={`https://promptpay.io/${dormitory.promptpay}/${totalPrice}.png`} alt='qrcode-promptpay' className='w-[180px] h-[180px]'/>
                                 </div>
                                 <div className='text-center text-green-600 text-lg'>รวมทั้งหมดราคา {totalPrice} บาท</div>
                             </div>

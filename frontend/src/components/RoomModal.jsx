@@ -8,6 +8,7 @@ import ContactCreate from "./room-renter/ContactCreate";
 import ContactPayment from "./room-renter/ContactPayment";
 import Contact from "./room-renter/Contact";
 import SettingRoom from "./room-renter/SettingRoom";
+import ContactDetail from "./room-renter/ContactDetail";
 
 const RoomModal = ({
   setRoomModal,
@@ -109,6 +110,16 @@ const RoomModal = ({
               </button>
               <button
                 className={`duration-300 rounded-b-lg py-1 ${
+                  tabMenu === 4
+                    ? " bg-colorBlueDark text-bgColor px-2 py-1 hover:bg-colorBlueDark cursor-pointer "
+                    : " "
+                }`}
+                onClick={() => setTabMenu(4)}
+              >
+                สัญญา
+              </button>
+              <button
+                className={`duration-300 rounded-b-lg py-1 ${
                   tabMenu === 3
                     ? " bg-colorBlueDark text-bgColor px-2 py-1 hover:bg-colorBlueDark cursor-pointer "
                     : " "
@@ -122,12 +133,14 @@ const RoomModal = ({
               {tabMenu === 0 ? (
                 <RenterDetail roomId={roomId} getRenterDetail={getRenterDetail}/>
               ) : tabMenu === 1 ? (
-                <BookingRoom />
+                <BookingRoom roomId={roomId} setRoomModal={setRoomModal}/>
               ) : tabMenu === 2 ? (
                 <Contact floorId={floorId} roomId={roomId} getRenterDetail={getRenterDetail} setRoomModal={setRoomModal}/>
               )  : tabMenu === 3 ? (
                 <SettingRoom floorId={floorId} roomId={roomId}/> 
-              ) : null}
+              ) : tabMenu === 4 ? (
+                <ContactDetail roomId={roomId} setRoomModal={setRoomModal}/>
+              ): null}
             </div>
           </div>
         </div>

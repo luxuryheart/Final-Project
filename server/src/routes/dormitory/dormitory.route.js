@@ -16,11 +16,19 @@ dormitoryRouter.put('/update-meter', auth.isAuthenticated, auth.authorizeRoles('
 dormitoryRouter.post('/bank', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryController.BankAccount)
 dormitoryRouter.get('/get-dormitory-by-user/:id', auth.isAuthenticated, dormitoryController.GetDormitoryByUser)
 
+//dormitory 
+dormitoryRouter.get('/dormitory/:id', auth.isAuthenticated, dormitoryController.GetDormitoryByID)
+dormitoryRouter.post('/dormitroy/booking', auth.isAuthenticated, dormitoryController.Booking)
+dormitoryRouter.get('/dormitory', auth.isAuthenticated, dormitoryController.GetDormitory)
+
 // เชื่อต่อหอพัก
 dormitoryRouter.get('/dormitory-connection', auth.isAuthenticated, dormitoryUserController.DormitoryConnectionRenter)
 dormitoryRouter.post('/dormitory-connection', auth.isAuthenticated, dormitoryUserController.DormitoryConnection)
 dormitoryRouter.post('/dormitory-search', auth.isAuthenticated, dormitoryUserController.DormitorySearchByID)
+dormitoryRouter.get('/dormitory-user-connect' , auth.isAuthenticated, dormitoryUserController.DormitoryConnectionUser)
+dormitoryRouter.put('/dormitory-user-connect', auth.isAuthenticated, dormitoryUserController.DisconnectDormitory)
 
 dormitoryRouter.get('/dormitory-connection/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), dormitoryUserController.DormitoryConnectionUserByID)
+
 
 module.exports = dormitoryRouter;

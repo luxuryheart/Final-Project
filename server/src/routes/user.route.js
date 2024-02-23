@@ -10,6 +10,8 @@ userRouter.get('/users', auth.isAuthenticated, auth.authorizeRoles('admin'), use
 userRouter.put('/user-update', auth.isAuthenticated, userController.updateProfileUser);
 userRouter.get('/user-detail', auth.isAuthenticated, userController.getUserDetail);
 userRouter.get('/inoviced/:id', auth.isAuthenticated, userController.GetInvoicedByID)
+userRouter.get('/user', auth.isAuthenticated, userController.GetUser)
+userRouter.put('/user', auth.isAuthenticated, userController.UpdateUser)
 
 // cron.schedule('* * * * *', () => {
 //     userController.getAllUser()

@@ -133,17 +133,17 @@ export const BillDetail = lazy(
     })
 )
 
-export const UserManagement = lazy(
+export const RenterManagement = lazy(
   () =>
     new Promise((resolve) => {
-      setTimeout(() => resolve(import("../pages/admin/user-management/UserManagement")), 1000);
+      setTimeout(() => resolve(import("../pages/admin/user-management/RenterManagement")), 1000);
     })
 )
 
-export const EmployeeManagement = lazy(
+export const UsersManagement = lazy(
   () =>
     new Promise((resolve) => {
-      setTimeout(() => resolve(import("../pages/admin/user-management/EmployeeManagement")), 1000);
+      setTimeout(() => resolve(import("../pages/admin/user-management/UsersManagement")), 1000);
     })
 )
 
@@ -165,6 +165,13 @@ export const DormitoryBank = lazy(
   () =>
     new Promise((resolve) => {
       setTimeout(() => resolve(import("../pages/dormitory-setting/DormitoryBank")), 1000);
+    })
+)
+
+export const Repair = lazy(
+  () =>
+    new Promise((resolve) => {
+      setTimeout(() => resolve(import("../pages/admin/repair/Repair")), 1000);
     })
 )
 

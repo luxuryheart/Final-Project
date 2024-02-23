@@ -33,7 +33,6 @@ backofficeRouter.post('/backoffice/electric-units', auth.isAuthenticated, auth.a
 backofficeRouter.get('/backoffice/room-by-elec-meter-units/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetElectricalMeterUnit)
 backofficeRouter.put('/backoffice/electric-units', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateElectricUnitPerMonth);
 
-
 // create invoice
 backofficeRouter.post('/backoffice/invoiced', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.CreateInvoiced)
 backofficeRouter.put('/backoffice/invoiced', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateInvoicedList)
@@ -43,6 +42,7 @@ backofficeRouter.delete('/backoffice/list/:id', auth.isAuthenticated, auth.autho
 backofficeRouter.put('/backoffice/list', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateList)
 backofficeRouter.delete('/backoffice/invoiced/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.DeleteInvoiced)
 backofficeRouter.put('/backoffice/list-update', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateListData)
+backofficeRouter.post('/backoffice/invoiced-all', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.CreateInvoicedAll)
 
 // room backoffice
 backofficeRouter.get('/backoffice/room/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), roomBOController.GetRoomByID)
@@ -64,5 +64,24 @@ backofficeRouter.get('/backoffice/user/:id', auth.isAuthenticated, auth.authoriz
 backofficeRouter.post('/backoffice/payment', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.PaymentByAdmin)
 backofficeRouter.get('/backoffice/payment/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetPaymentByAdmin)
 backofficeRouter.post('/backoffice/bank-transfer', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.BankTransferPayment)
+
+// booking
+backofficeRouter.post('/backoffice/booking', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.BookingByAdmin)
+backofficeRouter.get('/backoffice/booking/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetBookingByRoomID)
+backofficeRouter.delete('/backoffice/booking/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.CancelBookingByAdmin)
+backofficeRouter.put('/backoffice/booking', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateBookingByAdmin)
+
+// contact 
+backofficeRouter.get('/backoffice/contact/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetContactByRoomID)
+backofficeRouter.delete('/backoffice/contact/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.CancelContactByID)
+backofficeRouter.get('/backoffice/renter/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetRenterByDormitoryID)
+backofficeRouter.put('/backoffice/user-disconnect', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.DisconnectUser)
+
+
+// repair
+backofficeRouter.post('/backoffice/repair', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.RepairByAdmin)
+backofficeRouter.get('/backoffice/repair', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.GetRepair)
+backofficeRouter.put('/backoffice/repair', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.UpdateRepairByAdmin)
+// backofficeRouter.delete('/backoffice/repair/:id', auth.isAuthenticated, auth.authorizeRoles('admin'), backofficeController.CancelRepairByAdmin)
 
 module.exports = backofficeRouter;

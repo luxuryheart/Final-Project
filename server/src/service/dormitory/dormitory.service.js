@@ -9,6 +9,7 @@ const {
   statusModel,
 } = require("../../models/dormitory/dormitory.model");
 const ErrorHandler = require("../../utils/ErrorHandler");
+const { bookingModel } = require("../../controllers/dormitory/booking.model");
 
 const DormitoryCreate = async (data, user, res) => {
   try {
@@ -19,6 +20,7 @@ const DormitoryCreate = async (data, user, res) => {
       name: data.name,
       address: data.address,
       contact: data.contact,
+      promptpay: data.promptpay,
       userID: user._id,
     });
     
@@ -29,33 +31,78 @@ const DormitoryCreate = async (data, user, res) => {
 };
 
 // add floor
-const Addfloor = async (id, amount, res) => {
+// const Addfloor = async (id, amount, res) => {
+//   try {
+//     // ลูปสร้างชั้นตามจำนวนที่ input
+//     let floorIds = [];
+//     for (let i = 0; i < amount; i++) {
+//       const floor = await floorsModel.create({
+//         name: i + 1,
+//       });
+//       floorIds.push(floor._id);
+//     }
+
+//     // เพ่ิมชั้นไปที่หอ
+//     await dormitoryModel.findByIdAndUpdate(
+//       { _id: id },
+//       { $push: { floors: { $each: floorIds } } },
+//       { new: true }
+//     );
+
+//     const updatedDormitory = await dormitoryModel
+//       .findById(id)
+//       .populate("floors");
+
+//     return floorIds;
+//   } catch (error) {
+//     return next(new ErrorHandler(error, 500));
+//   }
+// };
+
+const CreateFloorsAndRooms = async (id, rooms, res, next) => {
   try {
-    // ลูปสร้างชั้นตามจำนวนที่ input
-    let floorIds = [];
-    for (let i = 0; i < amount; i++) {
+    const status = await statusModel.findOne({ name: "ว่าง" });
+
+    for (let i = 0; i < rooms.length; i++) {
       const floor = await floorsModel.create({
-        name: i + 1,
+        name: rooms[i].floor,
       });
-      floorIds.push(floor._id);
+      const roomIds = [];
+
+      for (let j = 0; j < rooms[i].room; j++) {
+        let roomNumber = (j + 1 < 10) ? "0" + (j + 1) : "" + (j + 1);
+        const roomName = floor.name + roomNumber;
+
+        const createdRoom = await roomsModel.create({ name: roomName, status: status._id });
+        roomIds.push(createdRoom._id);
+      }
+
+      const updatedFloor = await floorsModel.findByIdAndUpdate(
+        { _id: floor._id },
+        { $push: { rooms: { $each: roomIds } } },
+        { new: true }
+      );
+
+      await dormitoryModel.findByIdAndUpdate(
+        { _id: id },
+        { $push: { floors: floor._id } },
+        { new: true }
+      );
     }
 
-    // เพ่ิมชั้นไปที่หอ
-    await dormitoryModel.findByIdAndUpdate(
-      { _id: id },
-      { $push: { floors: { $each: floorIds } } },
-      { new: true }
-    );
+    const dormitory = await dormitoryModel.findOne({ _id: id });
 
-    const updatedDormitory = await dormitoryModel
-      .findById(id)
-      .populate("floors");
+    return res.status(201).json({
+      success: true,
+      message: "Floors created successfully",
+      dormitory
+    });
 
-    return floorIds;
   } catch (error) {
     return next(new ErrorHandler(error, 500));
   }
 };
+
 
 // add default rooms in floor
 const Addrooms = async (id, dormitoryId, res) => {
@@ -651,5 +698,79 @@ const GetDormitoryByUser = async (id, res) => {
   }
 };
 
-module.exports = { DormitoryCreate, createWaterPrice, createElectricalPrice, Addfloor, Addrooms, InCreaseFloors, 
-  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice, GetAllRooms, GroupMeters, UpdateElectrical, UpdateWater, CreateBankAccount, DeleteBankAccount, GetDormitoryByUser };
+const GetDormitoryByID = async (id, res) => {
+  try {
+    const dormitory = await dormitoryModel
+      .findOne({ _id: id })
+      .populate({ path: "floors", populate: { path: "rooms", populate: [{ path: "waterID" }, { path: "electricID" }, { path: "status" }] } })
+      .populate({ path: "banks" });
+    return res.status(200).json({
+      success: true,
+      message: "Get dormitory successfully",
+      dormitory,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+}
+
+const Booking = async (userId, data, res) => {
+  try {
+    const booking = await bookingModel.create({
+      roomId: data.roomId,
+      userId: userId,
+      bookingDate: data.bookingDate,
+      bookingStartDate: data.bookingStartDate,
+      bookingAmount: data.bookingAmount,
+      name: data.name,
+      tel: data.phone,
+      note: data.note
+    });
+  if (!booking) {
+    return res.status(404).json({
+      success: false,
+      message: "Booking not found",
+    });
+  }
+  const status = await statusModel.findOne({ name: "จอง" });
+
+  await roomsModel.findOneAndUpdate({ _id: data.roomId }, {
+    status: status._id
+  })
+  return res.status(200).json({
+    success: true,
+    message: "Booking success",
+    booking
+  });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+const GetDormitory = async (res) => {
+  try {
+    const dormitory = await dormitoryModel
+      .find()
+      .populate({ path: "floors", populate: { path: "rooms", populate: [{ path: "waterID" }, { path: "electricID" }, { path: "status" }] } })
+      .populate({ path: "banks" });
+    res.status(200).json({
+      success: true,
+      message: "Get dormitory successfully",
+      dormitory,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+}
+
+module.exports = { GetDormitory, DormitoryCreate, createWaterPrice, createElectricalPrice, Addrooms, InCreaseFloors, Booking, CreateFloorsAndRooms,
+  IncreaseRoom, DeleteRoom, DeleteFloor, UpdatePriceForRoom, UpdateWaterPrice, UpdateElectricalPrice, GetAllRooms, GroupMeters, UpdateElectrical, UpdateWater, CreateBankAccount, DeleteBankAccount, GetDormitoryByUser, GetDormitoryByID };

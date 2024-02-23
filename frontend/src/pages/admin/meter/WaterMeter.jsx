@@ -14,6 +14,7 @@ const WaterMeter = () => {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 7));
   // const [date, setDate] = useState("2024-04");
   const [meterUnit, setMeterUnit] = useState({})
+  const [search, setSearch] = useState("");
 
   // pagination for rooms
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,6 +30,9 @@ const WaterMeter = () => {
       setCurrentPage(currentPage - 1);
     }
   }
+
+  console.log(floorId);
+  console.log(floor);
 
   const nextPage = () => {
     if (currentPage !== totalPages) {
@@ -47,6 +51,7 @@ const WaterMeter = () => {
       if (res) {
         setRooms(res)
         setMeterUnit(res)
+
       } else {
         setMeterUnit(res)
       }
@@ -131,7 +136,7 @@ const WaterMeter = () => {
     if (floorId || date) {
       getRoomByMeterUnit(floorId, date);
     }
-  }, [date, floorId])
+  }, [date, floorId, floor])
 
   return (
     <div className="px-5 mt-6">
@@ -139,7 +144,11 @@ const WaterMeter = () => {
         <div className="text-2xl font-bold mb-5">มิเตอร์น้ำ</div>
         <div id="header-bar" className="flex justify-between items-center mb-5">
           <div className="flex items-center gap-x-5">
-            <div className="text-base font-semibold">ชั้นที่ 1</div>
+            <div className="text-base font-semibold">
+              {floor.filter((item) => item._id === floorId).map((selectedFloor) => (
+                `ชั้นที่ ${selectedFloor.name}`
+              ))}
+            </div>
             <select
               className="select select-bordered w-xs max-w-xs select-xs"
               onChange={handleSelectFloor}
@@ -150,14 +159,17 @@ const WaterMeter = () => {
                 </option>
               ))}
             </select>
+            <div className="relative flex items-center text-sm text-colorBlueDark">
+              <IoMdSearch className="absolute ml-2 h-5 w-5 text-colorBlueGray cursor-pointer hover:scale-105 duration-300" />
+              <input
+                type="text"
+                placeholder="ค้นหาด้วยเลขห้อง"
+                className="btn btn-xs input-bordered bg-colorBlueDark/10"
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
           </div>
           <div className="relative flex items-center text-sm text-colorBlueDark">
-            {/* <IoMdSearch className="absolute ml-2 h-5 w-5 text-colorBlueGray cursor-pointer hover:scale-105 duration-300" />
-            <input
-              type="text"
-              placeholder="ค้นหาด้วยเลขห้อง"
-              className="px-8 py-1 border border-colorBlueDark/20 rounded-md bg-colorBlueDark/10"
-            /> */}
             <input type="month" name="date" id="date" value={date} min={new Date().toISOString().slice(0, 7)} className="input input-bordered input-sm" onChange={(e) => setDate(e.target.value)}/>
           </div>
         </div>
@@ -181,7 +193,7 @@ const WaterMeter = () => {
                 </tr>
               </thead>
               <tbody className="">
-                {records.map((room, i) => {
+                {records.filter((room) => room.roomId.name.toLowerCase().includes(search.toLowerCase())).map((room, i) => {
                   return (
                     <tr
                       className={`text-center ${i % 2 !== 0 ? "bg-base-300" : ""}`}

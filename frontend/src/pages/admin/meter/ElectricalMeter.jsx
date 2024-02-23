@@ -15,6 +15,7 @@ const ElectricalMeter = () => {
   const token = localStorage.getItem("token");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 7));
   const [electricalMeterUnit, setElectricalMeterUnit] = useState({})
+  const [search, setSearch] = useState("");
 
   // pagination for rooms
   const [currentPage, setCurrentPage] = useState(1);
@@ -140,7 +141,11 @@ const ElectricalMeter = () => {
         <div className="text-2xl font-bold mb-5">มิเตอร์ไฟฟ้า</div>
         <div id="header-bar" className="flex justify-between items-center mb-5">
           <div className="flex items-center gap-x-5">
-            <div className="text-base font-semibold">ชั้นที่ 1</div>
+          <div className="text-base font-semibold">
+              {floor.filter((item) => item._id === floorId).map((selectedFloor) => (
+                `ชั้นที่ ${selectedFloor.name}`
+              ))}
+            </div>
             <select
               className="select select-bordered w-xs max-w-xs select-xs"
               onChange={handleSelectFloor}
@@ -151,14 +156,17 @@ const ElectricalMeter = () => {
                 </option>
               ))}
             </select>
+            <div className="relative flex items-center text-sm text-colorBlueDark">
+              <IoMdSearch className="absolute ml-2 h-5 w-5 text-colorBlueGray cursor-pointer hover:scale-105 duration-300" />
+              <input
+                type="text"
+                placeholder="ค้นหาด้วยเลขห้อง"
+                className="btn btn-xs input-bordered bg-colorBlueDark/10"
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
           </div>
           <div className="relative flex items-center text-sm text-colorBlueDark">
-            {/* <IoMdSearch className="absolute ml-2 h-5 w-5 text-colorBlueGray cursor-pointer hover:scale-105 duration-300" />
-          <input
-            type="text"
-            placeholder="ค้นหาด้วยเลขห้อง"
-            className="px-8 py-1 border border-colorBlueDark/20 rounded-md bg-colorBlueDark/10"
-          /> */}
             <input
               type="month"
               name="date"
@@ -196,7 +204,7 @@ const ElectricalMeter = () => {
                   </tr>
                 </thead>
                 <tbody className="">
-                  {records.map((room, i) => {
+                  {records.filter((room) => room.roomId.name.includes(search)).map((room, i) => {
                     return (
                       <tr
                         className={`text-center ${

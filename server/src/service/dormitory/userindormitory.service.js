@@ -155,10 +155,113 @@ const DormitoryConnectionUserByID = async (dormitoryId, res) => {
     }
 }
 
+const DormitoryConnectionUser = async (userId, res) => {
+    try {
+        const userInDormitory = await userInDormitoryModel.find();
+        if (!userInDormitory || userInDormitory.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "User in dormitory not found",
+                dormitory: null,
+            });
+        }
+
+        const dormitoryIds = []
+        for (const dormitory of userInDormitory) {
+            for (const user of dormitory.userId) {
+                if (user.toString() === userId) {
+                    dormitoryIds.push(dormitory.dormitoryId);
+                    break;
+                }
+            }
+        }
+
+        if (!dormitoryIds || dormitoryIds.length === 0) {
+          return res.status(404).json({
+            success: false,
+            message: "User in dormitory not found",
+            dormitory: null,
+          });
+        }
+        const dormitoryDetail = await dormitoryModel.find({ _id: { $in: dormitoryIds } })
+            .populate({
+                path: "floors",
+                populate: {
+                    path: "rooms",
+                    populate: [
+                        { path: "waterID" },
+                        { path: "electricID" },
+                        { path: "status" },
+                    ]
+                },
+            })
+
+        res.status(200).json({
+            success: true,
+            message: "User in dormitory details",
+            dormitory: dormitoryDetail
+        });
+    } catch (error) {
+        // กรณีเกิดข้อผิดพลาดในการค้นหาหรือประมวลผลข้อมูล
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message
+        });
+    }
+}
+
+const DisconnectDormitory = async (dormitoryId, id, res) => {
+    try {
+        const userInDormitory = await userInDormitoryModel.findOne({ dormitoryId: dormitoryId });
+        if (!userInDormitory) {
+            return res.status(404).json({
+                success: false,
+                message: "User in dormitory not found",
+                userInDormitory: null,
+            });
+        }
+
+        const dormitory = await userInDormitoryModel.findOne({ dormitoryId: dormitoryId });
+        if (dormitory.userId.length === 1) {
+            await userInDormitoryModel.deleteOne({ dormitoryId: dormitoryId });
+            return res.status(200).json({
+                success: true,
+                message: "Dormitory connection successfully",
+            });
+        } else {
+            await userInDormitoryModel.findOneAndUpdate(
+                { dormitoryId: dormitoryId },
+                { userId: userInDormitory.userId.filter((id) => id.toString() !== userId) }
+            );
+            return res.status(200).json({
+                success: true,
+                message: "Dormitory connection successfully",
+            });
+        }
+        // const newDormitoryConnect = await userInDormitoryModel.findOneAndUpdate({ dormitoryId: dormitoryId } ,{
+        //     userId: userInDormitory.userId.filter((id) => id.toString() !== id),
+        // })
+        // return res.status(200).json({
+        //     success: true,
+        //     message: "Dormitory connection successfully",
+        //     newDormitoryConnect
+        // });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+}
+
+
 
 module.exports = {
     DormitoryConnectionRenter,
     DormitorySearchByID, 
     DormitoryConnection,
-    DormitoryConnectionUserByID
+    DormitoryConnectionUserByID,
+    DormitoryConnectionUser,
+    DisconnectDormitory
 }

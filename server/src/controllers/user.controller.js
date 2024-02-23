@@ -35,7 +35,10 @@ const Register = CatchAsyncError(async (req, res, next) => {
             email,
             password: newPassword,
             role: role._id,
-            status: status._id
+            status: status._id,
+            tel: "",
+            personalId: "",
+
         }
 
         userService.register(data, res);
@@ -112,7 +115,7 @@ const getAllUser = CatchAsyncError(async(req, res, next) => {
 
 const updateProfileUser = CatchAsyncError(async(req, res, next) => {
     try {
-        const data = { firstname, lastname, gender, role } = req.body;
+        const data = { firstname, lastname, gender, img, role, tel, personalId, address } = req.body;
         
         if (data.firstname === undefined || data.firstname === null || data.firstname === ""
             || data.lastname === undefined || data.lastname === null || data.lastname === ""
@@ -134,7 +137,6 @@ const updateProfileUser = CatchAsyncError(async(req, res, next) => {
 
 const getUserDetail = CatchAsyncError(async(req, res, next) => {
     try {
-        console.log(req.user);
         await userService.getUserDetail(req.user, res)
     } catch (error) {
         return next(new ErrorHandler(error, 500))
@@ -150,4 +152,22 @@ const GetInvoicedByID = CatchAsyncError(async(req, res, next) => {
       }
 })
 
-module.exports = { Register, Login, getAllUser, updateProfileUser, getUserDetail, GetInvoicedByID };
+const GetUser = CatchAsyncError(async(req, res, next) => {
+    try {
+        const userId = req.user._id;
+        await userService.GetUser(userId, res);
+      } catch (error) {
+        return next(new ErrorHandler(error, 500));
+      }
+})
+
+const UpdateUser = CatchAsyncError(async(req, res, next) => {
+    try {
+        const data = req.body;
+        await userService.UpdateUser(data, req.user._id, res);
+      } catch (error) {
+        return next(new ErrorHandler(error, 500));
+      }
+})
+
+module.exports = { Register, UpdateUser,  Login, getAllUser, updateProfileUser, getUserDetail, GetInvoicedByID, GetUser };

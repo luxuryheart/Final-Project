@@ -4,15 +4,6 @@ require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const endpointSecret =
   "whsec_ad0978dee7bfe9145878cbb28dddef7128a029fba1f41b33795d839563d48097";
-
-const omise = require("omise");
-
-const omiseClient = omise({
-  secretKey: process.env.OMISE_SECRET_KEY,
-  publicKey: process.env.OMISE_PUBLIC_KEY,
-  omiseVersion: "2019-05-29",
-});
-
 const { v4: uuidv4 } = require("uuid");
 const { paymentModel } = require("../../models/payment/payment.model");
 const { invoicedModel } = require("../../models/backoffice/invoice.model");
@@ -49,7 +40,7 @@ const PostPayment = async (req, res, next) => {
     });
 
     const orderData = {
-        userId: userId,
+      userId: userId,
       orderId: orderId,
       invoiceId: invoice.invoiceId,
       price: invoice.price,
@@ -91,69 +82,9 @@ const GetOrder = async (req, res, next) => {
   }
 };
 
-const PaymentHook = async (req, res) => {
-    try {
-      const sig = req.headers["stripe-signature"];
-      let event;
-  
-      try {
-        event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-      } catch (err) {
-        res.status(400).send(`Webhook Error: ${err.message}`);
-        return;
-      }
-  
-      switch (event.type) {
-        case "checkout.session.completed":
-          const paymentData = event.data.object;
-          console.log(paymentData);
-          const sessionId = paymentData.id;
-  
-          // อัปเดตสถานะการชำระเงินในฐานข้อมูล
-          const updatedPayment = await paymentModel.findOneAndUpdate(
-            { sessionId: sessionId },
-            { status: paymentData.payment_status },
-            { new: true }
-          );
-  
-          console.log("Updated payment:", updatedPayment);
-          break;
-        default:
-          console.log(`Unhandled event type ${event.type}`);
-          res.send();
-      }
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-  };
-   
-
-// const OmisePayment = async(req, res, next) => {
-//     try {
-//         const { source } = req.body;
-//         // const customer = await omiseClient.customers.create({
-//         //     email: "Jhone@gmail.com",
-//         //     description: "test",
-//         //     card: "tokn_test_5ysaawcvs0iy8h8fdo6"
-//         // });
-
-//         // const charge = await omiseClient.charges.create({
-//         //     amount: 10000,
-//         //     currency: 'thb',
-//         //     customer: customer.id
-//         // })
-
-//         console.log(source);
-
-//     } catch (error) {
-//         console.error("Error: ", error);
-//     }
-// }
-
 const GetPayment = async (req, res, next) => {
     try {
-        const payment = await paymentModel.findOneAndUpdate({ orderId: req.params.id }, {
+        const payment = await paymentModel.findOneAndUpdate({ invoiceId: req.params.id }, {
             status: "completed",
         }, { new: true });
 
@@ -234,4 +165,76 @@ const BankTransferPayment = async (req, res, next) => {
   }
 }
 
-module.exports = { PostPayment, GetOrder, PaymentHook, GetPayment, BankTransferPayment };
+const Payment = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const userId = req.user._id;
+    const orderId = uuidv4();
+    const orderData = {
+      userId: userId,
+      orderId: orderId,
+      invoiceId: data.invoiceId,
+      price: data.amount,
+      status: "pending",
+      paymentType: data.method,
+      date: new Date(),
+    };
+
+    const payment = await paymentModel.findOne({ invoiceId: data.invoiceId });
+
+    if (payment) {
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: data.amount,
+        currency: "thb",
+        payment_method_types: [data.method.toString()],
+        description: "Payment for order " + orderId,
+      });
+
+      await paymentModel.findOneAndUpdate(
+        { invoiceId: data.invoiceId },
+        {
+          $set: {
+            status: "pending",
+            paymentType: data.method,
+          }
+        }
+      );
+
+      return res.send({
+        clientSecret: paymentIntent.client_secret,
+        payment,
+      });
+    } else {
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: data.amount,
+        currency: "thb",
+        payment_method_types: [data.method.toString()],
+        description: "Payment for order " + orderId,
+      });
+
+      const newPayment = await paymentModel.create(orderData);
+
+      return res.send({
+        clientSecret: paymentIntent.client_secret,
+        payment: newPayment,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ error: "An error occurred while processing the payment." });
+  }
+}
+
+
+const GetConfig = async (req, res, next) => {
+  try {
+    res.send({
+      publishableKey: process.env.STRIPE_PB_KEY
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+}
+
+module.exports = { PostPayment, GetOrder, GetPayment, BankTransferPayment, Payment, GetConfig };

@@ -12,6 +12,8 @@ const DormitoryCreate = CatchAsyncError(async (req, res, next) => {
             address: req.body.address, 
             contact: req.body.contact,
             amount: req.body.amount, 
+            promptpay: req.body.promptpay,
+            rooms: req.body.rooms
         };
 
         if (data.name === undefined || data.name === null || data.name === ""
@@ -28,9 +30,10 @@ const DormitoryCreate = CatchAsyncError(async (req, res, next) => {
         await dormitoryService.createWaterPrice(value, dormitory);
         await dormitoryService.createElectricalPrice(value, dormitory);
 
-        const floors = await dormitoryService.Addfloor(dormitory._id, data.amount, res);
+        // const floors = await dormitoryService.Addfloor(dormitory._id, data.rooms, res);
+        await dormitoryService.CreateFloorsAndRooms(dormitory._id, data.rooms, res);
 
-        const room = await dormitoryService.Addrooms(floors, dormitory._id, res);
+        // const room = await dormitoryService.Addrooms(floors, dormitory._id, res);
 
     } catch (error) {
         return next(new ErrorHandler(error, 500));
@@ -257,4 +260,31 @@ const GetBankByDormitoryIdForUser = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-module.exports = { DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId, GetBankByDormitoryId, UpdateMeter, BankAccount, GetDormitoryByUser, GetBankByDormitoryIdForUser }
+const GetDormitoryByID = CatchAsyncError(async(req, res, next) => {
+    try {
+        const id = req.params;
+        await dormitoryService.GetDormitoryByID(id.id, res);
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+const Booking = CatchAsyncError(async(req, res, next) => {
+    try {
+        const data = req.body;
+        const userId = req.user._id;
+        await dormitoryService.Booking(userId, data, res);
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+const GetDormitory = CatchAsyncError(async(req, res, next) => {
+    try {
+        await dormitoryService.GetDormitory(res);
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+module.exports = { GetDormitory, DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId, GetBankByDormitoryId, UpdateMeter, BankAccount, GetDormitoryByUser, GetBankByDormitoryIdForUser, GetDormitoryByID, Booking }

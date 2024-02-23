@@ -16,8 +16,6 @@ const ContactCreate = ({ next, setNext, contactData, setContactData, users }) =>
         }));
     }
 
-    console.log(contactData);
-
     const handleSelect = (e) => {
         const { value } = e.target;
         const selectedUser = usersConnect.find((user) => user.username === value);
@@ -25,7 +23,10 @@ const ContactCreate = ({ next, setNext, contactData, setContactData, users }) =>
             setContactData((prevContactData) => ({
                 ...prevContactData,
                 name: selectedUser.profile.firstname + " " + selectedUser.profile.lastname,
-                userId: selectedUser._id
+                userId: selectedUser._id,
+                personalId: selectedUser.personalId,
+                tel: selectedUser.tel,
+                address: selectedUser.address?.address + " " + selectedUser.address?.province + " " + selectedUser.address?.district + " " + selectedUser.address?.sub_district + " " + selectedUser.address?.zipcode
                 /* 
                     TODO: เดี๋ยวจะไปเพิ่มข้อมูล user => ให้มีเบอร์โทร ที่อยู่(อาจจะ) IDCard
                     IDcard: selectedUser.profile.IDcard,
