@@ -10,6 +10,7 @@ import { TiCancel } from "react-icons/ti";
 import BookingModal from "../../components/BookingModal";
 import DormitoryList from "../../components/DormitoryList";
 import Profile from "../../components/Profile";
+import RepairModal from "../../components/RepairModal";
 
 const Home = () => {
   const location = useLocation();
@@ -29,6 +30,8 @@ const Home = () => {
   const [dormitoryId, setDormitoryId] = useState(null);
   const [listModal, setListModal] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
+  const [repairModal, setRepairModal] = useState(false);
+  const [roomId, setRoomId] = useState("");
   // สร้างอาร์เรย์เพื่อเก็บจำนวน rooms ของแต่ละ dormitory
   const roomsCountPerDormitory = dormitory.map((d) => ({
     dormitoryName: d.name,
@@ -157,6 +160,11 @@ const Home = () => {
     }
   }
 
+  const handleRepair = (roomId) => {
+    setRoomId(roomId);
+    setRepairModal(true);
+  }
+
   const openBookingModal = (dormitoryId) => {
     setDormitoryId(dormitoryId);
     setBookingModal(true);
@@ -186,6 +194,7 @@ const Home = () => {
         openModal={openModal}
         setListModal={setListModal}
       />
+      {repairModal && <RepairModal roomId={roomId} setRepairModal={setRepairModal}/>}
       {openProfile && <Profile setOpenProfile={setOpenProfile} userDetail={userDetail} setListModal={setListModal}/>}
       {listModal && <DormitoryList setListModal={setListModal}/>}
       {openModal && <UserModal setOpenProfile={setOpenProfile}/>}
@@ -292,7 +301,8 @@ const Home = () => {
                                 บิล
                               </button>
                             </Link>
-                            <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
+                            <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg"
+                            onClick={() => handleRepair(renter.renter?.roomId?._id)}>
                               แจ้งซ้อม
                             </button>
                           </div>
@@ -338,7 +348,7 @@ const Home = () => {
           </div>
         ) : (
           <div className="pt-8 px-48">
-            <UserHome renter={renter} setSearchModal={setSearchModal} userIndormitory={userIndormitory} openBookingModal={openBookingModal} DisconnectDormitory={DisconnectDormitory}/>
+            <UserHome setRoomId={setRoomId} setRepairModal={setRepairModal} renter={renter} setSearchModal={setSearchModal} userIndormitory={userIndormitory} openBookingModal={openBookingModal} DisconnectDormitory={DisconnectDormitory}/>
           </div>
         )}
       </div>

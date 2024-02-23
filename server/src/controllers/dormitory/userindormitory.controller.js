@@ -49,7 +49,6 @@ const DormitoryConnectionUserByID = CatchAsyncError(async (req, res, next) => {
 const DormitoryConnectionUser = CatchAsyncError(async (req, res, next) => {
     try {
         const userId = req.user._id
-        // await dormitoryUserService.DormitoryConnectionUser("65cef9c2477c2eeafc96aff1", res)
         await dormitoryUserService.DormitoryConnectionUser(userId, res)
     } catch (error) {
         return next(new ErrorHandler(error, 500));

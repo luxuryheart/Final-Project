@@ -155,7 +155,7 @@ const ContactPayment = ({ setNext, contactData, users, list, setList, getRenterD
                     <div id='header' className='flex items-center justify-between mb-1'>
                         <div className='text-lg'>ข้อมูลสัญญา</div>
                         <div className='text-xs text-bgColor flex gap-x-2'>
-                            <button className='bg-bgCyan rounded-md px-1 py-1 hover:bg-slate-400 hover:scale-105 duration-300'>พิมพ์สัญญาเช่า</button>
+                            {/* <button className='bg-bgCyan rounded-md px-1 py-1 hover:bg-slate-400 hover:scale-105 duration-300'>พิมพ์สัญญาเช่า</button> */}
                             <button className='bg-colorBlueDark rounded-md px-1 py-1 hover:bg-slate-400 hover:scale-105 duration-300'
                             onClick={() => setNext(0)}>แก้ไขข้อมูลสัญญา</button>
                         </div>

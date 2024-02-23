@@ -101,7 +101,6 @@ const contactPaymentSchema = new mongoose.Schema({
     },
     account: {
         type: String,
-        // required: [true, "Account is required"]
     },
     paid: {
         type: Boolean,

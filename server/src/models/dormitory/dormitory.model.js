@@ -158,7 +158,7 @@ const dormitorySchema = new mongoose.Schema({
         default: null
     }
 }, { timestamps:true });
-// TODO: model สร้างใหม่
+
 const bankSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -176,10 +176,6 @@ const bankSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Dormitory"
     },
-    // userConnectId: {
-    //     type: [mongoose.Schema.Types.ObjectId],
-    //     ref: "User"
-    // },
     img: {
         type: String,
         default: null

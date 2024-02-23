@@ -5,7 +5,6 @@ const moment = require("moment");
 const backofficeService = require("../../service/backoffice/backoffice.service");
 const { roomsModel, dormitoryModel } = require("../../models/dormitory/dormitory.model");
 const { renterDetailModel } = require("../../models/backoffice/renter.model");
-const { waterUnitModel, electricalUnitModel } = require("../../models/backoffice/unit.model");
 
 // ทำสัญญาด้วย admin
 const CreateContact = CatchAsyncError(async (req, res, next) => {
@@ -79,15 +78,11 @@ const MeterCalculate = CatchAsyncError(async (req, res, next) => {
     }
 });
 
-// TODO: สร้าง invoice เองจากหน้า backoffice admin กดสร้าง invoice ตามห้องแต่ละเดือนเองเลย
 const CreateInvoice = CatchAsyncError(async(req, res, next) => {
     try {
 		const { roomId, dormitoryId } = req.body;
-
 		const dormitory = await dormitoryModel.findOne({ _id: dormitoryId });
 		const room = await roomsModel.findOne({ _id: roomId });
-		// TDOD: ใช้จริงตอนปรับ model room กับ user แล้ว
-		// const user = await userModel.findOne({ room: roomId });
 		const renterDetail = await renterDetailModel.findOne({ userId: "6566206ff1f9248f3aef9013" });
 		const waterUnit = await waterUnitModel.findOne({ roomId: roomId });
 		const electricalUnit = await electricalUnitModel.findOne({ roomId: roomId });
@@ -117,7 +112,6 @@ const GetRenterDetail = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-// TODO: สร้าง contact details กับ bill details
 const ContactPayment = CatchAsyncError(async (req, res, next) => {
   try {
     const { contactBill, contactData, dormitoryId } = req.body
@@ -181,7 +175,6 @@ const GetFloorById = CatchAsyncError(async (req, res, next) => {
   }
 })
 
-// get unit 
 const GetWaterUnits = CatchAsyncError(async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -200,13 +193,9 @@ const GetElectricUnits = CatchAsyncError(async (req, res, next) => {
   }
 })
 
-// Create meter unit per month
 const CreateMeterUnit = CatchAsyncError(async (req, res, next) => {
   try {
     const { date, dormitoryId } = req.body;
-    // const day = date.split("-")[2];
-    // const month = date.split("-")[1];
-    // const year =  date.split("-")[0];
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return
   }
@@ -224,8 +213,6 @@ const CreateMeterUnit = CatchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler(error, 500));
   }
 })
-
-// getMeter with dormitoryId and date 
 
 const CreateElectricUnitPerMonth = CatchAsyncError(async (req, res, next) => {
   try {
@@ -555,7 +542,6 @@ const DisconnectUser = CatchAsyncError(async (req, res, next) => {
 const CreateInvoicedAll = CatchAsyncError(async (req, res, next) => {
   try {
     const data = req.body;
-    {/* roomId[], dormitoryId, date = "2024-02" */}
     const [year, month, day] = data.date.split("-");
     
     const dateData = {
@@ -597,6 +583,22 @@ const UpdateRepairByAdmin = CatchAsyncError(async (req, res, next) => {
   }
 })
 
+const GetInvoiceFilter = CatchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status, date } = req.query;
+    const [ year, month ] = date.split("-");
+    const newDate = {
+      year: year,
+      month: month,
+      date: date
+    }
+    await backofficeService.GetInvoiceFilter(id, status, newDate, res);
+  } catch (error) {
+    return next(new ErrorHandler(error, 500));
+  }
+})
+
 module.exports = { 
   CreateContact, UpdateRenterDetails, MeterCalculate,
   CreateInvoice, GetRenterDetail, ContactPayment,
@@ -612,5 +614,6 @@ module.exports = {
   BookingByAdmin, GetBookingByRoomID, CancelBookingByAdmin,
   GetContactByRoomID, CancelContactByID, UpdateBookingByAdmin,
   GetRenterByDormitoryID, DisconnectUser, CreateInvoicedAll,
-  RepairByAdmin, GetRepair, UpdateRepairByAdmin
+  RepairByAdmin, GetRepair, UpdateRepairByAdmin,
+  GetInvoiceFilter,
 };

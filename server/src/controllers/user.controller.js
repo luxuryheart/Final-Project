@@ -63,7 +63,6 @@ const Login = CatchAsyncError(async(req, res, next) => {
             return next(new ErrorHandler("Username or password is required"));
         }
 
-        // login with email or username
         let user = await userModel.findOneAndUpdate({ username: userlogin}, { new: true })
         if (!user) {
             user = await userModel.findOne({ email: userlogin }, { new: true })
@@ -97,7 +96,6 @@ const Login = CatchAsyncError(async(req, res, next) => {
     }
 });
 
-// get user for admin
 const getAllUser = CatchAsyncError(async(req, res, next) => {
     try {
         const user = await userModel.find()
@@ -105,7 +103,7 @@ const getAllUser = CatchAsyncError(async(req, res, next) => {
             .populate('status');
 
         if (user) {
-            userService.getUserAll(user, res)
+            await userService.getUserAll(user, res)
         }
 
     } catch (error) {

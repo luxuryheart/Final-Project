@@ -50,15 +50,6 @@ const DormitoryConnectionRenter = async (userId, newdate, res) => {
 const DormitorySearchByID = async (numberId, res) => {
     try {
         const dormitory = await dormitoryModel.findOne({ numberId: numberId })
-            // .populate({
-            //     path: "roomId",
-            //     populate: [
-            //         { path: "waterID" },
-            //         { path: "electricID" },
-            //         { path: "status" },
-            //     ],
-            // })
-
         if (!dormitory) {
             return res.status(404).json({
                 success: false,
@@ -93,7 +84,6 @@ const DormitoryConnection = async (userId, dormitoryId, res) => {
                 newDormitoryConnect
             });
         }
-        // เช็คว่ามี user เชื่อมต่ออยู่ก่อนแล้วมั้ย
         if (dormitoryConnect.userId.includes(userId)) {
             return res.status(400).json({
                 success: false,
@@ -202,7 +192,6 @@ const DormitoryConnectionUser = async (userId, res) => {
             dormitory: dormitoryDetail
         });
     } catch (error) {
-        // กรณีเกิดข้อผิดพลาดในการค้นหาหรือประมวลผลข้อมูล
         res.status(500).json({
             success: false,
             message: "Internal Server Error",
@@ -239,14 +228,6 @@ const DisconnectDormitory = async (dormitoryId, id, res) => {
                 message: "Dormitory connection successfully",
             });
         }
-        // const newDormitoryConnect = await userInDormitoryModel.findOneAndUpdate({ dormitoryId: dormitoryId } ,{
-        //     userId: userInDormitory.userId.filter((id) => id.toString() !== id),
-        // })
-        // return res.status(200).json({
-        //     success: true,
-        //     message: "Dormitory connection successfully",
-        //     newDormitoryConnect
-        // });
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -254,8 +235,6 @@ const DisconnectDormitory = async (dormitoryId, id, res) => {
         });
     }
 }
-
-
 
 module.exports = {
     DormitoryConnectionRenter,

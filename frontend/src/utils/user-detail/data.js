@@ -3,5 +3,5 @@ export const Gender = [
 ]
 
 export const Role = [
-    "เจ้าของหอ", "พนักงาน", "ผู้เช่า"
+    "เจ้าของหอ", "ผู้เช่า"
 ]

@@ -4,7 +4,7 @@ import { FaCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { TiCancel } from "react-icons/ti";
 
-const UserHome = ({ setSearchModal, userIndormitory, openBookingModal }) => {
+const UserHome = ({ setSearchModal, userIndormitory, openBookingModal, roomId, setRepairModal, setRoomId }) => {
   const [renter, setRenter] = useState([]);
   const [date, setDate] = useState(new Date().toISOString().slice(0, 7));
   const token = localStorage.getItem("token");
@@ -24,6 +24,11 @@ const UserHome = ({ setSearchModal, userIndormitory, openBookingModal }) => {
       console.log(error);
     }
   };
+
+  const handleRepair = (roomId) => {
+    setRoomId(roomId);
+    setRepairModal(true);
+  }
 
   const DisconnectDormitory = async (dormitoryId) => {
     try {
@@ -105,7 +110,8 @@ const UserHome = ({ setSearchModal, userIndormitory, openBookingModal }) => {
                         บิล
                       </button>
                     </Link>
-                    <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
+                    <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg"
+                    onClick={() => handleRepair(renter.renter?.roomId?._id)}>
                       แจ้งซ้อม
                     </button>
                   </div>

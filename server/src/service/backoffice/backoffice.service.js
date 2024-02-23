@@ -1,46 +1,17 @@
 const moment = require("moment");
 const { v4: uuidv4 } = require("uuid");
-const {
-  contactModel,
-  contactPaymentModel,
-} = require("../../models/backoffice/contact.model");
-const {
-  renterDetailModel,
-  vehicleModel,
-} = require("../../models/backoffice/renter.model");
-const {
-  invoiceModel,
-  invoicedModel,
-} = require("../../models/backoffice/invoice.model");
-const {
-  waterUnitModel,
-  electricalUnitModel,
-} = require("../../models/backoffice/unit.model");
-const {
-  roomsModel,
-  waterModel,
-  electricalModel,
-  statusModel,
-  dormitoryModel,
-  floorsModel,
-  bankModel,
-} = require("../../models/dormitory/dormitory.model");
-const {
-  meterUnitModel,
-  meterPerMonthModel,
-  electricalMeterUnitModel,
-  electricalMeterPerMonthModel,
-} = require("../../models/backoffice/meterUnit.model");
+const {contactModel,contactPaymentModel,} = require("../../models/backoffice/contact.model");
+const {renterDetailModel,vehicleModel,} = require("../../models/backoffice/renter.model");
+const {invoicedModel,} = require("../../models/backoffice/invoice.model");
+const {roomsModel,waterModel,electricalModel,statusModel,dormitoryModel,floorsModel,bankMode} = require("../../models/dormitory/dormitory.model");
+const {meterUnitModel,meterPerMonthModel,electricalMeterUnitModel,electricalMeterPerMonthModel,} = require("../../models/backoffice/meterUnit.model");
 const { paymentModel } = require("../../models/payment/payment.model");
 const { userInDormitoryModel } = require("../../models/dormitory/userindormitory.model");
 const { bookingModel } = require("../../controllers/dormitory/booking.model");
-const { populate } = require("dotenv");
 const { repairModel } = require("../../models/backoffice/repair.model");
 
 const CalculateContact = async (startDate, durationInMonths, res) => {
-  // Parse the startDate using a specific format
   const parsedStartDate = moment(startDate, "YYYY-MM-DD");
-
   // ตรวจสอบว่า startDate ไม่ใช่วันที่อดีต
   if (parsedStartDate.isBefore(moment().startOf("day"))) {
     return res.json({
@@ -48,7 +19,6 @@ const CalculateContact = async (startDate, durationInMonths, res) => {
       message: "startDate ต้องไม่เป็นวันที่อดีต",
     });
   }
-
   // ตรวจสอบว่า startDate ไม่เกิน 5 วันในอนาคต
   if (parsedStartDate.isAfter(moment().add(5, "days").startOf("day"))) {
     return res.json({
@@ -56,7 +26,6 @@ const CalculateContact = async (startDate, durationInMonths, res) => {
       message: "startDate ต้องไม่เกิน 5 วันในอนาคต",
     });
   }
-
   const endDate = parsedStartDate.add(durationInMonths, "months");
   const date = {
     startDate: parsedStartDate.format("YYYY-MM-DD"),
@@ -72,7 +41,6 @@ const CreateContactForm = async (data, userId, date, res) => {
   if (data.refundAmount !== undefined) {
     totalPrice = data.deposit - data.refundAmount;
   }
-
   const status = await statusModel.findOne({ name: "มีผู้เช่า" });
 
   if (await contactModel.findOne({ roomId: data.roomId })) {
@@ -155,52 +123,6 @@ const CreateContactForm = async (data, userId, date, res) => {
   }
 };
 
-// TODO: Invoice
-// create invoice
-const CreateInvoice = async (data, res) => {
-  try {
-    const water = await waterModel.findOne({ _id: data.room.waterID });
-    const electrical = await electricalModel.findOne({
-      _id: data.room.electricID,
-    });
-
-    const waterPrice =
-      water.name === "คิดตามหน่วยจริง"
-        ? data.waterUnit.totalUnit * water.price
-        : water.price;
-
-    const electricalPrice =
-      electrical.name === "คิดตามหน่วยจริง"
-        ? data.electricalUnit.totalUnit * electrical.price
-        : electrical.price;
-
-    const totalPrice = waterPrice + electricalPrice;
-
-    await invoiceModel.create({
-      roomId: data.room._id,
-      renterDetailId: data.renterDetail._id,
-      "description.roomDesc.roomPrice": data.room.roomCharge,
-      "description.waterDesc.waterPrice": waterPrice,
-      "description.electricalDesc.electricalPrice": electricalPrice,
-      totalPrice: totalPrice,
-      grandTotal: totalPrice,
-      dormitoryId: data.dormitoryId,
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: "Contact created successfully",
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
-  }
-};
-
-// user details
 const UpdateRenterDetails = async (data, userId, res) => {
   if (!(await contactModel.findOne({ roomId: data.roomId }))) {
     return res.status(404).json({
@@ -249,15 +171,12 @@ const UpdateRenterDetails = async (data, userId, res) => {
   });
 };
 
-// water calculate
 const WaterCalculate = async (data, res) => {
   for (const room of data.meterUnit) {
     const roomId = await roomsModel.findOne({ _id: room.roomId });
     const totalUnit = room.latedUnit - roomId.waterMeter;
     const water = await waterModel.findOne({ _id: room.waterID });
     const roomIsExists = await waterUnitModel.findOne({ roomId: room.roomId });
-
-    // TODO: ทำเช็คว่ามี invoice ยังถ้ามีแล้วให้อัปเดต ถ้ายังไม่มีให้ผ่านไปก่อน
     if (water.name === "เหมาจ่ายรายเดือน") {
       await roomsModel.findOneAndUpdate(
         { _id: room.roomId },
@@ -273,21 +192,19 @@ const WaterCalculate = async (data, res) => {
         });
       }
       await waterUnitModel.updateOne(
-        { roomId: room.roomId }, // แก้ไขเป็น _id
+        { roomId: room.roomId }, 
         {
           oldUnit: room.oldUnit,
           latedUnit: room.latedUnit,
           totalUnit: totalUnit,
         }
       );
-      // แก้ไขเป็น _id
       await roomsModel.findOneAndUpdate(
         { _id: room.roomId },
         { waterMeter: room.latedUnit }
       );
     }
   }
-
   return res.status(200).json({
     success: true,
     message: "Water updated successfully",
@@ -320,14 +237,13 @@ const ElectricalCalculate = async (data, res) => {
         });
       }
       await electricalUnitModel.updateOne(
-        { roomId: room.roomId }, // แก้ไขเป็น _id
+        { roomId: room.roomId },
         {
           oldUnit: room.oldUnit,
           latedUnit: room.latedUnit,
           totalUnit: totalUnit,
         }
       );
-      // แก้ไขเป็น _id
       await roomsModel.findOneAndUpdate(
         { _id: room.roomId },
         { electricalMeter: room.latedUnit }
@@ -457,7 +373,6 @@ const GetFloorById = async (dormitoryId, res) => {
   });
 };
 
-// get unit
 const GetWaterUnits = async (dormitoryId, res) => {
   try {
     const waterUnits = await waterUnitModel.find({ dormitoryId: dormitoryId });
@@ -510,7 +425,6 @@ const GetElectricUnits = async (dormitoryId, res) => {
 
 const CreateMeterUnit = async (dateDate, dormitoryId, res) => {
   try {
-    // Check if the date is not in the past
     const currentDate = new Date();
     if (dateDate.date < currentDate) {
       return res.status(404).json({
@@ -520,7 +434,6 @@ const CreateMeterUnit = async (dateDate, dormitoryId, res) => {
       });
     }
 
-    // Find dormitory
     const dormitory = await dormitoryModel
       .findOne({ _id: dormitoryId })
       .populate("floors");
@@ -543,18 +456,6 @@ const CreateMeterUnit = async (dateDate, dormitoryId, res) => {
         roomsIds.push(floorIds[i].rooms[j]);
       }
     }
-    // for (let i = 0; i < roomsIds.length; i++) {
-    //   await meterUnitModel.create({
-    //     roomId: roomsIds[i],
-    //     month: dateDate.month,
-    //     year: dateDate.year,
-    //     initialReading: roomsIds[i].waterMeter || 0,
-    //     finalReading: 0,
-    //     consumption: 0,
-    //     meterType: "water"
-    //   })
-    // }
-
     const roomsArray = await roomsModel.find({ _id: { $in: roomsIds } });
 
     for (const roomId of roomsArray) {
@@ -614,7 +515,6 @@ const CreateElectricalMeterUnit = async (dateData, dormitoryId, res) => {
       });
     }
 
-    // Find dormitory
     const dormitory = await dormitoryModel
       .findOne({ _id: dormitoryId })
       .populate("floors");
@@ -685,7 +585,6 @@ const CreateElectricalMeterUnit = async (dateData, dormitoryId, res) => {
   }
 };
 
-// create invoice
 const CreateInvoiced = async (dormitoryId, roomId, dateData, res) => {
   try {
     const meterUnit = await meterPerMonthModel
@@ -1097,7 +996,6 @@ const GetInvoicedList = async (dormitoryId, date, res) => {
         path: "renterDetailId",
         populate: { path: "userId" },
       })
-      console.log(invoice);
     return res.status(200).json({
       success: true,
       message: "Get invoice list success",
@@ -1149,25 +1047,17 @@ const DeleteInvoicedList = async (index, listid, id, res) => {
   try {
     const invoice = await invoicedModel.findOne({ _id: id });
 
-    // ตรวจสอบว่ารายการที่ต้องการลบมีอยู่ในใบแจ้งหนี้หรือไม่
     if (invoice && invoice.lists[index]._id.toString() === listid) {
-      // ลบรายการ
       invoice.lists.splice(index, 1);
-
-      // คำนวณราคารวมใหม่
       let totalPrice = 0;
       invoice.lists.forEach(item => {
         totalPrice += item.total;
       });
-
-      // ปรับปรุงราคารวมและราคารวมทั้งหมดของใบแจ้งหนี้
       invoice.total = totalPrice;
       invoice.grandTotal = totalPrice;
 
-      // บันทึกการเปลี่ยนแปลงโดยใช้ findOneAndUpdate
       await invoicedModel.findOneAndUpdate({ _id: id }, { lists: invoice.lists, total: invoice.total, grandTotal: invoice.grandTotal });
 
-      console.log("Delete success");
       return res.status(200).json({ success: true, message: "Delete success" });
     } else {
       return res.status(404).json({ success: false, message: "List not found" });
@@ -1293,14 +1183,18 @@ const DeleteDormitory = async (id, res) => {
     }
     const dormitory = await dormitoryModel.findOne({ _id: id });
     if (dormitory) {
-      for (const floor of dormitory.floors) {
-        const floors = await floorsModel.findOne({ _id: floor });
-        for (const room of floors.rooms) {
-          await roomsModel.deleteOne({ _id: room });
-        }
-        await floorsModel.deleteOne({ _id: floor });
+      for (const floorId of dormitory.floors) {
+          const floor = await floorsModel.findOne({ _id: floorId });
+          if (floor) {
+              for (const roomId of floor.rooms) {
+                  await bookingModel.deleteMany({ roomId: roomId });
+                  await roomsModel.deleteOne({ _id: roomId });
+              }
+              await floorsModel.deleteOne({ _id: floorId });
+          }
       }
-    }
+  }
+  
     await dormitoryModel.deleteOne({ _id: id });
       
     return res.status(200).json({ success: true, message: "Delete success" });
@@ -1349,20 +1243,16 @@ const UpdateListData = async (data, res) => {
     const invoice = await invoicedModel.findOne({ _id: data.invoiceId });
 
     if (invoice) {
-        // อัปเดตค่าใน subdocument
         invoice.lists[data.index].description = data.description;
         invoice.lists[data.index].amount = data.amount;
         invoice.lists[data.index].price = data.price;
         invoice.lists[data.index].total = data.amount * data.price;
         invoice.lists[data.index].grandTotal = data.amount * data.price
-
-      // คำนวณ grandTotal จากค่าใน subdocument
       let totalPrice = 0;
       invoice.lists.forEach(item => {
         totalPrice += item.total;
       });
 
-      // อัปเดต grandTotal ในเอกสารหลัก
       await invoicedModel.findOneAndUpdate(
         { _id: data.invoiceId },
         { $set: { "grandTotal": totalPrice, "lists.$[elem].description": data.description, "lists.$[elem].amount": data.amount, "lists.$[elem].price": data.price, "lists.$[elem].total": data.amount * data.price } },
@@ -1409,15 +1299,13 @@ const GetUserByDormitoryID = async (id, res) => {
 
 const PaymentByAdmin = async (data, res) => {
   try {
-    // อัปเดต grandTotal ในใบแจ้งหนี้
     const invoice = await invoicedModel.findOneAndUpdate(
       { _id: data.invoiceId },
       { $set: { grandTotal: data.grandTotal - data.amount } },
-      { new: true } // เพิ่ม option new เพื่อให้ return document ที่อัปเดตแล้วออกมา
+      { new: true } 
     );
 
     const orderId = uuidv4();
-    // สร้างรายการชำระเงินใหม่
     const payment = await paymentModel.create({
       invoiceId: data.invoiceId,
       date: data.date,
@@ -1430,16 +1318,13 @@ const PaymentByAdmin = async (data, res) => {
 
     if (invoice) {
       if (invoice.grandTotal > 0) {
-        // หากยอดคงเหลือในใบแจ้งหนี้ยังมากกว่าศูนย์
         payment.price = invoice.grandTotal;
         await payment.save();
       } else if (invoice.grandTotal === 0) {
-        // หากยอดคงเหลือในใบแจ้งหนี้เป็นศูนย์ แสดงว่าชำระเงินครบแล้ว
         payment.price = data.amount;
         payment.status = "completed";
         await payment.save();
 
-        // invoice.total = data.amount;
         invoice.grandTotal = invoice.total;
         invoice.invoiceStatus = "paid";
         await invoicedModel.findOneAndUpdate({ _id: data.invoiceId }, invoice, { new: true }); // ใช้ findByIdAndUpdate แทนการ save()
@@ -1967,10 +1852,30 @@ const UpdateRepairByAdmin = async (data, res) => {
   }
 }
 
+const GetInvoiceFilter = async (id, status, newDate, res) => {
+  try {
+    const invoice = await invoicedModel.find({ dormitoryId: id, invoiceStatus: status, "date.year": newDate.year, "date.month": newDate.month });
+    if (!invoice) {
+      return res.status(500).json({
+        success: false,
+        message: "ไม่พบใบเสร็จ",
+        invoice: null
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Invoice detail",
+      invoice
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 
 module.exports = {
   CalculateContact, CreateContactForm, UpdateRenterDetails,
-  CreateInvoice, WaterCalculate, ElectricalCalculate,
+  WaterCalculate, ElectricalCalculate,
   GetRenterDetail, ContactPayment, DeleteContactPayment,
   CreateRenterDeatails, GetVehicle, GetFloorFilter,
   GetFloorById, GetWaterUnits, GetElectricUnits,
@@ -1985,5 +1890,5 @@ module.exports = {
   GetBookingByRoomID, CancelBookingByAdmin, GetContactByRoomID,
   CancelContactByID, UpdateBookingByAdmin, GetRenterByDormitoryID,
   DisconnectUser, CreateInvoicedAll, RepairByAdmin,
-  GetRepair, UpdateRepairByAdmin
+  GetRepair, UpdateRepairByAdmin, GetInvoiceFilter
 };

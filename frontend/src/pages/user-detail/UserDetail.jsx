@@ -276,7 +276,7 @@ const UserDetail = () => {
             </div>
             <div className="mb-10 text-[#797F8B]">
               <p className="text-sm">ตำแหน่ง :</p>
-              <div className="px-5 mt-2 flex justify-between items-center">
+              <div className="px-5 mt-2 flex gap-x-[46px] items-center">
                 {Role.map((item, i) => (
                   <div className="flex items-center gap-x-2" key={i}>
                     <input

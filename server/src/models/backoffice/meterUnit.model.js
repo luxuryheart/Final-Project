@@ -40,14 +40,6 @@ const meterUnitSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     }
-    // waterId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Water",
-    // },
-    // electricalId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Electrical",
-    // }
   },
   { timestamps: true }
 );
@@ -81,10 +73,6 @@ const meterPerMonthSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    // floorId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Floor",
-    // },
     dormitoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Dormitory",

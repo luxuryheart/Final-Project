@@ -2,9 +2,7 @@ const CatchAsyncError = require('../../middleware/catchAsyncErrors');
 const { dormitoryModel, floorsModel, waterModel, electricalModel, bankModel } = require('../../models/dormitory/dormitory.model');
 const ErrorHandler = require('../../utils/ErrorHandler');
 const dormitoryService = require('../../service/dormitory/dormitory.service');
-const { userModel } = require('../../models/user.model');
 
-// dormitory create
 const DormitoryCreate = CatchAsyncError(async (req, res, next) => {
     try {
         const data = { 
@@ -25,22 +23,15 @@ const DormitoryCreate = CatchAsyncError(async (req, res, next) => {
         const dormitory = await dormitoryService.DormitoryCreate(data, req.user, res);
         
         const value = [ "คิดตามหน่วยจริง", "เหมาจ่ายรายเดือน" ]
-        //TODO: หาวิธีเพิ่มหน่วย unit เข้าไปตอนสร้างหอให้ได้
-        const unit = [ "หน่วย", "เหมา"]
         await dormitoryService.createWaterPrice(value, dormitory);
         await dormitoryService.createElectricalPrice(value, dormitory);
-
-        // const floors = await dormitoryService.Addfloor(dormitory._id, data.rooms, res);
         await dormitoryService.CreateFloorsAndRooms(dormitory._id, data.rooms, res);
-
-        // const room = await dormitoryService.Addrooms(floors, dormitory._id, res);
 
     } catch (error) {
         return next(new ErrorHandler(error, 500));
     }
 });
 
-// edit rooms
 const EditRoomsAndFloors = CatchAsyncError(async (req, res, next) => {
     try {
 
@@ -51,15 +42,15 @@ const EditRoomsAndFloors = CatchAsyncError(async (req, res, next) => {
             return next(new ErrorHandler("flag or dormitory is required", 400));
         }
 
-        // Add floor
+        // เพิ่มชั้น
         if (flag === "0") {
             dormitoryService.InCreaseFloors(dormitoryId, res)
         }
-        // Add rooms on floor
+        // เพ่ิมห้องในชั้นนั้นๆ
         if (flag === "1") {
             dormitoryService.IncreaseRoom(floorId, res)
         }
-        // Delete rooms on floor
+        // ลบห้องในชั้นนั้นๆ
         if (flag === "2") {
             dormitoryService.DeleteRoom(floorId, roomId, res)
         }
@@ -73,7 +64,6 @@ const EditRoomsAndFloors = CatchAsyncError(async (req, res, next) => {
     }
 })
 
-// price for rooms
 const UpdatePriceForRoom = CatchAsyncError(async(req, res, next) => {
     try {
 
@@ -94,7 +84,6 @@ const UpdatePriceForRoom = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-// water and electrical price 
 const UpdateWaterAndElectricPrice = CatchAsyncError(async(req, res, next) => {
     try {
 
@@ -126,7 +115,6 @@ const UpdateWaterAndElectricPrice = CatchAsyncError(async(req, res, next) => {
             return next(new ErrorHandler("dormitory id not found"))
         }
 
-        // update water
         if (flag === "0") {
             await dormitoryService.UpdateWaterPrice(floorById, roomIds, waterId, res);
         }
@@ -157,7 +145,6 @@ const GetAllRooms = CatchAsyncError(async(req, res, next) => {
     }
 });
 
-// TODO: พึ่งสร้างใหม่
 const GetMeterByDormitoryId = CatchAsyncError(async(req, res, next) => {
     try {
         const dormitoryId = req.params; 
@@ -169,7 +156,6 @@ const GetMeterByDormitoryId = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-// TODO: บัญชีธนาคารสร้างใหม่
 const GetBankByDormitoryId = CatchAsyncError(async(req, res, next) => {
     try {
         const dormitoryId = req.params; 
@@ -208,15 +194,12 @@ const BankAccount = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-// TODO: อัพเดตค่าน้ำค่าไฟ
 const UpdateMeter = CatchAsyncError(async(req, res, next) => {
     try {
         const { flag, id, price } = req.body;
-    
-        // อัพเดตค่าไฟตามไอดี
         if (flag === "1") {
             await dormitoryService.UpdateElectrical(id, price, res);
-        } else if (flag === "2") { // อัพเดตค่าน้ำตามไอดี
+        } else if (flag === "2") { 
             await dormitoryService.UpdateWater(id, price, res);
         }
         
@@ -287,4 +270,13 @@ const GetDormitory = CatchAsyncError(async(req, res, next) => {
     }
 })
 
-module.exports = { GetDormitory, DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId, GetBankByDormitoryId, UpdateMeter, BankAccount, GetDormitoryByUser, GetBankByDormitoryIdForUser, GetDormitoryByID, Booking }
+const Repair = CatchAsyncError(async(req, res, next) => {
+    try {
+        const data = req.body;
+        await dormitoryService.Repair(data, res);
+    } catch (error) {
+        return next(new ErrorHandler(error, 500));
+    }
+})
+
+module.exports = { Repair, GetDormitory, DormitoryCreate, EditRoomsAndFloors, UpdatePriceForRoom, UpdateWaterAndElectricPrice, GetAllRooms, GetMeterByDormitoryId, GetBankByDormitoryId, UpdateMeter, BankAccount, GetDormitoryByUser, GetBankByDormitoryIdForUser, GetDormitoryByID, Booking }

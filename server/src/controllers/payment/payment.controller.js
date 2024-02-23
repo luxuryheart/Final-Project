@@ -14,74 +14,6 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const PostPayment = async (req, res, next) => {
-  try {
-    const { userId, invoice } = req.body;
-
-    const orderId = uuidv4();
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["promptpay"],
-      line_items: [
-        {
-          price_data: {
-            currency: "thb",
-            product_data: {
-              name: invoice.invoiceId,
-            },
-            unit_amount: invoice.price * 100,
-          },
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      success_url: `${process.env.YOUR_DOMAIN}/success/${orderId}`,
-      cancel_url: `${process.env.YOUR_DOMAIN}/cancel`,
-    });
-
-    const orderData = {
-      userId: userId,
-      orderId: orderId,
-      invoiceId: invoice.invoiceId,
-      price: invoice.price,
-      status: session.status,
-      sessionId: session.id,
-      paymentType: "promptpay",
-    };
-
-    const payment = await paymentModel.create(orderData);
-
-    if (payment) {
-      return res.status(200).json({
-        success: true,
-        message: "Payment success",
-        payment,
-        sessionId: session.id
-      });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const GetOrder = async (req, res, next) => {
-  try {
-    const orderId = req.params.id;
-
-    const payment = await paymentModel.findOne({ orderId: orderId });
-
-    if (payment) {
-      return res.status(200).json({
-        success: true,
-        message: "Payment success",
-        payment,
-      });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 const GetPayment = async (req, res, next) => {
     try {
         const payment = await paymentModel.findOneAndUpdate({ invoiceId: req.params.id }, {
@@ -237,4 +169,4 @@ const GetConfig = async (req, res, next) => {
   }
 }
 
-module.exports = { PostPayment, GetOrder, GetPayment, BankTransferPayment, Payment, GetConfig };
+module.exports = { GetPayment, BankTransferPayment, Payment, GetConfig };

@@ -67,10 +67,10 @@ const InvoiceForUser = () => {
                   <button className="btn btn-sm bg-colorBlueDark/40 text-bgColor"><IoReturnUpBack /> กลับ</button>
                 </Link>
                 <div>
-                  <button className="btn btn-sm bg-colorBlueDark text-bgColor">
+                  {/* <button className="btn btn-sm bg-colorBlueDark text-bgColor">
                     <FaPrint />
                     พิมพ์
-                  </button>
+                  </button> */}
                 </div>
               </div>
               <div className="text-end text-xl text-colorDark mt-2">

@@ -10,7 +10,6 @@ const vehicleSchema = new mongoose.Schema({
 const renterDetailSchema = new mongoose.Schema({
     email: {
         type: String,
-        // required: [true, "Email is required"],
         default: "",
     },
     facebook: {
@@ -23,12 +22,10 @@ const renterDetailSchema = new mongoose.Schema({
     },
     educational_or_office: {
         type: String,
-        // required: [true, "Education or Office is required"],
         default: "",
     },
     department: {
         type: String,
-        // required: [true, "Department is required"],
         default: "",
     },
     position: {
@@ -41,17 +38,14 @@ const renterDetailSchema = new mongoose.Schema({
     },
     urgent_tel: {
         type: String,
-        // required: [true, "Telephone is required"],
         default: "",
     },
     relationships: {
         type: String,
-        // required: [true, "Relations is required"],
         default: "",
     },
     tel: {
         type: String,
-        // required: [true, "Telephone is required"],
         default: "",
     },
     vehicle: [
@@ -62,12 +56,10 @@ const renterDetailSchema = new mongoose.Schema({
             },
             carId: {
                 type: String,
-                // required: [true, "carNumber is required"],
                 default: "",
             },
             detail: {
                 type: String,
-                // required: [true, "Detail is required"],
                 default: '',
             },
         }

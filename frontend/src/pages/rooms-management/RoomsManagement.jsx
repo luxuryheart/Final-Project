@@ -96,8 +96,8 @@ const RoomsManagement = ({ setStateManegeRoom }) => {
 
   return (
     <div id="contained" className="container mx-auto">
-      <div className="flex justify-center py-10">
-        <div className="bg-bgForm py-10 px-4 mt-5 w-8/12 lg:w-6/12 xl:w-5/12 drop-shadow-lg rounded-md">
+      <div className="flex justify-center py-5">
+        <div className="bg-bgForm py-6 px-4 mt-5 w-8/12 lg:w-6/12 xl:w-5/12 drop-shadow-lg rounded-md">
           <div className="flex flex-col">
             <div className="overflow-y-scroll overscroll-auto max-h-[60vh] mb-5">
               <div className="flex flex-col gap-y-5 items-center justify-between w-full text-colorDark text-xl">
@@ -138,7 +138,6 @@ const RoomsManagement = ({ setStateManegeRoom }) => {
                                         value={room.name}
                                       />
                                     </td>
-                                    {/* TODO: หลังบ้านทำสถานะก่อนเดี๋ยวมาเพิ่ม */}
                                     <td>
                                       <div className="bg-[#EBF9F1] text-[#1F9254] px-2 py-1 text-xs rounded-xl">
                                         {room.status.name}

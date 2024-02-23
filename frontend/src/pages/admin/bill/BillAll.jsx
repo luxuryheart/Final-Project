@@ -8,10 +8,29 @@ const BillAll = () => {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 7));
   const token = localStorage.getItem("token");
   const { id } = useParams();
+  const [selectedRoom, setSelectedRoom] = useState("");
+  const [status, setStatus] = useState("");
+
+  console.log(status);
 
   const getAllBill = async() => {
     try {
       const res = await axios.get(`/api/v1/backoffice/invoiced-list/${id}?date=${date}`, {
+        headers: {
+          authtoken: `${token}`,
+        },
+      })
+      if (res.data.success) {
+        setBillAll(res.data.invoice)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const filterInVoice = async() => {
+    try {
+      const res = await axios.get(`/api/v1/backoffice/invoiced-filter/${id}?date=${date}&status=${status}`, {
         headers: {
           authtoken: `${token}`,
         },
@@ -35,25 +54,25 @@ const BillAll = () => {
         <div className="px-5 text-colorBlueDark mb-3 text-xl">ค้นหา</div>
         <div className="flex items-center justify-between px-5">
           <div className="flex items-center gap-x-2 ">
-            <select className="select select-bordered w-full max-w-xs select-sm">
+            {/* <select className="select select-bordered w-full max-w-xs select-sm">
               <option disabled selected>
                 ห้องทั้งหมด
               </option>
               <option>ห้อง 101</option>
               <option>ห้อง 102</option>
-            </select>
-            <select className="select select-bordered-primary  w-full max-w-xs select-sm">
+            </select> */}
+            <select className="select select-bordered-primary  w-full max-w-xs select-sm" onChange={(e) => setStatus(e.target.value)}>
               <option disabled selected>
                 สถานะ
               </option>
-              <option>ยังไม่ชำระ</option>
-              <option>ชำระแล้ว</option>
-              <option>กำลังดำเนินการ</option>
+              <option value={"unpaid"}>ยังไม่ชำระ</option>
+              <option value={"paid"}>ชำระแล้ว</option>
+              <option value={"pending"}>กำลังดำเนินการ</option>
             </select>
-            <button className="btn btn-sm bg-colorBlueDark text-bgColor">
+            <button className="btn btn-sm bg-colorBlueDark text-bgColor" onClick={() => filterInVoice()}>
               ค้นหา
             </button>
-            <span className="text-colorBlueDark cursor-pointer hover:underline hover:scale-105 duration-300">
+            <span className="text-colorBlueDark cursor-pointer hover:underline hover:scale-105 duration-300" onClick={() => getAllBill()}>
               รีเซ็ต
             </span>
           </div>

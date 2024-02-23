@@ -26,7 +26,6 @@ const userSchema = new mongoose.Schema({
         },
         gender: {
             type: String,
-            // required: [true, 'gender is required'],
             default: ''
         },
         img: {
@@ -49,14 +48,12 @@ const userSchema = new mongoose.Schema({
     },
     personalId: {
         type: String,
-        // required: [true, "personalId is required"],
         min: 13,
         max: 13,
         default: null,
     },
     tel: {
         type: String,
-        // required: [true, "tel is required"],
         min: 10,
         max: 10,
     },
@@ -69,12 +66,11 @@ const userSchema = new mongoose.Schema({
         ref: 'Role',
         default: null,
     },
-    status:
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'UserStatus',
-            default: null,
-        }
+    status:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'UserStatus',
+        default: null,
+    }
     ,
     dormitory: {
         type: mongoose.Schema.Types.ObjectId,
@@ -92,19 +88,15 @@ const userSchema = new mongoose.Schema({
         },
         province: {
             type: String,
-            // required: [true, "Province is required"],
         },
         district: {
             type: String,
-            // required: [true, "District is required"],
         },
         sub_district: {
             type: String,
-            // required: [true, "Sub-District is required"],
         },
         zipcode: {
             type: String,
-            // required: [true, "Zipcode is required"],
         },
     }
 }, {timestamps: true});

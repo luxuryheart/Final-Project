@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const repairSchema = new mongoose.Schema({
-    // roomId: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Room",
-    // },
     roomName: {
         type: String,
         required: [true, "Room name is required"],

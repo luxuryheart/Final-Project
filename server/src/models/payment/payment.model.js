@@ -34,7 +34,7 @@ const paymentSchema = new mongoose.Schema({
     date: {
         type: String,
         required: [true, "Date is required"],
-        default: Date.now()
+        default: new Date()
     },
     img: {
         type: String,
