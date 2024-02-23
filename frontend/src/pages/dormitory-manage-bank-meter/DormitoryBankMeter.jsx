@@ -22,15 +22,10 @@ const DormitoryBankMeter = ({ setStateManegeBankMeter }) => {
   const recordsPerPage = 3;
   const lastIndex = currentPage * recordsPerPage; // 1 * 3 = 3
   const firstIndex = lastIndex - recordsPerPage; // 3 - 3 = 0
-    
-  // const records = Array.isArray(bankAccount) && bankAccount.length > 0
-  //   ? bankAccount.slice(Math.max(0, firstIndex), Math.min(lastIndex, bankAccount.length))
-  //   : [];
 
   const records = bankAccount.slice(firstIndex, lastIndex);
 
   const totalPages = Math.ceil(bankAccount.length / recordsPerPage);
-  // const numbers = Array.from({ length: totalPages }, (_, i) => i + 1);
   const numbers = [...Array(totalPages + 1).keys()].slice(1);
 
   const getBankAccount = async () => {
@@ -402,7 +397,7 @@ const DormitoryBankMeter = ({ setStateManegeBankMeter }) => {
                       </p>
                     )}
                     <input
-                      type="number" // Changed from "text" to "number"
+                      type="number"
                       placeholder="Type here"
                       className="input input-bordered w-full max-w-xs mb-2"
                       value={meter.price}

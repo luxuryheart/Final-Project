@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-// TODO: ทำฟังก์ชั่น update renter detail
 const RenterDetail = ({ roomId }) => {
   const [renterDetail, setRenterDetail] = useState({
     email: "",

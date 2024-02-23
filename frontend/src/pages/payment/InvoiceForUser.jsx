@@ -3,11 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams } from "react-router-dom";
 import { FaPrint } from "react-icons/fa6";
 import { IoReturnUpBack } from "react-icons/io5";
-const stripe = Stripe("pk_test_51Ok68OGiPTOivo4lR6KXzErE300ae1AAvi0xI5OG9zValZIIwR0K0BHv0Ax5yCvrd7gRXlYm7KE7Mx5hKBrZFl4a00LrvbHRNn")
 import { GiMoneyStack } from "react-icons/gi";
-import { paymentType } from '../../utils/admin/paymentType';
 import PaymentType from "../../components/payment/PaymentType";
-import { loadStripe } from '@stripe/stripe-js';
 
 const InvoiceForUser = () => {
   const [bill, setBill] = useState({});
@@ -15,10 +12,6 @@ const InvoiceForUser = () => {
   const token = localStorage.getItem("token");
   const [paymentTypeOpen, setPaymentTypeOpen] = useState(false);
   const [banks, setBanks] = useState([]);
-  const [stripePromise, setStripePromise] = useState(null);
-  const [stripePromisePrompt, setStripePromisePrompt] = useState(null);
-  const [clientSecret, setClientSecret] = useState("");
-  const [clientSecretPrompt, setClientSecretPrompt] = useState("");
 
   const getBillById = async() => {
     try {
@@ -67,10 +60,6 @@ const InvoiceForUser = () => {
                   <button className="btn btn-sm bg-colorBlueDark/40 text-bgColor"><IoReturnUpBack /> กลับ</button>
                 </Link>
                 <div>
-                  {/* <button className="btn btn-sm bg-colorBlueDark text-bgColor">
-                    <FaPrint />
-                    พิมพ์
-                  </button> */}
                 </div>
               </div>
               <div className="text-end text-xl text-colorDark mt-2">

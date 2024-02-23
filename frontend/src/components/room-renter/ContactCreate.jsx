@@ -27,19 +27,13 @@ const ContactCreate = ({ next, setNext, contactData, setContactData, users }) =>
                 personalId: selectedUser.personalId,
                 tel: selectedUser.tel,
                 address: selectedUser.address?.address + " " + selectedUser.address?.province + " " + selectedUser.address?.district + " " + selectedUser.address?.sub_district + " " + selectedUser.address?.zipcode
-                /* 
-                    TODO: เดี๋ยวจะไปเพิ่มข้อมูล user => ให้มีเบอร์โทร ที่อยู่(อาจจะ) IDCard
-                    IDcard: selectedUser.profile.IDcard,
-                    tel: selectedUser.profile.tel,
-                    address: selectedUser.profile.address,
-                */
             }));
         }
     }
     const currentDate = () => {
         const today = new Date();
         const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 3); // Add 3 days to the current date
+        maxDate.setDate(today.getDate() + 3); 
     
         const formattedToday = today.toISOString().slice(0, 10);
         const formattedMaxDate = maxDate.toISOString().slice(0, 10);
@@ -152,7 +146,6 @@ const ContactCreate = ({ next, setNext, contactData, setContactData, users }) =>
                     <input type="date" placeholder="ว/ด/ป" name='startDate' value={contactData.startDate} onChange={(e) => handleSelectDate(e)} className="input input-bordered w-full max-w-full input-sm" />
                 </div>
                 <div className=''>
-                    {/* TODO: ถ้าเลือกระยะเวลาสัญญาจะคำนวณวันที่สิ้นสุดให้เลย */}
                     <p className='mb-1'>ระยะเวลาสัญญา</p>
                     <select className="select select-bordered w-full max-w-full select-sm" name='durationInMonth' onChange={(e) => handleSelectDate(e)}>
                         <option disabled selected>เลือกระยะเวลา</option>

@@ -63,7 +63,6 @@ const UserHome = ({ setSearchModal, userIndormitory, openBookingModal, roomId, s
         <div className="text-center text-xl">สำหรับผู้เช่า</div>
         <div id="line" className="border-b-2 border-colorBlueDark"></div>
         <div className="mt-3 px-8 overflow-y-scroll max-h-[50vh] xl:mb-8 lg:mb-4">
-          {/* TODO: เดี๋ยวจะกลับมาทำตอนทำระบบจองห้องพักเสร็จ */}
           {renter.length === 0 ? (
             <div className="text-center text-base text-colorBlueGray mb-3">
               ยังไม่มีหอพัก
@@ -86,9 +85,6 @@ const UserHome = ({ setSearchModal, userIndormitory, openBookingModal, roomId, s
                     {renter.renter?.dormitoryId?.address?.zipcode}
                   </div>
                   <div className="flex justify-end items-center gap-x-2 mt-3 xl:mb-9 lg:mb-14">
-                    {/* <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
-                      จัดการห้อง
-                    </button> */}
                     <Link
                       to={
                         (renter.invoice &&

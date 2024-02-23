@@ -9,7 +9,6 @@ import { MdCancel } from "react-icons/md";
 
 const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName, roomModal }) => {
   const [dormitory, setDormitory] = useState({})
-  const [floorOpen, setFloorOpen] = useState(false)
   const [search, setSearch] = useState("");
   
   const { id } = useParams()
@@ -172,15 +171,8 @@ const RoomManagement = ({ setRoomModal, setRoomId, setFloorId, setRoomName, room
             <div className="flex flex-col items-center justify-center text-colorDark tooltip" data-tip="เพิ่มชั้น">
               <IoAddCircleOutline
                 className="h-10 w-10 text-green-800 cursor-pointer hover:text-green-500 duration-300"
-                // onMouseEnter={(e) => setFloorOpen(true)}
-                // onMouseLeave={(e) => setFloorOpen(false)}
                 onClick={increaseFloor}
               />
-              {/* {floorOpen && (
-                <div className="bg-bgForm shadow-lg px-3 py-1 rounded-md text-sm">
-                  เพิ่มชั้น
-                </div>
-              )} */}
             </div>
           </div>
         </div>

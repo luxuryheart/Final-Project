@@ -34,7 +34,6 @@ const HomeNav = ({userDetail, setOpenModal, openModal, setListModal}) => {
                 <div className="font-base">{userDetail?.role?.name}</div>
               </div>
             </div>
-            {/* <FaCircleUser className="h-8 w-8 text-colorDark cursor-pointer shadow-lg" onClick={() => setOpenModal(!openModal)}/> */}
             <div className='flex items-center justify-end'>
               <img src={userDetail.profile?.img === "" ? "https://avataaars.io/?avatarStyle=Circle&topType=LongHairFrida&accessoriesType=Prescription02&facialHairType=Blank&clotheType=ShirtScoopNeck&clotheColor=PastelRed&eyeType=Side&eyebrowType=RaisedExcited&mouthType=Vomit&skinColor=Brown" : userDetail.profile?.img} className="h-12 w-12 text-colorDark cursor-pointer shadow-lg mb-2" onClick={() => setOpenModal(!openModal)}/>
             </div>

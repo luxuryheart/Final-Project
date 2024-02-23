@@ -13,7 +13,6 @@ const DormitoryCreate = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  //address
   const [provinces, setProvinces] = useState([]);
   const [amphures, setAmphures] = useState([]);
   const [tambons, setTambons] = useState([]);
@@ -39,15 +38,10 @@ const DormitoryCreate = () => {
     },
   ]);
   const getAddress = () => {
-    //province
     const uniqueProvinces = [...new Set(Address.map((item) => item.province))];
     setProvinces(uniqueProvinces);
-
-    //amphoe
     const uniqueAmphures = [...new Set(Address.map((item) => item.amphoe))];
     setAmphures(uniqueAmphures);
-
-    //district
     const uniqueDistricts = [...new Set(Address.map((item) => item.district))];
     setTambons(uniqueDistricts);
   };

@@ -109,13 +109,6 @@ const BookingRoom = ({ roomId, setRoomModal }) => {
         selectedUser.profile?.firstname + " " + selectedUser.profile?.lastname
       );
     }
-    {
-      /*
-        TODO: เดี๋ยวกลับมาทำหลังจากเพิ่ม field user แล้ว
-        ที่ต้องทำเพิ่มคือ IDCard, Tel, ที่อยู่
-        setPhone(selectedUser.profile?.tel);
-      */
-    }
   };
 
   const handleChange = (e) => {

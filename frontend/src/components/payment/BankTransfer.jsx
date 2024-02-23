@@ -32,7 +32,6 @@ const BankTransfer = ({ banks, setPaymentTypeOpen, bill }) => {
       })
       if (res.data.success) {
         setPaymentTypeOpen(false)
-        // setTimeout(() => window.location.reload(), 1000)
       }
     } catch (error) {
       console.log(error);

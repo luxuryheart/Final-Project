@@ -17,7 +17,6 @@ const Bill = () => {
     const { id } = useParams();
     const token = localStorage.getItem("token");
     const [date, setDate] = useState(new Date().toISOString().slice(0, 7));
-    // const [date, setDate] = useState("2024-04");
     const [meterUnit, setMeterUnit] = useState({})
     const [electricalMeterUnit, setElectricalMeterUnit] = useState({})
   
@@ -82,9 +81,6 @@ const Bill = () => {
         if (res.length > 0) {
           setFloor(res);
           setFloorId(res[0]._id);
-        //   const floorNames = res
-        //   .filter((floor) => floor._id === floorId)
-        //   console.log(floorNames);
         }
       } catch (error) {
         console.log(error);
@@ -94,7 +90,6 @@ const Bill = () => {
     const handleSelectFloor = async (e) => {
       const selectedFloorId = e.target.value;
       setFloorId(selectedFloorId);
-      // await getFloorFilter(selectedFloorId);
     };
   
     const CreatInvoice = async(e, roomId) => {
@@ -156,9 +151,6 @@ const Bill = () => {
           <div className="text-2xl font-bold mb-5">สร้างใบแจ้งหนี้</div>
           <div id="header-bar" className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-x-5">
-                {/*
-                    TODO: ชื่อชั้นไม่ไดนามิกตามเวลาชั้นเปลี่ยน
-                */}
               <div className="text-base font-semibold">
                 {floor.filter((item) => item._id === floorId).map((selectedFloor) => (
                   `ชั้นที่ ${selectedFloor.name}`
@@ -183,7 +175,6 @@ const Bill = () => {
           {(meterUnit === undefined) || (meterUnit === null) ? (
             <div className="text-center mt-10">
               <p>ยังไม่มีการจดมิเตอร์</p>
-              {/* <button className="btn btn-sm bg-colorBlueDark text-bgColor mt-5" onClick={CreateMeterUnit}>สร้างรายการจดมิเตอร์</button> */}
             </div>
           ) : (
           <div id="table">

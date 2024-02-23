@@ -62,10 +62,6 @@ const ModalRoomPrice = ({ selectRooms, setSelectRooms, setOpenModal, getRooms}) 
                         <p>ค่าเช่าห้อง (บาท/เดือน)</p>
                         <input type="number" name='room' value={rommPrice} placeholder="0.00" className="input input-bordered w-full max-w-xs" onChange={handleChange}/>
                     </div>
-                    {/* <div className='flex justify-between items-center'>
-                        <p>ค่าเช่าห้อง (บาท/เดือน)</p>
-                        <input type="number" name='furniture' value={furniturePrice} placeholder="0.00" className="input input-bordered w-full max-w-xs" onChange={handleChange}/>
-                    </div> */}
                     <div className='text-red-700'>
                         ** ถ้าไม่มีค่าห้องให้กำหนดเป็น 0 **
                     </div>

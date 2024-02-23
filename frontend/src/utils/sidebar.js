@@ -1,13 +1,7 @@
 export const menu = [
-    // {
-    //     name: "Dashboard",
-    //     path: "dashboard",
-    //     // icon: <MdDashboard />,
-    // },
     {
         name: "ข้อมูลห้องพัก",
         path: "room-management",
-        // icon: <PiListDashesFill />,
     },
     {
         name: "แจ้งซ่อม",
@@ -16,37 +10,22 @@ export const menu = [
     {
         name: "จดมิเตอร์",
         path: "water-meter" || "electric-meter",
-        // icon: <FaTachometerAlt />,
     },
     {
         name: "บิล",
         path: "bill",
-        // icon: <RiBillLine />,
     },
     {
         name: "ข้อมูลผู้ใช้",
         path: "renter-management",
-        // icon: <BiSolidUserAccount />,
     },
-    // {
-    //     name: "บัญชี",
-    //     path: "account",
-    //     // icon: <FaMoneyCheckAlt />,
-    // },
     {
         name: "ข้อมูลหอพัก",
         path: "dormitory-setting",
-        // icon: <MdOutlineApartment />,
     },
-    // {
-    //     name: "รายงาน",
-    //     path: "report",
-    //     // icon: <TbReportSearch />,
-    // },
     {
         name: "หน้าหลัก",
         path: "/",
-        // icon: <FaPowerOff />,
     } 
 ]
 
@@ -58,7 +37,6 @@ export const subMenu = [
             {subname: "มิเตอร์ไฟ", path: "electrical-meter"},
         ],
         open: false,
-        // icon: <FaRegCircle />,
     },
     {
         name: "ข้อมูลผู้ใช้",
@@ -67,8 +45,6 @@ export const subMenu = [
             {subname: "ผู้ใช้งานทั่วไป", path: "users-management"},
         ],
         open: false,
-        // path: "/",
-        // icon: <FaRegCircle />,
     },
     {
         name: "บิล",
@@ -77,17 +53,13 @@ export const subMenu = [
             {subname: "บิลทั้งหมด", path: "bill-all"},
         ],
         open: false,
-        // path: "/",
-        // icon: <FaRegCircle />,
     },
     {
         name: "ข้อมูลหอพัก",
         submenu: [
             {subname: "หอพัก", path: "dormitory-setting"},
             {subname: "บัญชีธนาคาร", path: "dormitory-bank"},
-            // {subname: "กำหนดมิเตอร์", path: "dormitory-meter"},
         ],
         open: false,
-        // path: "/",
     }
 ]

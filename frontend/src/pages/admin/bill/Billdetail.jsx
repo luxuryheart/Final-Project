@@ -266,11 +266,10 @@ const Billdetail = () => {
   }, []);
 
   useEffect(() => {
-    // อัปเดต paymentData เมื่อ bill ถูกเซ็ตค่า
     setPaymentData(prevPaymentData => ({
       ...prevPaymentData,
-      grandTotal: bill?.grandTotal || 0, // กำหนดค่า grandTotal จาก bill หรือถ้าไม่มีกำหนดให้เป็น 0
-      userId: bill?.renterDetailId?.userId?._id || "", // กำหนด userId จาก bill หรือถ้าไม่มีกำหนดให้เป็น ""
+      grandTotal: bill?.grandTotal || 0, 
+      userId: bill?.renterDetailId?.userId?._id || "", 
     }));
   }, [bill]);
 

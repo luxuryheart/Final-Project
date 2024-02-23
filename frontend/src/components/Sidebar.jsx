@@ -139,13 +139,6 @@ const Sidebar = () => {
                     return submenu.submenu.map((subSubItem, subSubIndex) => (
                       <div
                         onClick={() =>
-                          // navigate(
-                          //   `${
-                          //     item.path === "meter"
-                          //       ? + "meter/" + subSubItem.path + "/" + id
-                          //       : " "
-                          //   }`
-                          // )
                           navigate(`${subSubItem.path}/${id}`)
                         }
                         className={`px-4 mt-[6px] text-bgColor flex flex-row items-center cursor-pointer hover:bg-bgColor/60 hover:text-colorDark hover:rounded-e-full duration-300 ${

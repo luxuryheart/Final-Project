@@ -32,7 +32,7 @@ const Home = () => {
   const [openProfile, setOpenProfile] = useState(false);
   const [repairModal, setRepairModal] = useState(false);
   const [roomId, setRoomId] = useState("");
-  // สร้างอาร์เรย์เพื่อเก็บจำนวน rooms ของแต่ละ dormitory
+
   const roomsCountPerDormitory = dormitory.map((d) => ({
     dormitoryName: d.name,
     roomsCount: d.floors.reduce(
@@ -232,7 +232,6 @@ const Home = () => {
                                 );
                               }
                             })}
-                            {/* TODO: ใส่ไม่ว่างไปก่อน ไว้ทำค้างชำระมาใส่แทนทีหลัง */}
                             <div>
                               <FaCircle className="inline h-3 w-3 text-red-500" />{" "}
                               ไม่ว่าง {roomOccupied[i].occupiedRoomsCount} ห้อง
@@ -275,7 +274,6 @@ const Home = () => {
                 <div className="text-center text-xl">สำหรับผู้เช่า</div>
                 <div id="line" className="border-b-2 border-colorBlueDark"></div>
                 <div className="mt-3 px-8 overflow-y-scroll max-h-[50vh] xl:mb-8 lg:mb-4">
-                  {/* TODO: เดี๋ยวจะกลับมาทำตอนทำระบบจองห้องพักเสร็จ */}
                   {renter.length === 0 ? (
                     <div className="text-center text-base text-colorBlueGray mb-2">
                       ยังไม่มีหอพัก
@@ -292,9 +290,6 @@ const Home = () => {
                             {renter.renter?.dormitoryId?.address?.address} ต.{renter.renter?.dormitoryId?.address?.sub_district} อ.{renter.renter?.dormitoryId?.address?.district} จ.{renter.renter?.dormitoryId?.address?.province} {renter.renter?.dormitoryId?.address?.zipcode}
                           </div>
                           <div className="flex justify-end items-center gap-x-2 mt-3 xl:mb-9 lg:mb-14">
-                            {/* <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">
-                              จัดการห้อง
-                            </button> */}
                             <Link to={(renter.invoice && renter.invoice?.invoiceStatus === "unpaid" || renter.invoice?.invoiceStatus === "pending") ? `/invoice/${renter.invoice._id}` : ""} className="indicator">
                               {(renter.invoice && renter.invoice?.invoiceStatus === "unpaid" || renter.invoice?.invoiceStatus === "pending") ? <span className="indicator-item badge badge-error text-xs text-bgColor h-5 w-3">1</span> : null}
                               <button className="px-3 py-1 rounded-md bg-colorDark text-bgColor font-extralight text-sm font-serif text-center hover:bg-slate-400 hover:scale-110 duration-300 drop-shadow-lg">

@@ -4,7 +4,6 @@ import { RiPictureInPictureExitFill } from "react-icons/ri";
 
 const ContactDetail = ({ roomId, setRoomModal }) => {
   const [contact, setContact] = useState(null);
-  const [editOpen, setEditOpen] = useState(false);
 
   const getContact = async () => {
     try {
@@ -50,7 +49,6 @@ const ContactDetail = ({ roomId, setRoomModal }) => {
                 <div>รายละเอียดสัญญา</div>
               </div>
               <div className='bg-bgForm border-2 border-colorBlueDark/30 py-3 '>
-                {/* <div className="text-end text-xs px-3 text-yellow-600 hover:underline cursor-pointer duration-300 hover:text-yellow-500 hover:px-3">แก้ไข</div> */}
                 <div className="grid grid-cols-2 items-center">
                   <div className='grid grid-cols-2 items-center mb-2 max-w-[300px]'>
                     <div className='text-colorDark text-sm px-5 font-bold'>ห้อง</div>

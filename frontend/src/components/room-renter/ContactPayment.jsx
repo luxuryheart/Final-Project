@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { paymentType } from '../../utils/admin/paymentType'
-import qrCode from '../../assets/images/qrcode.png'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { GetDormitoryByID } from '../../services/backoffice/dormitorybo';
@@ -155,7 +154,6 @@ const ContactPayment = ({ setNext, contactData, users, list, setList, getRenterD
                     <div id='header' className='flex items-center justify-between mb-1'>
                         <div className='text-lg'>ข้อมูลสัญญา</div>
                         <div className='text-xs text-bgColor flex gap-x-2'>
-                            {/* <button className='bg-bgCyan rounded-md px-1 py-1 hover:bg-slate-400 hover:scale-105 duration-300'>พิมพ์สัญญาเช่า</button> */}
                             <button className='bg-colorBlueDark rounded-md px-1 py-1 hover:bg-slate-400 hover:scale-105 duration-300'
                             onClick={() => setNext(0)}>แก้ไขข้อมูลสัญญา</button>
                         </div>
@@ -238,7 +236,6 @@ const ContactPayment = ({ setNext, contactData, users, list, setList, getRenterD
                                     onClick={() => setPaidStatus(true)}>จ่ายแล้ว</button>
                                 </div>
                                 <div className='text-center mt-3 w-full flex items-center justify-center'>
-                                    {/* <img src={qrCode} alt={qrCode} className='w-[180px] h-[180px]' /> */}
                                     <img src={`https://promptpay.io/${dormitory.promptpay}/${totalPrice}.png`} alt='qrcode-promptpay' className='w-[180px] h-[180px]'/>
                                 </div>
                                 <div className='text-center text-green-600 text-lg'>รวมทั้งหมดราคา {totalPrice} บาท</div>

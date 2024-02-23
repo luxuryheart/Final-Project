@@ -104,9 +104,6 @@ const UsersManagement = () => {
                         <td>{user.tel}</td>
                         <td>{user.role?.name === "user" && "ผู้ใช้"}</td>
                         <td>
-                          {/* <button className={`btn btn-sm ${i % 2 !== 0 ? " bg-base-300" : " "}}`}>
-                            รายละเอียด
-                          </button> */}
                           <button className="btn btn-sm ml-2 tooltip tooltip-warning" data-tip="เลิกเชื่อมต่อ" onClick={() => DisconnectDormitory(user?._id)}>
                             <AiOutlineDisconnect className='text-yellow-700'/>
                           </button>

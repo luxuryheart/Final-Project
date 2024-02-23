@@ -12,7 +12,6 @@ const WaterMeter = () => {
   const { id } = useParams();
   const token = localStorage.getItem("token");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 7));
-  // const [date, setDate] = useState("2024-04");
   const [meterUnit, setMeterUnit] = useState({})
   const [search, setSearch] = useState("");
 
@@ -75,7 +74,6 @@ const WaterMeter = () => {
   const handleSelectFloor = async (e) => {
     const selectedFloorId = e.target.value;
     setFloorId(selectedFloorId);
-    // await getFloorFilter(selectedFloorId);
   };
 
   const handleChange = (e, roomId, waterID) => {

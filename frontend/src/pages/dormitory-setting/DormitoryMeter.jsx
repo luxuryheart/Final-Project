@@ -156,7 +156,7 @@ const DormitoryMeter = () => {  const [meters, setMeters] = useState([]);
                   </p>
                 )}
                 <input
-                  type="number" // Changed from "text" to "number"
+                  type="number"
                   placeholder="Type here"
                   className="input input-bordered w-full max-w-xs mb-2"
                   value={meter.price}

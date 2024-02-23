@@ -13,8 +13,6 @@ const RoomsManagement = ({ setStateManegeRoom }) => {
   const { id } = useParams();
   const token = localStorage.getItem("token");
 
-  // เดี๋ยวมีการเอาไอดีจาก params มาตอนนี้ใช้ useDispatch ชั่วคราว
-
   const [rooms, setRooms] = useState({})
 
   const getRooms = async() => {

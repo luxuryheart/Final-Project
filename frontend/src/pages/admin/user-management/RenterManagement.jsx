@@ -63,7 +63,6 @@ const RenterManagement = () => {
                       <th>อีเมล</th>
                       <th>เบอร์โทร</th>
                       <th>ตำแหน่ง</th>
-                      {/* <th>action</th> */}
                     </tr>
                   </thead>
                   <tbody>
@@ -80,11 +79,6 @@ const RenterManagement = () => {
                         <td>{user.userId?.email}</td>
                         <td>{user.userId?.tel === "" ? "-" : user.userId?.tel}</td>
                         <td>{"ผู้เช่า"}</td>
-                        {/* <td>
-                          <button className="btn btn-sm">
-                            รายละเอียด
-                          </button>
-                        </td> */}
                       </tr>
                     ))}
                   </tbody>

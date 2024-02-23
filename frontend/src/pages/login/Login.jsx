@@ -90,15 +90,6 @@ const Login = () => {
 				required
 			  />
             </div>
-			{/* <div className="flex justify-between items-center w-full mb-20">
-				<div id="remember-me" className="flex items-center gap-x-2 ">
-					<input type="checkbox" checked className="checkbox" />
-					<p className="inline-block text-xs text-colorDark">Remember me</p>
-				</div>
-				<div>
-					<p className="text-colorBlueGray text-xs">ลืมรหัสผ่านใช่มั้ย?</p>
-				</div>
-			</div> */}
 			<div className='mb-20'></div>
 			{/* Submit button */}
 			<button className="btn w-full bg-colorBlueDark text-bgColor font-extralight text-lg font-serif"

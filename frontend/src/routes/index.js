@@ -76,13 +76,6 @@ export const AdminLayout = lazy(
     })
 )
 
-export const Dashboard = lazy(
-  () =>
-    new Promise((resolve) => {
-      setTimeout(() => resolve(import("../pages/admin/dashboard/Dashboard")), 1000);
-    })
-)
-
 export const RoomManagementBo = lazy(
   () =>
     new Promise((resolve) => {
@@ -175,9 +168,3 @@ export const Repair = lazy(
     })
 )
 
-// export const DormitoryMeter = lazy(
-//   () =>
-//     new Promise((resolve) => {
-//       setTimeout(() => resolve(import("../pages/dormitory-setting/DormitoryMeter")), 1000);
-//     })
-// )

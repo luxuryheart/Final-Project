@@ -8,7 +8,6 @@ const BillAll = () => {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 7));
   const token = localStorage.getItem("token");
   const { id } = useParams();
-  const [selectedRoom, setSelectedRoom] = useState("");
   const [status, setStatus] = useState("");
 
   console.log(status);
@@ -54,13 +53,6 @@ const BillAll = () => {
         <div className="px-5 text-colorBlueDark mb-3 text-xl">ค้นหา</div>
         <div className="flex items-center justify-between px-5">
           <div className="flex items-center gap-x-2 ">
-            {/* <select className="select select-bordered w-full max-w-xs select-sm">
-              <option disabled selected>
-                ห้องทั้งหมด
-              </option>
-              <option>ห้อง 101</option>
-              <option>ห้อง 102</option>
-            </select> */}
             <select className="select select-bordered-primary  w-full max-w-xs select-sm" onChange={(e) => setStatus(e.target.value)}>
               <option disabled selected>
                 สถานะ

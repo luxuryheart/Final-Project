@@ -3,7 +3,6 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useLocation,
 } from "react-router-dom";
 import axios from "axios";
 
@@ -31,9 +30,6 @@ import { WaterMeter } from "./routes/index";
 import { ElectricalMeter } from "./routes/index";
 import { MeterLayout } from "./routes/index";
 import Success from "./pages/payment/Success";
-// import {loadStripe} from '@stripe/stripe-js';
-
-// const vite_public_key = "pk_test_51Ok68OGiPTOivo4lR6KXzErE300ae1AAvi0xI5OG9zValZIIwR0K0BHv0Ax5yCvrd7gRXlYm7KE7Mx5hKBrZFl4a00LrvbHRNn";  
 
 function App() {
   const [token, setToken] = useState(null);
@@ -58,7 +54,6 @@ function App() {
     <>
       <div className="bg-bgColor h-screen w-screen max-h-full">
         <Router>
-          {/* <Suspense> */}
           <Suspense
             fallback={
               <div className="flex items-center justify-center h-screen">
@@ -105,7 +100,6 @@ function App() {
                   </AdminRoute>
                 }
               >
-                <Route path="dashboard/:id" element={<Dashboard />} />
                 <Route
                   path="room-management/:id"
                   element={

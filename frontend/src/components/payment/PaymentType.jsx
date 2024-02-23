@@ -9,7 +9,7 @@ import { RxCross2 } from "react-icons/rx";
 import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
 import { Elements } from "@stripe/react-stripe-js";
-const stripe = Stripe("pk_test_51Ok68OGiPTOivo4lR6KXzErE300ae1AAvi0xI5OG9zValZIIwR0K0BHv0Ax5yCvrd7gRXlYm7KE7Mx5hKBrZFl4a00LrvbHRNn")
+const stripe = Stripe("pk_test_ตัวเอง")
 
 
 const PaymentType = ({
@@ -166,17 +166,6 @@ const PaymentType = ({
           </div>
         </div>
       </div>
-      {/* <div className='container mx-auto max-h-screen'>
-        <div className='flex justify-center items-center h-screen'>
-          <div className='bg-bgForm rounded-lg'>
-            {stripePromise && clientSecret && (
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <CreditCard />
-              </Elements>
-            )}
-          </div>
-        </div>  
-      </div> */}
     </div>
   );
 };

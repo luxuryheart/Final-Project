@@ -13,11 +13,8 @@ import ContactDetail from "./room-renter/ContactDetail";
 const RoomModal = ({
   setRoomModal,
   roomId,
-  setRoomId,
   floorId,
-  setFloorId,
   roomName,
-  setRoomName,
 }) => {
   const { id } = useParams();
   const [renter, setRenter] = useState({});
@@ -45,9 +42,6 @@ const RoomModal = ({
     <div className="bg-colorBlueDark/30 z-20 w-screen h-screen absolute">
       <div className="flex items-center justify-center h-full relative">
         <div className="lg:h-[75vh] xl:h-[80vh] lg:w-[100vh] xl:w-[120vh]">
-          {/* {renter === null ? (
-            <div className="bg-colorBlueDark/60 h-80 w-80 absolute top-[247px] cursor-not-allowed"></div>
-          ) : null} */}
           <div className="bg-bgForm text-colorBlueDark shadow-md h-full w-full z-50">
             <div
               id="header"

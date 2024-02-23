@@ -72,7 +72,6 @@ const ElectricalMeter = () => {
   const handleSelectFloor = async (e) => {
     const selectedFloorId = e.target.value;
     setFloorId(selectedFloorId);
-    // await getFloorFilter(selectedFloorId); 
   };
 
   const handleChange = (e, roomId, electricID) => {
@@ -214,7 +213,6 @@ const ElectricalMeter = () => {
                       >
                         <th>{room.roomId.name}</th>
                         <td>{room.roomId.status.name}</td>
-                        {/* TODO: เดี๋ยวมาทำเปลี่ยนค่า value ใหม่หลังจากทำ waterUnit */}
                         <td>
                           <input
                             type="text"
@@ -227,7 +225,6 @@ const ElectricalMeter = () => {
                             }
                           />
                         </td>
-                        {/* TODO: เดี๋ยวมาทำเปลี่ยนค่า value ใหม่หลังจากทำ waterUnit */}
                         <td>
                           <input
                             type="text"
@@ -240,7 +237,6 @@ const ElectricalMeter = () => {
                             }
                           />
                         </td>
-                        {/* TODO: เดี๋ยวมาทำเปลี่ยนค่า value ใหม่หลังจากทำ waterUnit */}
                         <td>
                           {room.consumption}
                         </td>

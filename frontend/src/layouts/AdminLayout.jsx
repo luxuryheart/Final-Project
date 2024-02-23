@@ -3,16 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import RoomModal from "../components/RoomModal";
 
-const AdminLayout = ({
-  roomModal,
-  setRoomModal,
-  roomId,
-  setRoomId,
-  floorId,
-  setFloorId,
-  roomName,
-  setRoomName,
-}) => {
+const AdminLayout = ({roomModal,setRoomModal,roomId,setRoomId,floorId,setFloorId,roomName,setRoomName,}) => {
   return (
     <>
       <div className="h-screen w-screen max-h-screen max-w-screen">
